@@ -4,10 +4,12 @@ nnoremap k gk
 
 nnoremap * *N
 "set t_ut=
-let &t_ti.="\e[1 q"
-let &t_SI.="\e[5 q"
-let &t_EI.="\e[1 q"
-let &t_te.="\e[0 q"
+if has('unix')
+	let &t_ti.="\e[1 q"
+	let &t_SI.="\e[5 q"
+	let &t_EI.="\e[1 q"
+	let &t_te.="\e[0 q"
+endif
 "set shiftwidth=4
 "set softtabstop=4
 "set expandtab
@@ -19,10 +21,9 @@ set guioptions-=T
 set guioptions-=m
 set wildmenu
 set wildmode=longest:full
-"set undodir=D:/Tool/vim74-kaoriya-win64/undo
 syntax enable
 set background=dark
-"set t_Co=256
+set t_Co=256
 set nobackup
 set autoindent
 set nu
@@ -32,14 +33,18 @@ set virtualedit=all
 set switchbuf=useopen
 set matchpairs& matchpairs+=<:>
 
-noremap <silent> <Esc><Esc> :nohlsearch<CR>
+nnoremap <silent> <Esc><Esc> :nohlsearch<CR>
 
 nnoremap <Left> <C-w><<CR>
 nnoremap <Right> <C-w>><CR>
 nnoremap <S-Up> <C-w>-
 nnoremap <S-Down> <C-w>+
 
-"set guifont=Myrica\ M:h12
+cnoremap <C-b> <left>
+cnoremap <C-f> <right>
+if has('win64')
+	set guifont=Myrica\ M:h12
+endif
 set iminsert=0
 
 set laststatus=2
@@ -50,6 +55,8 @@ nnoremap <S-y> y$
 
 " move easy window
 nnoremap <Space>w <C-w>
+
+vnoremap * "zy:let @/ = @z<CR>n
 "}}}
 " setting fold"{{{
 set modeline
@@ -60,7 +67,6 @@ nnoremap <silent> cy ce <C-r>0<ESC>:let@/=@1<CR>:noh<CR>
 vnoremap <silent> cy  c <C-r>0<ESC>:let@/=@1<CR>:noh<CR>
 vnoremap <silent> ciy  ciw <C-r>0<ESC>:let@/=@1<CR>:noh<CR>
 "}}}
-vnoremap * "zy:let @/ = @z<CR>n
 "NeoBundle"{{{
 "************************************************************
 set nocompatible
@@ -91,12 +97,13 @@ NeoBundle 'majutsushi/tagbar'
 NeoBundle 'vim-scripts/zoom.vim'
 NeoBundle 'Lokaltog/vim-easymotion'
 NeoBundle 'vim-scripts/taglist.vim'
-NeoBundle 'itchyny/lightline.vim'
+"NeoBundle 'itchyny/lightline.vim'
 NeoBundle 'thinca/vim-quickrun'
 NeoBundle '5t111111/alt-gtags.vim'
 NeoBundle 'fuenor/qfixgrep'
 NeoBundle 'fuenor/qfixhowm'
 NeoBundle 'junegunn/vim-easy-align'
+NeoBundle 'pebble8888/doxygen_comment_creator'
 NeoBundle 'vim-scripts/gtags.vim'
 NeoBundle 'tomasr/molokai'
 NeoBundle 'vim-scripts/DoxygenToolkit.vim'
@@ -114,17 +121,20 @@ NeoBundle 'lyuts/vim-rtags'
 NeoBundle 't9md/vim-quickhl'
 NeoBundle 'nathanaelkane/vim-indent-guides'
 NeoBundle 'kien/ctrlp.vim'
+NeoBundle 'dhruvasagar/vim-table-mode'
+NeoBundle 'vim-airline/vim-airline'
 
 NeoBundle 'Shougo/neocomplete.vim'
 
 call neobundle#end()
-"}}}
+
 "call smartinput#map_to_trigger('i' '<Plug>(smartinput_BS)',
 "            \                   '<BS>'
 "            \                   '<BS>')
  
 filetype plugin indent on       " restore filetype
 "************************************************************
+"}}}
 "setting unite{{{
 let g:unite_enable_start_insert=1
 
@@ -147,10 +157,14 @@ au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>q
 
 inoremap <buffer> <mm> <Plug> (uite_insert_leave)
 "}}}
-"tagbar configuration"{{{
+" setting tagbar"{{{
+" [Usage]
+" tag jump: p
 let g:tagbar_width = 30
-let g:tagbar_autoshowtag = 1
+let g:tagbar_autoshowtag = 0
+let g:tagbar_expand = 1
 noremap <silent> <F8> :TagbarToggle<CR>
+set statusline=%F%m%r%h%w\%=%{tagbar#currenttag('[%s]','')}\[Pos=%v,%l]\[Len=%L]
 "}}}
 " setting Doxygen"{{{
 noremap ,d :Dox<CR>
@@ -158,7 +172,7 @@ noremap ,d :Dox<CR>
 nnoremap <Space>l gt
 nnoremap <Space>h gT
 "}}}
-" vimfiler"{{{
+" setting vimfiler"{{{
 "************************************************************
 nnoremap <silent><F7> :VimFilerExplorer<CR>
 "}}}
@@ -248,19 +262,28 @@ if expand("%:t") =~ ".*\.cpp"
 	map <C-p> :cp<CR>
 endif
 "}}}
-" howm setting{{{
+"  setting howm{{{
 let QFixHown_Key = 'g'
-let howm_dir = 'c:/howm'
+if has('win64')
+	let howm_dir = 'c:/howm'
+	let howm_fileencoding = 'cp932'
+	let howm_fileformat = 'dos'
+else
+	let howm_dir = '/home/okada-hxf'
+	let howm_fileencoding = 'utf-8'
+	let howm_fileencoding = 'unix'
+endif
 let howm_filename = '%Y/%m/%Y^%m-%d-%H%M%S.txt'
-let howm_fileencoding = 'cp932'
-let howm_fileformat = 'dos'
+let g:QFixHowm_WildCardChapter = 1
+let QFixHowm_FoldingChapterTitle = 1
+let QFixHowm_Folding = 0
 "}}}
 " windows"{{{
 nnoremap <space>a gg<S-v><S-g>
 vnoremap <space>c "*y
 nnoremap <space>v "*p
 "}}}
-" vim-easymotion"{{{
+" setting vim-easymotion"{{{
 " let g:EasyMotion_do_mapping = 0
 " nmap s <Plug>(easymotion-s2)
 " xmap s <Plug>(easymotion-s2)
@@ -278,7 +301,7 @@ nnoremap <space>v "*p
 " let g:EasyMotion_space_jump_first = 1
 " hi EasyMotionTarget guifg=#80a0ff ctermfg=81
 "}}}
-"one line is 80 charactor"{{{
+" setting one line is 80 charactor"{{{
 highlight trun gui=standout cterm=standout
 call matchadd("trun", '.\%>81v')
 
@@ -288,7 +311,7 @@ noremap <Plug> (ToggleColorColumn)
 
 nnoremap cc <Plug> (ToggleColorColumn)
 "}}}
-" neosnippet"{{{
+" setting neosnippet"{{{
 inoremap <C-k> <Plug>(neosnippet_expand_or_jump)
 snoremap <C-k> <Plug>(neosnippet_expand_or_jump)
 xnoremap <C-k> <Plug>(neosnippet_expand_target)
@@ -312,26 +335,26 @@ let g:neosnippet#snippets_directory='~/.vim/bundle/neosnippet-snippets/snippets/
 " setting operator-replace"{{{
 nnoremap _ <Plug>(operator-replace)
 "}}}
-" setting surround"{{{
-"nnoremap sa <Plug>(operator-surround-append-input-in-advance)
-"nnoremap s( <Plug>(operator-surround-append-input-in-advance)(
-"nnoremap sb <Plug>(operator-surround-append-input-in-advance)(
-"nnoremap s{ <Plug>(operator-surround-append-input-in-advance){
-"nnoremap s[ <Plug>(operator-surround-append-input-in-advance)[
-"nnoremap s" <Plug>(operator-surround-append-input-in-advance)"
-"nnoremap s' <Plug>(operator-surround-append-input-in-advance)'
-noremap <silent>sa <Plug>(operator-surround-append)
-noremap <silent>sd <Plug>(operator-surround-delete)
-noremap <silent>sr <Plug>(operator-surround-replace)
+" setting operator-surround"{{{
+" nnoremap sa <Plug>(operator-surround-append-input-in-advance)
+" nnoremap s( <Plug>(operator-surround-append-input-in-advance)(
+" nnoremap sb <Plug>(operator-surround-append-input-in-advance)(
+" nnoremap s{ <Plug>(operator-surround-append-input-in-advance){
+" nnoremap s[ <Plug>(operator-surround-append-input-in-advance)[
+" nnoremap s" <Plug>(operator-surround-append-input-in-advance)"
+" nnoremap s' <Plug>(operator-surround-append-input-in-advance)'
+map <silent>sa <Plug>(operator-surround-append)
+map <silent>sd <Plug>(operator-surround-delete)
+map <silent>sr <Plug>(operator-surround-replace)
 
-nnoremap <silent>sdd <Plug>(operator-surround-delete)<Plug>(textobj-multiblock-a)
-nnoremap <silent>srr <Plug>(operator-surround-replace)<Plug>(textobj-multiblock-a)
+nmap <silent>sdd <Plug>(operator-surround-delete)<Plug>(textobj-multiblock-a)
+nmap <silent>srr <Plug>(operator-surround-replace)<Plug>(textobj-multiblock-a)
 
-nnoremap <silent>sdd <Plug>(operator-surround-delete)<Plug>(textobj-anyblock-a)
-nnoremap <silent>srr <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)
+"map <silent>sdd <Plug>(operator-surround-delete)<Plug>(textobj-anyblock-a)
+"map <silent>srr <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)
 
-nnoremap <silent>sdb <Plug>(operator-surround-delete)<Plug>(textobj-between-a)
-nnoremap <silent>srb <Plug>(operator-surround-replace)<Plug>(textobj-between-a)
+"map <silent>sdb <Plug>(operator-surround-delete)<Plug>(textobj-between-a)
+"map <silent>srb <Plug>(operator-surround-replace)<Plug>(textobj-between-a)
 "}}}
 " setting jedi-vi"{{{
 " autocmd FileType python setlocal omnifunc=jedi#completions
@@ -355,7 +378,11 @@ nnoremap <silent>srb <Plug>(operator-surround-replace)<Plug>(textobj-between-a)
 "}}}
 " setting gundo"{{{
 nnoremap <silent>U :<C-u>GundoToggle<CR>
-set undodir=/root/.vimundo
+if has('win64')
+	set undodir=D:/Tool/vim74-kaoriya-win64/undo
+else
+	set undodir=/root/.vimundo
+endif
 set undofile
 "}}}
 " setting easy align"{{{
@@ -369,8 +396,28 @@ nnoremap ga <Plug>(EasyAlign)
 "}}}
 " setting Align"{{{
 vnoremap <Space>a :Align 
+"}}}
+" setting run cpp"{{{
+function! MyExecuteCpp()
+	:call system("clear")
+	:!rcpp %
+endfunction
 
-nnoremap <F5> :!rcpp % <CR>
+if expand("%:t") =~ ".*\.cpp"
+	nnoremap <F5> :call MyExecuteCpp()<CR>
+endif
+"}}}
+" setting run python"{{{
+function! MyExecutePython()
+python << PYTHON
+PYTHON
+	:!python3 %
+	:!clear
+endfunction
+
+if expand("%:t") =~ ".*\.py"
+	nnoremap <F5> :call MyExecutePython()<CR>
+endif
 "}}}
 " setting rtags"{{{
 " jump define
@@ -383,7 +430,6 @@ nnoremap <F5> :!rcpp % <CR>
 nmap <Space>s <Plug>(quickhl-manual-this)
 nmap <Space>se <Plug>(quickhl-manual-reset)
 "}}}
-colorscheme molokai
 " setting jedi-vim"{{{
 NeoBundleLazy "davidhalter/jedi-vim", {
     \ "autoload": { "filetypes": [ "python", "python3", "djangohtml"] }}
@@ -423,3 +469,36 @@ autocmd FileType python setlocal completeopt-=preview
     endif
 endif
 "}}}
+" setting vim-table-mode"{{{
+" [Usage ]
+" ------------------------------
+" toggle table mode # <S-t>
+" create edge       # |
+" create line       # ||
+" align right       
+"  1. :
+"  2. <>
+"  create table after write param 
+"  1. follwing -> param1, param2
+"  2. :Tableize (in virtual mode)
+"
+nnoremap <silent><S-t> :TableModeToggle<CR>
+vnoremap <silent><S-t> :Tableize<CR>
+let g:table_mode_corner_corner="+"
+let g:table_mode_header_fillchar="="
+
+function! s:isAtStartOfLine(mapping)
+	let text_before_cursor = getline('.')[0 : col('.')-1]
+	let mapping_pattern = '\V' . escape(a:mapping, '\')
+	let co |ttern = '\V' . escape(substitute(&l:cong, '%s.*$', '', ''), '\')
+        return (text_before_cursor =~? '^' . ('\v(' . co |ttern . '\v)?') . '\s*\v' . mapping_pattern . '\v$')
+endfunction
+
+inoreabbrev <expr> <bar><bar>
+		\ <SID>isAtStartOfLine('\|\|') ?
+		\ '<c-o>:TableModeEnable<cr><bar><space><bar><left><left>' : '<bar><bar>'
+inoreabbrev <expr> __
+		\ <SID>isAtStartOfLine('__') ?
+		\ '<c-o>:silent! TableModeDisable<cr>' : '__'
+"}}}
+colorscheme molokai
