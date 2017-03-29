@@ -1,0 +1,162 @@
+[活動まとめ]
+1. 学習テーマ選定{{{
+   - 学習テーマ(学習環境) : OpenAI_gymを選択
+   - テーマ選定理由       : 駆動系データへのdeeplearning適用
+                            具体的には自動運転などが対象
+}}}
+2. 学習テーマにdeeplearningを適用するための準備{{{
+   - OpenAI_gym環境作成{{{
+     OpenAI_gymの環境作成方法を確立し、redmineに起票
+     また、OpenAI gym の結果確認はアニメーションをレンダリング
+     することで確認することも可能なため、その方法も起票
+     具体的な作成方法は以下を参照
+
+     +-------------+--------+
+     | redmine URL | OK/NG? |
+     +=============+========+
+     |             | OK     |
+     +-------------+--------+
+     }}}
+   - OpenAI_gymの理解{{{
+     OpenAI_gymとは? {{{
+     ref: https://www.slideshare.net/takahirokubo7792/python-openai-gym
+     ref: https://gym.openai.com/
+
+     [OpenAI_gymとは?]
+     強化学習を開発評価するためのプラットフォーム
+     OpenAI_gymが提供する操作対象に対して行動(action)を
+     実行し、その結果(操作対象の状態:observation)を
+     フィードバックとし作成した学習アルゴリズムの評価が可能
+
+     CartPole-v0を例に具体的なactionとobservationを説明する。
+     以下のコードは"CartPole-v0"という環境(評価対象のゲーム)
+     を表示するコードである。"CartPole-v0"については以下を参照
+     ------------------------------------------------------
+     ref: https://gym.openai.com/envs/CartPole-v0
+     ref: https://github.com/openai/gym/wiki/CartPole-v0
+     ------------------------------------------------------
+
+       - observation
+       observationとは操作対象(ゲーム内の)の状態
+       CartPole-v0では以下の4つのパラメータがある
+       +-----+----------------------+---------+---------+
+       | Num | Observation          | Min     | Max     |
+       +=====+======================+=========+=========+
+       | 0   | Cart Position        | -2.4    | 2.4     |
+       | 1   | Cart Velocity        | -Inf    | Inf     |
+       | 2   | Pole Angle           | ~-41.8° | ~ 41.8° |
+       | 3   | Pole Velocity At Tip | -Inf    | Inf     |
+       +-----+----------------------+---------+---------+
+
+       - action
+       actionとは操作対象へ実行できる操作である
+       CartPole-v0では以下の2つのactionが実行可能
+       +-----+------------------------+
+       | Num | Action                 |
+       +=====+========================+
+       | 0   | Push cart to the left  |
+       | 1   | Push cart to the right |
+       +-----+------------------------+
+
+
+     [CartPole-v0を環境としたsample_code]
+     以下のコードは"CartPole-v0"でactionをランダムに動作させる
+     コードである。
+     ---------------------------------------------------------------
+     import gym
+     # gymの作成, ゲームは'CartPole-v0'
+     env = gym.make('CartPole-v0')
+     # ゲームをリセット
+     env.reset()
+     for _ in range(1000):
+         # ゲームのレンダリング
+         env.render()
+         # アクションを実行(.sampleのため現状はランダム)
+         # し状態を変化させる
+         env.step(env.action_space.sample()) # take a random action
+         # 終了フラグがたった場合終了
+         if done:
+             print("Episode finished after {} timesteps".format(t+1))
+             break
+     ---------------------------------------------------------------
+
+     [OpenAI gym handson]
+     ref: https://github.com/icoxfog417/techcircle_openai_handson
+     OpenAI_gymのハンズオン, 強化学習も同時に説明されている
+     }}}
+     作成した学習アルゴリズムを
+     OpenAI_gymにどのように適用するかをredmineに起票
+     具体的な作成方法は以下を参照
+     +-------------+--------+
+     | redmine URL | OK/NG? |
+     +=============+========+
+     |             | OK     |
+     +-------------+--------+
+     }}}
+   - 強化学習(Qlearning)の理解{{{
+     Qlearningの実装し、概要をredmineに起票
+     +-------------+--------+
+     | redmine URL | OK/NG? |
+     +=============+========+
+     |             | NG     |
+     +-------------+--------+
+
+     [Qlearningとは?]
+     ref: http://qiita.com/icoxfog417/items/242439ecd1a477ece312
+     迷路をもとにQlearningを説明する
+     学習の目的: 最短ゴールのパスを探索することを
+     学習の対象: Q値(各状態遷移[十字路やT字路]での遷移先[進む方向]を決めるための値)
+
+     1. Q値をランダムに初期化(路地で進む方向をランダムに初期化)
+     2. Q値が最大の方向に進む,あるいは特定のタイミングでランダムに進む
+        (この手法はε-greedyと呼ばれ初期値に依存しないようにするために実施する)
+        学習が進むにつれてランダムに進む回数は減少させる
+     3. Q値の更新
+        進む前のQ値を報酬を使用した式で更新(報酬が高いとQ値も高くなる)
+     4. 報酬の更新
+        行き止まりの場合かつ以下だった場合
+        if   : ゴールだった場合報酬を受け取る
+        else : ゴールでない場合報酬はなし
+
+     [sample_code]
+     ref: redmine URL
+
+     }}}
+   - deepQlearningの理解{{{
+     deepQlearning概要をredmineに起票
+     +-------------+--------+
+     | redmine URL | OK/NG? |
+     +=============+========+
+     |             | NG     |
+     +-------------+--------+
+
+     +-----------+------------------------------------------------------+
+     | reference | http://qiita.com/ashitani/items/bb393e24c20e83e54577 |
+     +===========+======================================================+
+     | explain   | deepQlearningの説明と改良について                    |
+     +-----------+------------------------------------------------------+
+     ref: 
+     }}}
+}}}
+3. 学習テーマに対するdeeplearning適用{{{
+   - OpenAI_gymを学習データとしたdeepQlearningの実装
+     学習データの入力/出力(状態遷移情報)をOpenAI_gymで実装
+     deeplearning(NNと学習部)をchainerで実装
+     Qlearningをpythonで実装
+
+     具体的には以下を参照
+     +-------------+--------+
+     | redmine URL | OK/NG? |
+     +=============+========+
+     |             | NG     |
+     +-------------+--------+
+
+   - 実装コードの解説(redmineに起票)
+     コード解説をredmineに起票
+     +-------------+--------+
+     | redmine URL | OK/NG? |
+     +=============+========+
+     |             | NG     |
+     +-------------+--------+
+     -> 現状はここまでです。(学習データは来期起票予定)
+}}}
