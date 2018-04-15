@@ -1,3 +1,7 @@
+# Usage
+# @reload:call dein#recache_runtimepath()
+# @lazy  :lazy = 1
+
 [[plugins]]
 repo = 'tyru/caw.vim.git'
 hook_add ='''
@@ -49,6 +53,37 @@ repo = 'Shougo/neoyank.vim'
 
 [[plugins]]
 repo = 'kassio/neoterm'
+hook_add = '''
+    let g:neoterm_size = 10
+    let g:neoterm_autoscroll=1
+    let g:neoterm_default_mod=''
+    tnoremap <silent> mm <C-\><C-n><C-w>
+    " nnoremap <silent> <C-e> :TREPLSendLine<CR>j0
+    " vnoremap <silent> <C-e> V:TREPLSendSelection<CR>'>j$
+    nnoremap <silent> <C-e> :call Exec_python()<CR>
+    nnoremap <silent> <C-t> :Ttoggle<CR>
+    nnoremap <silent> <F5> :T pdb %<CR><c-w>ki
+    function! Exec_python()
+        :w!
+        :Tclear
+        :T python %
+    endfunction
+
+    if has('vim_starting')
+        let &t_ti.="\e[1 q"
+        let &t_SI.="\e[5 q"
+        let &t_EI.="\e[1 q"
+        let &t_te.="\e[0 q"
+    endif
+
+    " Useful maps
+    " hide/close terminal
+    nnoremap <silent> ,th :call neoterm#close()<cr>
+    " clear terminal
+    nnoremap <silent> ,tl :call neoterm#clear()<cr>
+    " kills the current job (send a <c-c>)
+    nnoremap <silent> ,tc :call neoterm#kill()<cr>
+'''
 
 [[plugins]]
 repo = 'jonathanfilip/vim-lucius'
@@ -71,14 +106,17 @@ hook_add = '''
 
 [[plugins]]
 repo = 'majutsushi/tagbar'
+lazy = 1
 hook_add = '''
+    noremap <silent> <F8> :TagbarToggle<CR>
+'''
+hook_source = '''
     " [Usage]
     " tag jump: p
     let g:tagbar_width = 30
     let g:tagbar_autoshowtag = 0
     let g:tagbar_expand = 1
     let g:tagbar_left = 1
-    noremap <silent> <F8> :TagbarToggle<CR>
     set statusline=%F%m%r%h%w\%=%{tagbar#currenttag('[%s]','')}\[Pos=%v,%l]\[Len=%L]
 '''
 
@@ -298,11 +336,14 @@ hook_add ='''
     "nnoremap <Space>a :<C-u>DeniteBookmarkAdd<CR>
     "nnoremap <Space>h :<C-u>Denite help<CR>
     " ウィンドウを分割して開く
-    "call denite#custom#map('_', "<C-h>", '<denite:do_action:split>')
-    "call denite#custom#map('insert', "<C-h>", '<denite:do_action:split>')
+    call denite#custom#map('_', "<C-h>", '<denite:do_action:split>')
+    call denite#custom#map('insert', "<C-h>", '<denite:do_action:split>')
     " ウィンドウを縦に分割して開く
-    "call denite#custom#map('_', "<C-v>", '<denite:do_action:vsplit>')
-    "call denite#custom#map('insert', "<C-v>", '<denite:do_action:vsplit>')
+    call denite#custom#map('_', "<C-v>", '<denite:do_action:vsplit>')
+    call denite#custom#map('insert', "<C-v>", '<denite:do_action:vsplit>')
+    " ウィンドウをタブで開く
+    call denite#custom#map('normal', "t", '<denite:do_action:tabopen>')
+    "call denite#custom#map('insert', "t", '<denite:do_action:tabopen>')
     " インサート→ノーマルモード
     call denite#custom#map('insert', "mm", '<denite:enter_mode:normal>')
     if executable('rg')
@@ -334,13 +375,16 @@ hook_post_source = '''
 [[plugins]]
 repo = 'zchee/deoplete-jedi'
 on_ft = 'python'
-hook_add = '''
+# hook_add = '''
+hook_source = '''
     let g:deoplete#sources#jedi#python_path = '/root/anaconda3/bin/python'
 '''
 
 [[plugins]]
 repo = 'davidhalter/jedi-vim'
-hook_add = '''
+lazy=1
+# hook_add = '''
+hook_source = '''
         let g:jedi#auto_initialization = 1
         let g:jedi#auto_vim_configuration = 1
 
@@ -413,4 +457,29 @@ hook_add = '''
 
 [[plugins]]
 repo = 'aliev/vim-compiler-python'
+
+[[plugins]]
+repo = 'hellosputnik/vim-plugin'
+hook_add = '''
+    let g:kite_auto_complete=0
+    let g:kite_tab_complete=1
+    set completeopt-=menu
+    set completeopt+=menuone
+    set completeopt-=longest
+    set completeopt-=preview
+    set completeopt+=noinsert
+    set completeopt-=noselect
+    set completeopt+=preview
+    autocmd CompleteDone * if !pumvisible() | pclose | endif
+    set belloff+=ctrlg
+    nmap <silent> <buffer> gK <Plug>(kite-hover)
+    let g:kite_documentation_continual=1
+    let g:kite_preview_code=1
+    let g:kite_override_sign_column_highlight=0
+    set statusline=%<%f\ %h%m%r%{kite#statusline()}%=%-14.(%l,%c%V%)\ %P
+    set laststatus=2
+'''
+
+[[plugins]]
+repo = 'neovim/python-client'
 

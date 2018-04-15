@@ -116,43 +116,7 @@ nnoremap to :tabonly<CR>
 "}}}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-" settings neoterm "{{{
-let g:neoterm_autoscroll=1
-let g:neoterm_default_mod=''
-tnoremap <silent> mm <C-\><C-n><C-w>
-" nnoremap <silent> <C-e> :TREPLSendLine<CR>j0
-" vnoremap <silent> <C-e> V:TREPLSendSelection<CR>'>j$
-nnoremap <silent> <C-e> :call Exec_python()<CR>
-nnoremap <silent> <C-t> :Ttoggle<CR>
-nnoremap <silent> <F5> :T pdb %<CR><c-w>ki
-function! Exec_python()
-    :w!
-    :Tclear
-    :T python %
-endfunction
-
-if has('vim_starting')
-	let &t_ti.="\e[1 q"
-	let &t_SI.="\e[5 q"
-	let &t_EI.="\e[1 q"
-	let &t_te.="\e[0 q"
-endif
-"}}}
-
-
+" ---------------------------neovim----------------------------
 if !&compatible
       set nocompatible
   endif
@@ -185,13 +149,6 @@ if has('vim_starting') && dein#check_install()
 endif
 
 
-" Useful maps
-" hide/close terminal
-nnoremap <silent> ,th :call neoterm#close()<cr>
-" clear terminal
-nnoremap <silent> ,tl :call neoterm#clear()<cr>
-" kills the current job (send a <c-c>)
-nnoremap <silent> ,tc :call neoterm#kill()<cr>
 
 " Git conds
 command! -nargs=+ Tg :T git <args>
@@ -206,3 +163,5 @@ syntax on
 let g:python_host_prog = substitute(system('which python3.6'), "\n", "", "")
 let g:python3_host_prog = substitute(system('which python3.6'), "\n", "", "")
 
+" settings deoplete
+set completeopt=menuone
