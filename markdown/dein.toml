@@ -3,6 +3,13 @@
 # @lazy  :lazy = 1
 
 [[plugins]]
+repo = 't9md/vim-quickhl'
+hook_add ='''
+    nmap <Space>s <Plug>(quickhl-manual-this)
+    nmap <Space>se <Plug>(quickhl-manual-reset)
+'''
+
+[[plugins]]
 repo = 'tyru/caw.vim.git'
 hook_add ='''
     nmap cc <Plug>(caw:hatpos:toggle)
@@ -56,12 +63,13 @@ repo = 'kassio/neoterm'
 hook_add = '''
     let g:neoterm_size = 10
     let g:neoterm_autoscroll=1
-    let g:neoterm_default_mod=''
-    tnoremap <silent> mm <C-\><C-n><C-w>
+    " terminal position
+    let g:neoterm_default_mod='belowright'
     " nnoremap <silent> <C-e> :TREPLSendLine<CR>j0
     " vnoremap <silent> <C-e> V:TREPLSendSelection<CR>'>j$
-    nnoremap <silent> <C-e> :call Exec_python()<CR>
-    nnoremap <silent> <C-t> :Ttoggle<CR>
+    " nnoremap <silent> <C-e> :call Exec_python()<cr><c-w>ki
+    nnoremap <silent> <C-e> :call Exec_python()<cr>
+    nnoremap <silent> tt :Ttoggle<CR>
     nnoremap <silent> <F5> :T pdb %<CR><c-w>ki
     function! Exec_python()
         :w!
@@ -78,11 +86,13 @@ hook_add = '''
 
     " Useful maps
     " hide/close terminal
-    nnoremap <silent> ,th :call neoterm#close()<cr>
+    nnoremap <silent> ti    :Topen <cr><c-w>ki
+    tnoremap <silent> mm <C-\><C-n><C-w><C-w>
+    "nnoremap <silent> th :call neoterm#close()<cr>
     " clear terminal
-    nnoremap <silent> ,tl :call neoterm#clear()<cr>
+    "nnoremap <silent> tl :call neoterm#clear()<cr>
     " kills the current job (send a <c-c>)
-    nnoremap <silent> ,tc :call neoterm#kill()<cr>
+    "nnoremap <silent> tc :call neoterm#kill()<cr>
 '''
 
 [[plugins]]
@@ -261,7 +271,7 @@ hook_add ='''
 [[plugins]]
 repo = 'kana/vim-operator-replace'
 hook_add ='''
-map t <Plug>(operator-replace)
+map r <Plug>(operator-replace)
 '''
 
 [[plugins]]
@@ -330,8 +340,8 @@ hook_add ='''
     nnoremap <silent> <Space>g :<C-u>DeniteBufferDir -direction=top grep<CR>
     nnoremap <silent> <Space>i :<C-u>Denite line -direction=top<CR>
     nnoremap <silent> ,g       :<C-u>Denite grep -direction=top -no-empty -no-quit -buffer-name=search-buffer<CR>
-    nnoremap <silent> <Space>n :<C-u>Denite -resume -immediately -select=+1<CR>
-    nnoremap <silent> <Space>p :<C-u>Denite -resume -immediately -select=-1<CR>
+    "nnoremap <silent> <Space>n :<C-u>Denite -resume -immediately -select=+1<CR>
+    "nnoremap <silent> <Space>p :<C-u>Denite -resume -immediately -select=-1<CR>
     "nnoremap <Space>d :<C-u>Denite -direction=topleft -cursor-wrap=true bookmark<CR>
     "nnoremap <Space>a :<C-u>DeniteBookmarkAdd<CR>
     "nnoremap <Space>h :<C-u>Denite help<CR>
@@ -348,7 +358,7 @@ hook_add ='''
     call denite#custom#map('insert', "mm", '<denite:enter_mode:normal>')
     if executable('rg')
         " コマンド．file_rec で使うコマンド
-        call denite#custom#var('file_rec', 'command', ['rg', '--files', '--glob', '!.git'])
+        " call denite#custom#var('file_rec', 'command', ['rg', '--files', '--glob', '!.git'])
         " コマンド．grep で使うコマンド
         call denite#custom#var('grep', 'command', ['rg'])
         "call denite#custom#var('grep', 'recursive_opts', )
@@ -384,14 +394,15 @@ hook_source = '''
 repo = 'davidhalter/jedi-vim'
 lazy=1
 # hook_add = '''
+# '''
 hook_source = '''
         let g:jedi#auto_initialization = 1
         let g:jedi#auto_vim_configuration = 1
 
-        nnoremap [jedi] <Nop>
-        xnoremap [jedi] <Nop>
-        nnoremap <Leader>j [jedi]
-        xnoremap <Leader>j [jedi]
+        "nnoremap [jedi] <Ctrl>
+        "xnoremap [jedi] <Ctrl>
+        "nnoremap <Leader>j [jedi]
+        "xnoremap <Leader>j [jedi]
 
         "# 補完キーの設定この場合???Ctrl+Space
         let g:jedi#completions_command = "<C-Space>"
@@ -402,11 +413,14 @@ hook_source = '''
         "# Pydocを表示???Ctrl + k???
         let g:jedi#documentation_command = "<C-k>"
         let g:jedi#rename_command = "[jedi]r"
-        let g:jedi#usages_command = "<C-h>"
+        "let g:jedi#usages_command = "<C-h>"
         let g:jedi#popup_select_first = 0
         " let g:jedi#popup_on_dot = 0
         let g:jedi#show_call_signatures = 1
         let g:jedi#show_call_signatures_delay = 10
+
+        nnoremap <C-j> :call jedi#goto_definitions()<CR>
+        " nnoremap <C-j> :call jedi#goto_definitions()<CR>
 '''
 
 [[plugins]]

@@ -97,9 +97,9 @@ nnoremap <Space>w <C-w>
 vnoremap * "zy:let @/ = @z<CR>n
 " highlighting tail space"{{{
 augroup HighlightTrailingSpaces
-	autocmd!
-	autocmd VimEnter,WinEnter,ColorScheme * highlight TrailingSpaces term=underline guibg=Red ctermbg=Red
-	autocmd VimEnter,WinEnter * match TrailingSpaces /\s\+$/
+	" autocmd!
+	" autocmd VimEnter,WinEnter,ColorScheme * highlight TrailingSpaces term=underline guibg=Red ctermbg=Red
+	" autocmd VimEnter,WinEnter * match TrailingSpaces /\s\+$/
 augroup END
 "}}}
 nnoremap <S-s> :%s///g<C-e><left><left><left>
@@ -165,3 +165,20 @@ let g:python3_host_prog = substitute(system('which python3.6'), "\n", "", "")
 
 " settings deoplete
 set completeopt=menuone
+
+
+" settings jedi
+" let g:jedi#completions_command = "<C-Space>"
+" let g:jedi#rename_command = "[jedi]r"
+" let g:jedi#popup_select_first = 0
+" let g:jedi#popup_on_dot = 0
+" let g:jedi#show_call_signatures = 1
+" let g:jedi#show_call_signatures_delay = 10
+nnoremap <C-g> :call jedi#goto_assignments()<CR>
+nnoremap <C-k> :call jedi#show_documentation()<CR>
+nnoremap <C-u> :call jedi#usages()<CR>
+nnoremap <C-j> :call jedi#goto_definitions()<CR>
+
+" settings quickfix
+nnoremap <Space>p :cp<cr>
+nnoremap <Space>n :cn<cr>
