@@ -4,9 +4,9 @@ nnoremap ,j <C-w>J
 nnoremap ,k <C-w>K
 nnoremap ,h <C-w>H
 " setting open vimrc "{{{
-command VI :tabnew /root/.config/nvim/init.vim
-command DE :tabnew /root/.config/nvim/dein.toml
-command SO :so /root/.config/nvim/init.vim
+command VI :tabnew ~/.config/nvim/init.vim
+command DE :tabnew ~/.config/nvim/dein.toml
+command SO :so ~/.config/nvim/init.vim
 "}}}
 " setting encoding"{{{
 set encoding=utf-8
@@ -103,7 +103,6 @@ augroup HighlightTrailingSpaces
 	" autocmd VimEnter,WinEnter * match TrailingSpaces /\s\+$/
 augroup END
 "}}}
-nnoremap <S-s> :%s///g<C-e><left><left><left>
 " set lines=53
 " set columns=97
 " winpos -15 0
@@ -162,7 +161,8 @@ command! -nargs=+ Tg :T git <args>
 set background=dark
 set t_Co=256
 " colorscheme lucius
-colorscheme tender
+" colorscheme tender
+colorscheme iceberg
 " colorscheme dracula
 syntax on
 "}}}
@@ -655,3 +655,4 @@ endfunction
 " vim:set et sts=2 sw=2:
 "}}}
 autocmd BufNewFile *.py 0r $HOME/.config/nvim/template/python/aapf_dev.py
+
