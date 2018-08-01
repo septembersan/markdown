@@ -20,12 +20,16 @@ hook_add ='''
     let g:airline#extensions#whitespace#mixed_indent_algo = 1
     let g:airline#extensions#tabline#buffer_idx_mode = 1
     let g:airline#extensions#ale#enabled = 1
+    let g:airline#extensions#ale#error_symbol = 'E:'
+    let g:airline#extensions#ale#warning_symbol = 'W:'
     " let g:airline_theme = 'dracula'
     " let g:airline_theme = 'iceberg'
     let g:airline_theme = 'tomorrow'
+    " let g:airline_theme = 'breezy'
     let g:airline#extensions#tabline#enabled = 1
     let g:airline#extensions#tabline#show_buffers = 0
     let g:airline#extensions#tabline#tab_nr_type = 1
+    let g:airline#extensions#virtualenv#enabled = 1
     let g:airline#extensions#tabline#fnamemod = ':t'
     " let g:airline_left_sep='>'
 '''
@@ -60,16 +64,15 @@ hook_add = '''
     let g:neoterm_autoscroll=1
     " terminal position
     let g:neoterm_default_mod='belowright'
-    " nnoremap <silent> <C-e> :TREPLSendLine<CR>j0
-    " vnoremap <silent> <C-e> V:TREPLSendSelection<CR>'>j$
-    " nnoremap <silent> <C-e> :call Exec_python()<cr><c-w>ki
-    nnoremap <silent> <C-e> :call Exec_python()<cr>
+    nnoremap <silent> <C-e><C-e> :TREPLSendLine<CR>j0
+    vnoremap <silent> <C-e><C-e> V:TREPLSendSelection<CR>'>j
+    nnoremap <silent> <C-e><C-f> :call Exec_python()<cr>
     nnoremap <silent> tt :Ttoggle<CR>
     nnoremap <silent> <F5> :T pdb %<CR><c-w>ki
     function! Exec_python()
         :w!
         :Tclear
-        :T python %
+        :T python3.6 %
     endfunction
 
     if has('vim_starting')
@@ -81,12 +84,12 @@ hook_add = '''
 
     " Useful maps
     " hide/close terminal
-    nnoremap <silent> <C-t>    :Topen <cr><c-w>ji
-    "nnoremap <silent> th :call neoterm#close()<cr>
+    nnoremap <silent> ti    :Topen <cr><c-w>ji
+    " kills the current job (send a <c-c>)
+    nnoremap <silent> tk :Tkill<cr>
+    nnoremap <silent> tc :Tclose<cr>
     " clear terminal
     "nnoremap <silent> tl :call neoterm#clear()<cr>
-    " kills the current job (send a <c-c>)
-    "nnoremap <silent> tc :call neoterm#kill()<cr>
 '''
 
 [[plugins]]
@@ -100,6 +103,9 @@ repo = 'cocopon/iceberg.vim'
 
 [[plugins]]
 repo = 'jacoborus/tender.vim'
+
+[[plugins]]
+repo = 'fneu/breezy'
 
 [[plugins]]
 repo = 'Shougo/neomru.vim'
@@ -225,6 +231,7 @@ hook_add ='''
     inoremap <C-k> <Plug>(neosnippet_expand_or_jump)
     snoremap <C-k> <Plug>(neosnippet_expand_or_jump)
     xnoremap <C-k> <Plug>(neosnippet_expand_target)
+    let g:neosnippet#snippets_directory='~/home/aapfuser/.cache/neosnippet/my'
 '''
 
 [[plugins]]
@@ -244,15 +251,6 @@ hook_add ='''
 '''
 
 [[plugins]]
-repo = 'Shougo/neosnippet.vim'
-hook_add ='''
-inoremap <C-k> <Plug>(neosnippet_expand_or_jump)
-snoremap <C-k> <Plug>(neosnippet_expand_or_jump)
-xnoremap <C-k> <Plug>(neosnippet_expand_target)
-let g:neosnippet#snippets_directory='‾/.vim/bundle/neosnippet-snippets/snippets/,‾/.vim/snippets'
-'''
-
-[[plugins]]
 repo = 'Shougo/neosnippet-snippets'
 hook_add ='''
 '''
@@ -265,7 +263,7 @@ hook_add ='''
 [[plugins]]
 repo = 'kana/vim-operator-replace'
 hook_add ='''
-map t <Plug>(operator-replace)
+map R <Plug>(operator-replace)
 '''
 
 [[plugins]]
@@ -335,7 +333,7 @@ hook_add ='''
     " nmap <Leader>f [Denite]
 
     nnoremap <silent> <Space>o :<C-u>Denite -direction=top file_mru<CR>
-    nnoremap <silent> <Space>b :<C-u>Denite -direction=top buffer<CR>
+    " nnoremap <silent> <Space>b :<C-u>Denite -direction=top buffer<CR>
     nnoremap <silent> <Space>f :<C-u>DeniteBufferDir -direction=top file_rec<CR>
     nnoremap <silent> <Space>g :<C-u>DeniteBufferDir -direction=top grep<CR>
     nnoremap <silent> <Space>i :<C-u>Denite line -direction=top<CR>
@@ -403,10 +401,21 @@ hook_source = '''
         "# 変数の宣言場所へジャンプ???Ctrl + g)
         let g:jedi#goto_assignments_command = "<C-g>"
         "# クラス???関数定義にジャンプ???Gtrl + d???
-        let g:jedi#goto_definitions_command = "<C-j>"
+        " let g:jedi#goto_definitions_command = "<C-j>"
+        nnoremap <C-j><C-j> :call jedi#goto_definitions()<cr>
+        nnoremap <C-j>s :call Jedi_my_setting_sp()<cr>
+        nnoremap <C-j>t :call Jedi_my_setting_tab()<cr>
+        function! Jedi_my_setting_sp()
+            :vs
+            :call jedi#goto_definitions()
+        endfunction
+        function! Jedi_my_setting_tab()
+            :tab sp
+            :call jedi#goto_definitions()
+        endfunction
         "# Pydocを表示???Ctrl + k???
-        let g:jedi#documentation_command = "<C-k>"
-        let g:jedi#usages_command = "<C-h>"
+        " let g:jedi#documentation_command = "<C-k>"
+        let g:jedi#usages_command = "<C-k>"
         let g:jedi#popup_select_first = 0
         " let g:jedi#popup_on_dot = 0
         let g:jedi#show_call_signatures = 1
@@ -414,6 +423,8 @@ hook_source = '''
 
         " nnoremap <silent><C-j> :call jedi#goto_definitions()<CR>
         " nnoremap <silent><C-h> :call jedi#usages_command()<CR>
+        nnoremap <silent><C-n> :cnext<cr>
+        nnoremap <silent><C-p> :cprev<cr>
 '''
 
 [[plugins]]
@@ -427,7 +438,7 @@ hook_add = '''
     let g:ale_lint_on_save = 1
     let g:ale_lint_on_text_changed = 0
     let g:ale_statusline_format = ['x %d', '? %d', 'o ok']
-    let g:ale_linters = { 'python': ['flake8'], }
+    let g:ale_linters = { 'python3.6': ['flake8'], }
 
     nmap [ale] <Nop>
     map <C-k> [ale]
@@ -510,11 +521,11 @@ repo = 'neovim/python-client'
 repo = 'ozelentok/denite-gtags'
 on_ft = 'python'
 hook_add = '''
-    autocmd FileType python call s:denite_gtags_settings()
-    function! s:denite_gtags_settings() abort
-        nmap <C-j> :DeniteCursorWord -buffer-name=gtags_def gtags_def<cr>
-        nmap <C-h> :DeniteCursorWord -buffer-name=gtags_ref gtags_ref<cr>
-    endfunction
+    " autocmd FileType python call s:denite_gtags_settings()
+    " function! s:denite_gtags_settings() abort
+    "     nmap <C-j> :DeniteCursorWord -buffer-name=gtags_def gtags_def<cr>
+    "     nmap <C-h> :DeniteCursorWord -buffer-name=gtags_ref gtags_ref<cr>
+    " endfunction
 '''
 
 # [[plugins]]
@@ -564,7 +575,8 @@ hook_add ='''
     " 現在のディレクトリ直下の .vimsessions/ を取得
     let s:local_session_directory = '~/.config/nvim/sessions'
     " session保存ディレクトリをそのディレクトリの設定
-    let g:session_directory = s:local_session_directory
+    " let g:session_directory = s:local_session_directory
+    let g:session_directory = "~/.cache/dein/repos/github.com/xolox"
     " vim終了時に自動保存
     let g:session_autosave = 'yes'
     " 引数なしでvimを起動した時にsession保存ディレクトリのdefault.vimを開く
@@ -641,8 +653,31 @@ repo = 'Shougo/unite.vim'
 depends = ['vimproc.vim']
 hook_add ='''
     nnoremap <Space>d :<C-u>Unite -default-action=vimfiler directory directory_mru<cr>
-    autocmd FileType unite nmap <silent><buffer><Space> <NOP>
+    " autocmd FileType unite nmap <silent><buffer><Space> <NOP>
     autocmd FileType unite nmap <silent><buffer><expr> f unite#do_action('vimfiler')
+
+    let g:unite_enable_start_insert=1
+    nnoremap <silent> <Space>ub :<C-u>Unite buffer<CR>
+    nnoremap <silent> <Space>uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+    nnoremap <silent> <Space>ur :<C-u>Unite file_rec<CR>
+    nnoremap <silent> <Space>uo :<C-u>Unite file_mru<CR>
+    nnoremap <silent> <Space>um :<C-u>Unite vim_bookmarks<CR>
+    nnoremap <silent> <Space>uu :<C-u>Unite buffer file_mru<CR>
+    nnoremap <silent> <Space>uy :<C-u>Unite history/yank<CR>
+    nnoremap <silent> <Space>b :<C-u>Unite bookmark<CR>
+    "nnoremap <silent> <Space>d :<C-u>UniteWithBufferDir -buffer-name=files buffer file_mru bookmark file<CR>
+    "au FileType unite nnoremap <silent> <buffer> <expr> <C-h> unite#do_action('split')
+    "au FileType unite inoremap <silent> <buffer> <expr> <C-h> unite#do_action('split')
+    au FileType unite nnoremap <silent> <buffer> <expr> <C-v> unite#do_action('vsplit')
+    au FileType unite nnoremap <silent> <buffer> <expr> l unite#do_action('default')
+    "au FileType unite inoremap <silent> <buffer> <expr> <C-v> unite#do_action('vsplit')
+    au FileType unite nnoremap <silent> <buffer> <expr> <Space>t unite#do_action('tabopen')
+    "au FileType unite inoremap <silent> <buffer> <expr> <Space>t unite#do_action('tabopen')
+    au FileType unite nnoremap <silent> <buffer> <ESC><ESC> q
+    au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>q
+    
+    inoremap <buffer> <mm> <Plug> (uite_insert_leave)
+
     " autocmd FileType unite nmap <silent><buffer><expr> f unite#do_action('vimfiler')
     " let g:unite_source_find_default_opts = '-type d'
 
@@ -663,7 +698,7 @@ depends = 'unite.vim'
 hook_add ='''
     let g:vimfiler_max_directories_history = 100
     autocmd VimEnter * VimFilerBufferDir -split -simple -no-quit -winwidth=30 -toggle -no-focus -auto-cd
-    nnoremap <silent> <Space>e :VimFilerBufferDir -split -simple -winwidth=30 -no-quit -toggle -auto-cd<cr>
+    nnoremap <silent> <Space>e :VimFilerBufferDir -split -simple -no-quit -winwidth=30 -toggle -auto-cd<cr>
     function! Vimfiler_mysplit()
         wincmd l
         vsplit
@@ -713,4 +748,16 @@ hook_add ='''
         nmap <silent><buffer> t O
         nmap <silent><buffer> v s
     endfunction
+'''
+
+[[plugins]]
+repo = 'plytophogy/vim-virtualenv' 
+hook_add ='''
+    nnoremap <F7> :VirtualEnvActivate 
+    nnoremap <F6> :VirtualEnvDeactivate<cr>
+'''
+
+[[plugins]]
+repo = 'mzlogin/vim-markdown-toc' 
+hook_add ='''
 '''

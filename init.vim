@@ -106,13 +106,18 @@ augroup END
 " set lines=53
 " set columns=97
 " winpos -15 0
-" set autochdir
+set autochdir
 set iminsert=0
 set imsearch=-1
 nnoremap <Space>l gt
 nnoremap <Space>h gT
 nnoremap tn :tabnew<CR>
 nnoremap to :tabonly<CR>
+nnoremap <Space>x :call My_tabclose()<CR>
+function! My_tabclose()
+  :tabclose
+  :tabprevious
+endfunction
 "}}}
 " setting fold{{{
 set modeline
@@ -158,12 +163,15 @@ endif
 command! -nargs=+ Tg :T git <args>
 
 "set termguicolors
-set background=dark
+" set background=dark
+set background=light
 set t_Co=256
 " colorscheme lucius
 " colorscheme tender
 colorscheme iceberg
+" colorscheme breezy
 " colorscheme dracula
+" set termguicolors
 syntax on
 "}}}
 let g:python_host_prog = substitute(system('which python3.6'), "\n", "", "")
@@ -185,15 +193,15 @@ set completeopt=menuone
 " nnoremap <C-j> :call jedi#goto_definitions()<CR>
 "}}}
 nnoremap <C-k> :DeniteCursorWord -buffer-name=gtags_ref gtags_ref<cr>
-nnoremap <F6> :call Exec_gtags()<cr>
-function! Exec_gtags()
-    :ClearGTAGS
-    :GenGTAGS
-endfunction
+" nnoremap <F6> :call Exec_gtags()<cr>
+" function! Exec_gtags()
+"     :ClearGTAGS
+"     :GenGTAGS
+" endfunction
 " settings quickfix{{{
 nnoremap <Space>p :cp<cr>
 nnoremap <Space>n :cn<cr>
-tnoremap <silent> mm <c-\><c-n><c-w><c-w>
+tnoremap <silent> mm <c-\><c-n><c-w>p
 "}}}
 " settings dev env{{{
 nnoremap <silent> <F9> :call Display_DevEnv_Toggle()<cr>
