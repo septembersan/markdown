@@ -72,6 +72,7 @@ hook_add = '''
     function! Exec_python()
         :w!
         :Tclear
+        :Topen
         :T python3.6 %
     endfunction
 
@@ -121,7 +122,8 @@ hook_add = '''
 repo = 'majutsushi/tagbar'
 lazy = 1
 hook_add = '''
-    noremap <silent> <F8> :TagbarToggle<CR>
+    nnoremap <silent> <F8> :TagbarToggle<CR>
+    nnoremap <Space>t :TagbarOpenAutoClose<CR>
 '''
 hook_source = '''
     " [Usage]
@@ -335,7 +337,7 @@ hook_add ='''
     nnoremap <silent> <Space>o :<C-u>Denite -direction=top file_mru<CR>
     " nnoremap <silent> <Space>b :<C-u>Denite -direction=top buffer<CR>
     nnoremap <silent> <Space>f :<C-u>DeniteBufferDir -direction=top file_rec<CR>
-    nnoremap <silent> <Space>g :<C-u>DeniteBufferDir -direction=top grep<CR>
+    " nnoremap <silent> <Space>g :<C-u>DeniteBufferDir -direction=top grep<CR>
     nnoremap <silent> <Space>i :<C-u>Denite line -direction=top<CR>
     nnoremap <silent> ,g       :<C-u>Denite grep -direction=top -no-empty -no-quit -buffer-name=search-buffer<CR>
     "nnoremap <silent> <Space>n :<C-u>Denite -resume -immediately -select=+1<CR>
@@ -399,7 +401,7 @@ hook_source = '''
         "# 補完キーの設定この場合???Ctrl+Space
         let g:jedi#completions_command = "<C-Space>"
         "# 変数の宣言場所へジャンプ???Ctrl + g)
-        let g:jedi#goto_assignments_command = "<C-g>"
+        " let g:jedi#goto_assignments_command = "<C-g>"
         "# クラス???関数定義にジャンプ???Gtrl + d???
         " let g:jedi#goto_definitions_command = "<C-j>"
         nnoremap <C-j><C-j> :call jedi#goto_definitions()<cr>
@@ -582,7 +584,7 @@ hook_add ='''
     " 引数なしでvimを起動した時にsession保存ディレクトリのdefault.vimを開く
     "let g:session_autoload = 'yes'
     " 5分間に1回自動保存
-    let g:session_autosave_periodic = 5
+    " let g:session_autosave_periodic = 5
     unlet s:local_session_directory
     let g:session_autoload = 'no'
 '''
@@ -627,7 +629,7 @@ hook_add ='''
     "     :Pytest session
     " endfunction
     nnoremap <silent> tps :Pytest session<cr>
-    nnoremap <silent> tpj :Pytest file<cr>
+    nnoremap <silent> tpj :call My_python_file()<cr>
     nnoremap <silent> tpc :Pytest class<cr>
     nnoremap <silent> tpf :Pytest function<cr>
     nnoremap <silent> tpe :Pytest fails<cr>
@@ -635,6 +637,10 @@ hook_add ='''
     nnoremap <silent> tpp :Pytest previous<cr>
     nnoremap <silent> tpd :Pytest file --pdb<cr>
     nnoremap <silent> tpo :call Create_pytest_file()<cr>
+    function! My_python_file()
+        :w
+        :Pytest file
+    endfunction
     function! Create_pytest_file()
         :tabedit ‾/hiroomi.py
     endfunction
@@ -664,19 +670,22 @@ hook_add ='''
     nnoremap <silent> <Space>um :<C-u>Unite vim_bookmarks<CR>
     nnoremap <silent> <Space>uu :<C-u>Unite buffer file_mru<CR>
     nnoremap <silent> <Space>uy :<C-u>Unite history/yank<CR>
-    nnoremap <silent> <Space>b :<C-u>Unite bookmark<CR>
+    nnoremap <silent> <Space>b  :<C-u>Unite bookmark<CR>
+    nnoremap <silent> <Space>r  :<C-u>Unite vimfiler/history<CR>
     "nnoremap <silent> <Space>d :<C-u>UniteWithBufferDir -buffer-name=files buffer file_mru bookmark file<CR>
     "au FileType unite nnoremap <silent> <buffer> <expr> <C-h> unite#do_action('split')
     "au FileType unite inoremap <silent> <buffer> <expr> <C-h> unite#do_action('split')
     au FileType unite nnoremap <silent> <buffer> <expr> <C-v> unite#do_action('vsplit')
     au FileType unite nnoremap <silent> <buffer> <expr> l unite#do_action('default')
     "au FileType unite inoremap <silent> <buffer> <expr> <C-v> unite#do_action('vsplit')
-    au FileType unite nnoremap <silent> <buffer> <expr> <Space>t unite#do_action('tabopen')
-    "au FileType unite inoremap <silent> <buffer> <expr> <Space>t unite#do_action('tabopen')
+    au FileType unite nnoremap <silent> <buffer> <expr> t unite#do_action('tabopen')
+    "au FileType unite inoremap <silent> <buffer> <expr> t unite#do_action('tabopen')
     au FileType unite nnoremap <silent> <buffer> <ESC><ESC> q
     au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>q
     
     inoremap <buffer> <mm> <Plug> (uite_insert_leave)
+    " nnoremap <silent> <buffer> <expr> <C-q> <Plug> (unite_exit)
+    " inoremap <silent> <buffer> <expr> <C-q> <Plug> (unite_exit)
 
     " autocmd FileType unite nmap <silent><buffer><expr> f unite#do_action('vimfiler')
     " let g:unite_source_find_default_opts = '-type d'
@@ -728,6 +737,16 @@ hook_add ='''
 [[plugins]]
 repo = 'tpope/vim-fugitive' 
 hook_add ='''
+    nnoremap <silent> <Space>gb :Gblame<cr>
+    nnoremap <silent> <Space>gd :Gdiff<cr>
+    nnoremap <silent> <Space>gs :Gstatus<cr>
+    nnoremap <silent> <Space>gr :Gread<cr>
+    nnoremap <silent> <Space>gc :Gcd<cr>
+    nnoremap <Space>gg :call My_Ggrep()<cr>
+    function! My_Ggrep()
+        :Gcd
+        call feedkeys(",g")
+    endfunction
 '''
 
 [[plugins]]
@@ -740,7 +759,7 @@ repo = 'gregsexton/gitv'
 hook_add ='''
     " Frequently cmd
     " ------------------------
-    " :Gitv! -> D (diff)
+    " :Gitv! -> D (diff) # compare file(between HEAD and select commit)
     autocmd FileType git call s:gitv_my_settings()
     function! s:gitv_my_settings()
         " set statusline+=%{fugitive#statusline()}

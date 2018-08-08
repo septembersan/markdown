@@ -113,7 +113,8 @@ nnoremap <Space>l gt
 nnoremap <Space>h gT
 nnoremap tn :tabnew<CR>
 nnoremap to :tabonly<CR>
-nnoremap <Space>x :call My_tabclose()<CR>
+nnoremap tp :tab sp<CR>
+nnoremap <Space>q :call My_tabclose()<CR>
 function! My_tabclose()
   :tabclose
   :tabprevious
