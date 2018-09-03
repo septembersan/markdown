@@ -61,19 +61,41 @@ repo = 'Shougo/neoyank.vim'
 repo = 'kassio/neoterm'
 hook_add = '''
     let g:neoterm_size = 10
-    let g:neoterm_autoscroll=1
+    let g:neoterm_autoscroll =1
+    let g:neoterm_autoinsert = 1
     " terminal position
     let g:neoterm_default_mod='belowright'
     nnoremap <silent> <C-e><C-e> :TREPLSendLine<CR>j0
     vnoremap <silent> <C-e><C-e> V:TREPLSendSelection<CR>'>j
     nnoremap <silent> <C-e><C-f> :call Exec_python()<cr>
-    nnoremap <silent> tt :Ttoggle<CR>
+    nnoremap <silent> ttg :Ttoggle<CR>
+    nnoremap <silent> ttn :Tnew<CR>
+    nnoremap <silent> ttt :call My_New_Terminal_Tab()<CR>
+    nnoremap <silent> tts :call My_New_Terminal_VSplit()<cr>
     nnoremap <silent> <F5> :T pdb %<CR><c-w>ki
+    function! My_New_Terminal_Tab()
+        " let g:neoterm_fixedsize = winfixheight
+        let g:neoterm_size = winheight(0) - 10
+        tabnew
+        Tnew
+        let g:neoterm_size = 10
+    endfunction
+
+    function! My_New_Terminal_VSplit()
+        " let g:neoterm_fixedsize = winfixheight
+        let g:neoterm_size = winwidth(0) / 2
+        vertical Tnew
+        " wincmd h
+        " call feedkeys("i")
+        let g:neoterm_size = 10
+    endfunction
+
     function! Exec_python()
         :w!
+        let g:neoterm_autoinsert = 0
         :Tclear
-        :Topen
         :T python3.6 %
+        let g:neoterm_autoinsert = 1
     endfunction
 
     if has('vim_starting')
@@ -85,7 +107,7 @@ hook_add = '''
 
     " Useful maps
     " hide/close terminal
-    nnoremap <silent> ti    :Topen <cr><c-w>ji
+    nnoremap <silent> ti    :Topen<cr>
     " kills the current job (send a <c-c>)
     nnoremap <silent> tk :Tkill<cr>
     nnoremap <silent> tc :Tclose<cr>
@@ -176,28 +198,28 @@ repo = 'fuenor/qfixgrep'
 hook_add ='''
 '''
 
-[[plugins]]
-repo = 'fuenor/qfixhowm'
-hook_add ='''
-    let QFixHown_Key = 'g'
-    if has('win64')
-        let howm_dir = 'c:/howm'
-        let howm_fileencoding = 'cp932'
-        let howm_fileformat = 'dos'
-    else
-        let howm_dir = '/home/okada-hxf'
-        let howm_fileencoding = 'utf-8'
-        let howm_fileencoding = 'unix'
-    endif
-    let howm_filename = '%Y/%m/%Y^%m-%d-%H%M%S.txt'
-    let g:QFixHowm_WildCardChapter = 1
-    let QFixHowm_FoldingChapterTitle = 1
-    let QFixHowm_Folding = 0
-
-    nnoremap <space>a gg<S-v><S-g>
-    vnoremap <space>c "*y
-    nnoremap <space>v "*p
-'''
+# [[plugins]]
+# repo = 'fuenor/qfixhowm'
+# hook_add ='''
+#     let QFixHown_Key = 'g'
+#     if has('win64')
+#         let howm_dir = 'c:/howm'
+#         let howm_fileencoding = 'cp932'
+#         let howm_fileformat = 'dos'
+#     else
+#         let howm_dir = '/home/okada-hxf'
+#         let howm_fileencoding = 'utf-8'
+#         let howm_fileencoding = 'unix'
+#     endif
+#     let howm_filename = '%Y/%m/%Y^%m-%d-%H%M%S.txt'
+#     let g:QFixHowm_WildCardChapter = 1
+#     let QFixHowm_FoldingChapterTitle = 1
+#     let QFixHowm_Folding = 0
+#
+#     nnoremap <space>a gg<S-v><S-g>
+#     vnoremap <space>c "*y
+#     nnoremap <space>v "*p
+# '''
 
 [[plugins]]
 repo = 'junegunn/vim-easy-align'
@@ -672,6 +694,7 @@ hook_add ='''
     nnoremap <silent> <Space>uy :<C-u>Unite history/yank<CR>
     nnoremap <silent> <Space>b  :<C-u>Unite bookmark<CR>
     nnoremap <silent> <Space>r  :<C-u>Unite vimfiler/history<CR>
+    nnoremap <silent> ,ug       :<C-u>Unite grep:. -no-empty -no-quit -buffer-name=search-buffer<CR>
     "nnoremap <silent> <Space>d :<C-u>UniteWithBufferDir -buffer-name=files buffer file_mru bookmark file<CR>
     "au FileType unite nnoremap <silent> <buffer> <expr> <C-h> unite#do_action('split')
     "au FileType unite inoremap <silent> <buffer> <expr> <C-h> unite#do_action('split')
@@ -726,6 +749,7 @@ hook_add ='''
         " nmap <buffer><silent> <C-v> :call Vimfiler_mysplit()<cr>
         nmap <silent><buffer> ? :help vimfiler-default-key-mappings<cr>
         nmap <silent><buffer><expr> <C-v> vimfiler#do_switch_action('vsplit')
+        nmap <silent><buffer><expr> <C-h> vimfiler#do_switch_action('split')
         nmap <silent><buffer><expr> <C-t> vimfiler#do_switch_action('tabopen')
         nmap <silent><buffer> <C-m> <Plug>(vimfiler_toggle_mark_current_line)
         " nmap <silent><buffer> <Space>f <Plug>(vimfiler_find)
@@ -737,12 +761,12 @@ hook_add ='''
 [[plugins]]
 repo = 'tpope/vim-fugitive' 
 hook_add ='''
-    nnoremap <silent> <Space>gb :Gblame<cr>
-    nnoremap <silent> <Space>gd :Gdiff<cr>
-    nnoremap <silent> <Space>gs :Gstatus<cr>
-    nnoremap <silent> <Space>gr :Gread<cr>
-    nnoremap <silent> <Space>gc :Gcd<cr>
-    nnoremap <Space>gg :call My_Ggrep()<cr>
+    nnoremap <silent> <Space>vb :Gblame<cr>
+    nnoremap <silent> <Space>vd :Gdiff<cr>
+    nnoremap <silent> <Space>vs :Gstatus<cr>
+    nnoremap <silent> <Space>vr :Gread<cr>
+    nnoremap <silent> <Space>vc :Gcd<cr>
+    nnoremap <Space>vg :call My_Ggrep()<cr>
     function! My_Ggrep()
         :Gcd
         call feedkeys(",g")
@@ -778,5 +802,40 @@ hook_add ='''
 
 [[plugins]]
 repo = 'mzlogin/vim-markdown-toc' 
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'kmnk/vim-unite-giti' 
+hook_add ='''
+    nnoremap <silent> <Space>gb  :<C-u>Unite giti/branch_all<CR>
+    nnoremap <silent> <Space>gc  :<C-u>Unite giti/config<CR>
+    nnoremap <silent> <Space>gl  :<C-u>Unite giti/log<CR>
+    nnoremap <silent> <Space>gr  :<C-u>Unite giti/remote<CR>
+    nnoremap <silent> <Space>gs  :<C-u>Unite giti/status<CR>
+    nnoremap <silent> <Space>gg  :<C-u>Unite giti/grep<CR>
+'''
+
+[[plugins]]
+repo = 'simeji/winresizer' 
+hook_add ='''
+    let g:winresizer_start_key = 'mr'
+    let g:winresizer_keycode_cancel = 'c'
+'''
+
+[[plugins]]
+repo = 'vim-scripts/DrawIt' 
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'gyim/vim-boxdraw' 
+hook_add ='''
+    nnoremap dm :DrawIt
+    nnoremap ds :DrawIt!
+'''
+
+[[plugins]]
+repo = 'Shougo/deol.nvim' 
 hook_add ='''
 '''
