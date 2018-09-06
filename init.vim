@@ -15,6 +15,7 @@ set fileformats=unix,dos
 "}}}
 nnoremap j gj
 nnoremap k gk
+nnoremap v <c-v>
 " setting search"{{{
 nnoremap * *Nzz
 set hlsearch
@@ -114,6 +115,7 @@ nnoremap <Space>h gT
 nnoremap tn :tabnew<CR>
 nnoremap to :tabonly<CR>
 nnoremap tp :tab sp<CR>
+nnoremap <Space>x :call My_tabclose()<CR>
 nnoremap <Space>q :call My_tabclose()<CR>
 nnoremap <Space>a gg<S-v><S-g>
 nnoremap <c-c> :only<CR>

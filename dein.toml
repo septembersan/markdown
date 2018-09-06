@@ -692,7 +692,8 @@ hook_add ='''
     nnoremap <silent> <Space>um :<C-u>Unite vim_bookmarks<CR>
     nnoremap <silent> <Space>uu :<C-u>Unite buffer file_mru<CR>
     nnoremap <silent> <Space>uy :<C-u>Unite history/yank<CR>
-    nnoremap <silent> <Space>b  :<C-u>Unite bookmark<CR>
+    nnoremap <silent> <Space>bk  :<C-u>Unite bookmark<CR>
+    nnoremap <silent> <Space>bf  :<C-u>Unite buffer<CR>
     nnoremap <silent> <Space>r  :<C-u>Unite vimfiler/history<CR>
     nnoremap <silent> ,ug       :<C-u>Unite grep:. -no-empty -no-quit -buffer-name=search-buffer<CR>
     "nnoremap <silent> <Space>d :<C-u>UniteWithBufferDir -buffer-name=files buffer file_mru bookmark file<CR>
@@ -764,13 +765,33 @@ hook_add ='''
     nnoremap <silent> <Space>vb :Gblame<cr>
     nnoremap <silent> <Space>vd :Gdiff<cr>
     nnoremap <silent> <Space>vs :Gstatus<cr>
+    nnoremap <silent> <Space>vl :Glog<cr>
+    " Usage 3-way diff :Gstatus -> D -> :diffget //2 |diffup -> :diffget //3 |diffup -> ]c -> :only
     nnoremap <silent> <Space>vr :Gread<cr>
-    nnoremap <silent> <Space>vc :Gcd<cr>
-    nnoremap <Space>vg :call My_Ggrep()<cr>
+    nnoremap <silent> <Space>gc :Gcd<cr>
+    nnoremap <Space>gg :call My_Ggrep()<cr>
     function! My_Ggrep()
         :Gcd
-        call feedkeys(",g")
+        call feedkeys(",ug")
     endfunction
+'''
+
+[[plugins]]
+repo = 'mzlogin/vim-markdown-toc' 
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'kmnk/vim-unite-giti' 
+hook_add ='''
+    " Usage: branch switch -> giti/branch new -> switch(`git branch -b`)
+    nnoremap <silent> <Space>gb  :<C-u>Unite giti/branch_all<CR>
+    " nnoremap <silent> <Space>gc  :<C-u>Unite giti/config<CR>
+    " nnoremap <silent> <Space>gl  :<C-u>Unite giti/log<CR>
+    nnoremap <silent> <Space>gl  :Gitv<CR>
+    nnoremap <silent> <Space>gr  :<C-u>Unite giti/remote<CR>
+    nnoremap <silent> <Space>gs  :<C-u>Unite giti/status<CR>
+    " nnoremap <silent> <Space>gg  :<C-u>Unite giti/grep<CR>
 '''
 
 [[plugins]]
@@ -783,7 +804,11 @@ repo = 'gregsexton/gitv'
 hook_add ='''
     " Frequently cmd
     " ------------------------
-    " :Gitv! -> D (diff) # compare file(between HEAD and select commit)
+    " * ファイルごとのdiffを確認する場合
+    "   :Gitv! -> D (diff) # compare file(between HEAD and select commit)
+    " * ログからdiffを確認する場合(一覧)
+    "   :Gitv  -> Enter -> zM
+    "   :Gitv  -> Enter -> Enter on target file
     autocmd FileType git call s:gitv_my_settings()
     function! s:gitv_my_settings()
         " set statusline+=%{fugitive#statusline()}
@@ -798,22 +823,6 @@ repo = 'plytophogy/vim-virtualenv'
 hook_add ='''
     nnoremap <F7> :VirtualEnvActivate 
     nnoremap <F6> :VirtualEnvDeactivate<cr>
-'''
-
-[[plugins]]
-repo = 'mzlogin/vim-markdown-toc' 
-hook_add ='''
-'''
-
-[[plugins]]
-repo = 'kmnk/vim-unite-giti' 
-hook_add ='''
-    nnoremap <silent> <Space>gb  :<C-u>Unite giti/branch_all<CR>
-    nnoremap <silent> <Space>gc  :<C-u>Unite giti/config<CR>
-    nnoremap <silent> <Space>gl  :<C-u>Unite giti/log<CR>
-    nnoremap <silent> <Space>gr  :<C-u>Unite giti/remote<CR>
-    nnoremap <silent> <Space>gs  :<C-u>Unite giti/status<CR>
-    nnoremap <silent> <Space>gg  :<C-u>Unite giti/grep<CR>
 '''
 
 [[plugins]]
@@ -838,4 +847,29 @@ hook_add ='''
 [[plugins]]
 repo = 'Shougo/deol.nvim' 
 hook_add ='''
+'''
+
+[[plugins]]
+repo = 'mattn/webapi-vim' 
+hook_add ='''
+" > <https://www.key-p.com/blog/staff/archives/20732>
+nnoremap <silent><F4> :call MyFeed()<cr>
+
+function! MyFeed()
+    tabnew
+    let result = webapi#feed#parseURL("http://sampo-03.asou.nec.co.jp:50080/dashboard/projects.atom?rss_token=-jHpUfyr4qgdP4AkgNBe")
+    let count = 0
+    let lines = []
+    for item in result
+        let str = join(["[ ]", item.date, item.title, item.content, item.link], ' :')
+        call append(count, str)
+        call add(lines, str)
+        let count += 1
+        " echo keys(item)
+    endfor
+    let outputfile = "~/.cache/dein/repos/github.com/mattn/save.txt"
+    execute ":w!" .outputfile
+    " call setfperm(outputfile, "rw-rw-rw-")
+    " call writefile(lines, outputfile, "a")
+endfunction
 '''
