@@ -18,7 +18,8 @@
   $ git config --global color.ui true
 
 ## What origin?
-"origin" is remote repository alias
+"origin" is "remote repository" alias
+ attention: remote repository ==> not branch
 
 ## fetc/pull
 > <https://eng-entrance.com/git-fetch>

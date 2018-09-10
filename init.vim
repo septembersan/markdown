@@ -112,6 +112,7 @@ set iminsert=0
 set imsearch=-1
 nnoremap <Space>l gt
 nnoremap <Space>h gT
+nnoremap tm :tabnext
 nnoremap tn :tabnew<CR>
 nnoremap to :tabonly<CR>
 nnoremap tp :tab sp<CR>

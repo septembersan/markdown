@@ -356,7 +356,7 @@ hook_add ='''
     " noremap [Denite] <Nop>
     " nmap <Leader>f [Denite]
 
-    nnoremap <silent> <Space>o :<C-u>Denite -direction=top file_mru<CR>
+    nnoremap <silent> <Space>uo :<C-u>Denite -direction=top file_mru<CR>
     " nnoremap <silent> <Space>b :<C-u>Denite -direction=top buffer<CR>
     nnoremap <silent> <Space>f :<C-u>DeniteBufferDir -direction=top file_rec<CR>
     " nnoremap <silent> <Space>g :<C-u>DeniteBufferDir -direction=top grep<CR>
@@ -375,7 +375,7 @@ hook_add ='''
     call denite#custom#map('insert', "<C-v>", '<denite:do_action:vsplit>')
     " ウィンドウをタブで開く
     call denite#custom#map('normal', "t", '<denite:do_action:tabopen>')
-    "call denite#custom#map('insert', "t", '<denite:do_action:tabopen>')
+    call denite#custom#map('insert', "<c-t>", '<denite:do_action:tabopen>')
     call denite#custom#map('normal', "l", '<denite:do_action:default>')
     " インサート→ノーマルモード
     call denite#custom#map('insert', "mm", '<denite:enter_mode:normal>')
@@ -390,6 +390,17 @@ hook_add ='''
         call denite#custom#var('grep', 'separator', ['--'])
         call denite#custom#var('grep', 'default_opts', ['--vimgrep', '--no-heading'])
     endif
+
+    ".git以下のディレクトリ検索
+    nnoremap <silent> <Space>gf :<C-u>Denite -direction=topleft -cursor-wrap=true
+          \ -path=`substitute(finddir('.git', './;'), '.git', '', 'g')`
+          \ file_rec/git<CR>
+    call denite#custom#source('file'    , 'matchers', ['matcher_cpsm', 'matcher_fuzzy'])
+    call denite#custom#source('buffer'  , 'matchers', ['matcher_regexp'])
+    call denite#custom#source('file_mru', 'matchers', ['matcher_regexp'])
+    call denite#custom#alias('source', 'file_rec/git', 'file_rec')
+    call denite#custom#var('file_rec/git', 'command',
+      \ ['git', 'ls-files', '-co', '--exclude-standard'])
 '''
 
 [[plugins]]
@@ -686,9 +697,9 @@ hook_add ='''
 
     let g:unite_enable_start_insert=1
     nnoremap <silent> <Space>ub :<C-u>Unite buffer<CR>
-    nnoremap <silent> <Space>uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+    " nnoremap <silent> <Space>uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
     nnoremap <silent> <Space>ur :<C-u>Unite file_rec<CR>
-    nnoremap <silent> <Space>uo :<C-u>Unite file_mru<CR>
+    nnoremap <silent> <Space>o  :<C-u>Unite file_mru<CR>
     nnoremap <silent> <Space>um :<C-u>Unite vim_bookmarks<CR>
     nnoremap <silent> <Space>uu :<C-u>Unite buffer file_mru<CR>
     nnoremap <silent> <Space>uy :<C-u>Unite history/yank<CR>
@@ -696,6 +707,7 @@ hook_add ='''
     nnoremap <silent> <Space>bf  :<C-u>Unite buffer<CR>
     nnoremap <silent> <Space>r  :<C-u>Unite vimfiler/history<CR>
     nnoremap <silent> ,ug       :<C-u>Unite grep:. -no-empty -no-quit -buffer-name=search-buffer<CR>
+    " nnoremap <silent> <Space>gf :<C-u>Unite file_rec/async:!<CR>
     "nnoremap <silent> <Space>d :<C-u>UniteWithBufferDir -buffer-name=files buffer file_mru bookmark file<CR>
     "au FileType unite nnoremap <silent> <buffer> <expr> <C-h> unite#do_action('split')
     "au FileType unite inoremap <silent> <buffer> <expr> <C-h> unite#do_action('split')
@@ -703,7 +715,7 @@ hook_add ='''
     au FileType unite nnoremap <silent> <buffer> <expr> l unite#do_action('default')
     "au FileType unite inoremap <silent> <buffer> <expr> <C-v> unite#do_action('vsplit')
     au FileType unite nnoremap <silent> <buffer> <expr> t unite#do_action('tabopen')
-    "au FileType unite inoremap <silent> <buffer> <expr> t unite#do_action('tabopen')
+    au FileType unite inoremap <silent> <buffer> <expr> <c-t> unite#do_action('tabopen')
     au FileType unite nnoremap <silent> <buffer> <ESC><ESC> q
     au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>q
     
@@ -769,6 +781,7 @@ hook_add ='''
     " Usage 3-way diff :Gstatus -> D -> :diffget //2 |diffup -> :diffget //3 |diffup -> ]c -> :only
     nnoremap <silent> <Space>vr :Gread<cr>
     nnoremap <silent> <Space>gc :Gcd<cr>
+    nnoremap <Space>gp :Gpull 
     nnoremap <Space>gg :call My_Ggrep()<cr>
     function! My_Ggrep()
         :Gcd
@@ -789,6 +802,7 @@ hook_add ='''
     " nnoremap <silent> <Space>gc  :<C-u>Unite giti/config<CR>
     " nnoremap <silent> <Space>gl  :<C-u>Unite giti/log<CR>
     nnoremap <silent> <Space>gl  :Gitv<CR>
+    nnoremap <silent> <Space>gL  :Gitv!<CR>
     nnoremap <silent> <Space>gr  :<C-u>Unite giti/remote<CR>
     nnoremap <silent> <Space>gs  :<C-u>Unite giti/status<CR>
     " nnoremap <silent> <Space>gg  :<C-u>Unite giti/grep<CR>
@@ -872,4 +886,9 @@ function! MyFeed()
     " call setfperm(outputfile, "rw-rw-rw-")
     " call writefile(lines, outputfile, "a")
 endfunction
+'''
+
+[[plugins]]
+repo = 'mzlogin/vim-markdown-toc' 
+hook_add ='''
 '''
