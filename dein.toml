@@ -395,9 +395,11 @@ hook_add ='''
     nnoremap <silent> <Space>gf :<C-u>Denite -direction=topleft -cursor-wrap=true
           \ -path=`substitute(finddir('.git', './;'), '.git', '', 'g')`
           \ file_rec/git<CR>
-    call denite#custom#source('file'    , 'matchers', ['matcher_cpsm', 'matcher_fuzzy'])
-    call denite#custom#source('buffer'  , 'matchers', ['matcher_regexp'])
-    call denite#custom#source('file_mru', 'matchers', ['matcher_regexp'])
+    " call denite#custom#source('file'    , 'matchers', ['matcher_cpsm', 'matcher_fuzzy'])
+    call denite#custom#source('file'    , 'matchers', ['matcher_substring'])
+    call denite#custom#source('buffer'  , 'matchers', ['matcher_substring'])
+    call denite#custom#source('file_mru', 'matchers', ['matcher_substring'])
+    call denite#custom#source('file_rec', 'matchers', ['matcher_substring'])
     call denite#custom#alias('source', 'file_rec/git', 'file_rec')
     call denite#custom#var('file_rec/git', 'command',
       \ ['git', 'ls-files', '-co', '--exclude-standard'])
@@ -700,13 +702,14 @@ hook_add ='''
     " nnoremap <silent> <Space>uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
     nnoremap <silent> <Space>ur :<C-u>Unite file_rec<CR>
     nnoremap <silent> <Space>o  :<C-u>Unite file_mru<CR>
-    nnoremap <silent> <Space>um :<C-u>Unite vim_bookmarks<CR>
+    nnoremap <silent> <Space>ubk :<C-u>Unite vim_bookmarks<CR>
     nnoremap <silent> <Space>uu :<C-u>Unite buffer file_mru<CR>
     nnoremap <silent> <Space>uy :<C-u>Unite history/yank<CR>
     nnoremap <silent> <Space>bk  :<C-u>Unite bookmark<CR>
     nnoremap <silent> <Space>bf  :<C-u>Unite buffer<CR>
     nnoremap <silent> <Space>r  :<C-u>Unite vimfiler/history<CR>
     nnoremap <silent> ,ug       :<C-u>Unite grep:. -no-empty -no-quit -buffer-name=search-buffer<CR>
+    nnoremap <silent> <Space>m  :<C-u>UniteResume search-buffer<CR>
     " nnoremap <silent> <Space>gf :<C-u>Unite file_rec/async:!<CR>
     "nnoremap <silent> <Space>d :<C-u>UniteWithBufferDir -buffer-name=files buffer file_mru bookmark file<CR>
     "au FileType unite nnoremap <silent> <buffer> <expr> <C-h> unite#do_action('split')
@@ -718,6 +721,7 @@ hook_add ='''
     au FileType unite inoremap <silent> <buffer> <expr> <c-t> unite#do_action('tabopen')
     au FileType unite nnoremap <silent> <buffer> <ESC><ESC> q
     au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>q
+
     
     inoremap <buffer> <mm> <Plug> (uite_insert_leave)
     " nnoremap <silent> <buffer> <expr> <C-q> <Plug> (unite_exit)
@@ -783,6 +787,14 @@ hook_add ='''
     nnoremap <silent> <Space>gc :Gcd<cr>
     nnoremap <Space>gp :Gpull 
     nnoremap <Space>gg :call My_Ggrep()<cr>
+    nnoremap <Space>gj :call My_Cursor_Under_Ggrep()<cr>
+    function! My_Cursor_Under_Ggrep()
+        :Gcd
+        call feedkeys("yiw")
+        call feedkeys(",ug")
+        call feedkeys("\<Space>p")
+        call feedkeys("\<cr>")
+    endfunction
     function! My_Ggrep()
         :Gcd
         call feedkeys(",ug")
