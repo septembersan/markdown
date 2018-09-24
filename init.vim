@@ -1,4 +1,6 @@
 " generic setting "{{{
+" set spell
+set spelllang=en,cjk
 nnoremap ,l <C-w>L
 nnoremap ,j <C-w>J
 nnoremap ,k <C-w>K
@@ -64,7 +66,6 @@ set whichwrap=b,s,h,l,<,>,[,],~
 " cursor highlight
 set cursorline
 set title
-
 " setting change window width"{{{
 nnoremap <Left> <C-w><<CR>
 nnoremap <Right> <C-w>><CR>
@@ -172,6 +173,7 @@ command! -nargs=+ Tg :T git <args>
 "set termguicolors
 " set background=dark
 set background=light
+autocmd VimEnter,WinEnter,ColorScheme * highlight Visual term=underline ctermfg=195 ctermbg=30 guifg=#c6c8d1 guibg=#5b7881
 set t_Co=256
 " colorscheme lucius
 " colorscheme tender

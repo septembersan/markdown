@@ -60,19 +60,28 @@ repo = 'Shougo/neoyank.vim'
 [[plugins]]
 repo = 'kassio/neoterm'
 hook_add = '''
-    let g:neoterm_size = 10
+    let g:neoterm_size = 14
     let g:neoterm_autoscroll =1
     let g:neoterm_autoinsert = 1
     " terminal position
     let g:neoterm_default_mod='belowright'
-    nnoremap <silent> <C-e><C-e> :TREPLSendLine<CR>j0
-    vnoremap <silent> <C-e><C-e> V:TREPLSendSelection<CR>'>j
+    nnoremap <silent> <C-e><C-e> :call My_TREPLSendSelection()<cr>
+    vnoremap <silent> <C-e><C-e> V:TREPLSendSelection<cr>
     nnoremap <silent> <C-e><C-f> :call Exec_python()<cr>
-    nnoremap <silent> ttg :Ttoggle<CR>
-    nnoremap <silent> ttn :Tnew<CR>
-    nnoremap <silent> ttt :call My_New_Terminal_Tab()<CR>
-    nnoremap <silent> tts :call My_New_Terminal_VSplit()<cr>
+    " nnoremap <silent> <C-e><C-f> :TREPLSendFile<cr>'>j0
+    nnoremap <silent> ttn  :Tnew<CR>
+    nnoremap <silent> tti  :Topen<cr>
+    nnoremap <silent> ttc  :Tclose<cr>
+    nnoremap <silent> tto  :Ttoggle<CR>
+    nnoremap <silent> ttt  :call My_New_Terminal_Tab()<CR>
+    nnoremap <silent> tts  :call My_New_Terminal_VSplit()<cr>
+    nnoremap <silent> ttk  :Tkill<cr>
     nnoremap <silent> <F5> :T pdb %<CR><c-w>ki
+    function! My_TREPLSendSelection()
+        Topen
+        :TREPLSendLine
+    endfunction
+
     function! My_New_Terminal_Tab()
         " let g:neoterm_fixedsize = winfixheight
         let g:neoterm_size = winheight(0) - 10
@@ -93,8 +102,9 @@ hook_add = '''
     function! Exec_python()
         :w!
         let g:neoterm_autoinsert = 0
-        :Tclear
-        :T python3.6 %
+        Topen
+        Tclear
+        T python3.6 %
         let g:neoterm_autoinsert = 1
     endfunction
 
@@ -105,14 +115,6 @@ hook_add = '''
         let &t_te.="¥e[0 q"
     endif
 
-    " Useful maps
-    " hide/close terminal
-    nnoremap <silent> ti    :Topen<cr>
-    " kills the current job (send a <c-c>)
-    nnoremap <silent> tk :Tkill<cr>
-    nnoremap <silent> tc :Tclose<cr>
-    " clear terminal
-    "nnoremap <silent> tl :call neoterm#clear()<cr>
 '''
 
 [[plugins]]
@@ -419,7 +421,7 @@ repo = 'zchee/deoplete-jedi'
 on_ft = 'python'
 # hook_add = '''
 hook_source = '''
-    let g:deoplete#sources#jedi#python_path = '/usr/bin/python3.6'
+    let g:deoplete#sources#jedi#python_path = substitute(system('which python3.6'), "¥n", "", "")
 '''
 
 [[plugins]]
@@ -473,7 +475,11 @@ hook_add = '''
     let g:ale_lint_on_save = 1
     let g:ale_lint_on_text_changed = 0
     let g:ale_statusline_format = ['x %d', '? %d', 'o ok']
-    let g:ale_linters = { 'python3.6': ['flake8'], }
+    let g:ale_linters = { 
+                \   'python3.6': ['flake8'],
+                \   'markdown': ['alex'],
+                \   'JSON': ['jq']
+                \}
 
     nmap [ale] <Nop>
     map <C-k> [ale]
@@ -888,7 +894,13 @@ function! MyFeed()
 endfunction
 '''
 
+# [[plugins]]
+# repo = 'gabrielelana/vim-markdown' 
+# hook_add ='''
+# '''
+
 [[plugins]]
-repo = 'mzlogin/vim-markdown-toc' 
+repo = 'plasticboy/vim-markdown' 
 hook_add ='''
 '''
+
