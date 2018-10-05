@@ -38,6 +38,10 @@ hook_add ='''
 repo = 'MattesGroeger/vim-bookmarks'
 hook_add ='''
     nnoremap mb :BookmarkToggle<CR>
+    let g:bookmark_sign = '@'
+    let g:bookmark_annotation_sign = '☰'
+    let g:bookmark_highlight_lines = 1
+    let g:bookmark_center = 1
 '''
 
 [[plugins]]
@@ -84,7 +88,7 @@ hook_add = '''
 
     function! My_New_Terminal_Tab()
         " let g:neoterm_fixedsize = winfixheight
-        let g:neoterm_size = winheight(0) - 10
+        let g:neoterm_size = winheight(0)
         tabnew
         Tnew
         let g:neoterm_size = 10
@@ -287,6 +291,49 @@ hook_add ='''
 '''
 
 [[plugins]]
+repo = 'kana/vim-textobj-user'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'osyo-manga/vim-textobj-multiblock'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'osyo-manga/vim-operator-stay-cursor'
+hook_add ='''
+    map y <Plug>(operator-stay-cursor-yank)
+'''
+
+[[plugins]]
+repo = 'osyo-manga/vim-operator-exec_command'
+hook_add ='''
+    nmap <expr> <Space>uj operator#exec_command#mapexpr(":Unite line -input=%t")
+'''
+
+[[plugins]]
+repo = 'bps/vim-textobj-python'
+hook_add ='''
+    let g:textobj_python_no_default_key_mappings = 1
+    xmap af <Plug>(textobj-python-function-a)
+    omap af <Plug>(textobj-python-function-a)
+    xmap if <Plug>(textobj-python-function-i)
+    omap if <Plug>(textobj-python-function-i)
+
+    xmap ac <Plug>(textobj-python-class-a)
+    omap ac <Plug>(textobj-python-class-a)
+    xmap ic <Plug>(textobj-python-class-i)
+    omap ic <Plug>(textobj-python-class-i)
+
+    nmap [f <Plug>(textobj-python-function-p)
+    nmap ]f <Plug>(textobj-python-function-n)
+
+    nmap [c <Plug>(textobj-python-class-p)
+    nmap ]c <Plug>(textobj-python-class-n)
+'''
+
+[[plugins]]
 repo = 'kana/vim-operator-replace'
 hook_add ='''
 map R <Plug>(operator-replace)
@@ -306,6 +353,7 @@ hook_add ='''
     map <silent>sd <Plug>(operator-surround-delete)
     map <silent>sr <Plug>(operator-surround-replace)
 
+    nmap <silent>saa <Plug>(operator-surround-append)<Plug>(textobj-multiblock-a)
     nmap <silent>sdd <Plug>(operator-surround-delete)<Plug>(textobj-multiblock-a)
     nmap <silent>srr <Plug>(operator-surround-replace)<Plug>(textobj-multiblock-a)
 
@@ -376,8 +424,8 @@ hook_add ='''
     call denite#custom#map('_', "<C-v>", '<denite:do_action:vsplit>')
     call denite#custom#map('insert', "<C-v>", '<denite:do_action:vsplit>')
     " ウィンドウをタブで開く
-    call denite#custom#map('normal', "t", '<denite:do_action:tabopen>')
-    call denite#custom#map('insert', "<c-t>", '<denite:do_action:tabopen>')
+    call denite#custom#map('normal', "t", '<denite:do_action:tabswitch>')
+    call denite#custom#map('insert', "<c-t>", '<denite:do_action:tabswitch>')
     call denite#custom#map('normal', "l", '<denite:do_action:default>')
     " インサート→ノーマルモード
     call denite#custom#map('insert', "mm", '<denite:enter_mode:normal>')
@@ -423,7 +471,7 @@ repo = 'zchee/deoplete-jedi'
 on_ft = 'python'
 # hook_add = '''
 hook_source = '''
-    let g:deoplete#sources#jedi#python_path = substitute(system('which python3.6'), "¥n", "", "")
+    " let g:deoplete#sources#jedi#python_path = substitute(system('which python3.6'), "¥n", "", "")
 '''
 
 [[plugins]]
@@ -460,8 +508,6 @@ hook_source = '''
         let g:jedi#show_call_signatures = 1
         let g:jedi#show_call_signatures_delay = 10
 
-        " nnoremap <silent><C-j> :call jedi#goto_definitions()<CR>
-        " nnoremap <silent><C-h> :call jedi#usages_command()<CR>
         nnoremap <silent><C-n> :cnext<cr>
         nnoremap <silent><C-p> :cprev<cr>
 '''
@@ -650,10 +696,6 @@ hook_add ='''
 repo = 'tweekmonster/braceless.vim'
 on_ft = 'python'
 hook_add ='''
-    " Usage:
-    " vip, cip
-    " >ip, >iP
-    " [[, ]], [m, ]m
     autocmd FileType python BracelessEnable +fold +highlight
     let g:braceless_jump_prev_key = '['
     let g:braceless_jump_next_key = ']'
@@ -672,7 +714,7 @@ hook_add ='''
     nnoremap <silent> tps :Pytest session<cr>
     nnoremap <silent> tpj :call My_python_file()<cr>
     nnoremap <silent> tpc :Pytest class<cr>
-    nnoremap <silent> tpf :Pytest function<cr>
+    nnoremap <silent> tpf :Pytest function -s -vv<cr>
     nnoremap <silent> tpe :Pytest fails<cr>
     nnoremap <silent> tpn :Pytest next<cr>
     nnoremap <silent> tpp :Pytest previous<cr>
@@ -680,7 +722,7 @@ hook_add ='''
     nnoremap <silent> tpo :call Create_pytest_file()<cr>
     function! My_python_file()
         :w
-        :Pytest file
+        :Pytest file -s -vv
     endfunction
     function! Create_pytest_file()
         :tabedit ‾/hiroomi.py
@@ -710,12 +752,15 @@ hook_add ='''
     nnoremap <silent> <Space>o  :<C-u>Unite file_mru<CR>
     nnoremap <silent> <Space>ubk :<C-u>Unite vim_bookmarks<CR>
     nnoremap <silent> <Space>uu :<C-u>Unite buffer file_mru<CR>
-    nnoremap <silent> <Space>uy :<C-u>Unite history/yank<CR>
+    nnoremap <silent> <Space>y :<C-u>Unite history/yank<CR>
     nnoremap <silent> <Space>bk  :<C-u>Unite bookmark<CR>
     nnoremap <silent> <Space>bf  :<C-u>Unite buffer<CR>
-    nnoremap <silent> <Space>r  :<C-u>Unite vimfiler/history<CR>
+    " nnoremap <silent> <Space>r  :<C-u>Unite vimfiler/history<CR>
+    nnoremap <silent> <Space>r  :<C-u>UniteResume search-buffer<CR>
     nnoremap <silent> ,ug       :<C-u>Unite grep:. -no-empty -no-quit -buffer-name=search-buffer<CR>
-    nnoremap <silent> <Space>m  :<C-u>UniteResume search-buffer<CR>
+    " nnoremap <silent> <Space>m  :<C-u>UniteResume search-buffer<CR>
+    nnoremap <silent> <Space>ul :<C-u>Unite line<CR>
+    nnoremap <silent> <Space>uc :<C-u>Unite -auto-preview colorscheme<CR>
     " nnoremap <silent> <Space>gf :<C-u>Unite file_rec/async:!<CR>
     "nnoremap <silent> <Space>d :<C-u>UniteWithBufferDir -buffer-name=files buffer file_mru bookmark file<CR>
     "au FileType unite nnoremap <silent> <buffer> <expr> <C-h> unite#do_action('split')
@@ -723,8 +768,8 @@ hook_add ='''
     au FileType unite nnoremap <silent> <buffer> <expr> <C-v> unite#do_action('vsplit')
     au FileType unite nnoremap <silent> <buffer> <expr> l unite#do_action('default')
     "au FileType unite inoremap <silent> <buffer> <expr> <C-v> unite#do_action('vsplit')
-    au FileType unite nnoremap <silent> <buffer> <expr> t unite#do_action('tabopen')
-    au FileType unite inoremap <silent> <buffer> <expr> <c-t> unite#do_action('tabopen')
+    au FileType unite nnoremap <silent> <buffer> <expr> t unite#do_action('tabswitch')
+    au FileType unite inoremap <silent> <buffer> <expr> <c-t> unite#do_action('tabswitch')
     au FileType unite nnoremap <silent> <buffer> <ESC><ESC> q
     au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>q
 
@@ -741,6 +786,13 @@ hook_add ='''
         let g:unite_source_grep_recursive_opt = '' 
     endif
 '''
+
+[[plugins]]
+repo = 'ujihisa/unite-colorscheme' 
+depends = 'unite.vim'
+hook_add ='''
+'''
+
 
 [[plugins]]
 repo = 'Shougo/vimproc.vim' 
@@ -773,7 +825,7 @@ hook_add ='''
         nmap <silent><buffer> ? :help vimfiler-default-key-mappings<cr>
         nmap <silent><buffer><expr> <C-v> vimfiler#do_switch_action('vsplit')
         nmap <silent><buffer><expr> <C-h> vimfiler#do_switch_action('split')
-        nmap <silent><buffer><expr> <C-t> vimfiler#do_switch_action('tabopen')
+        nmap <silent><buffer><expr> <C-t> vimfiler#do_switch_action('tabswitch')
         nmap <silent><buffer> <C-m> <Plug>(vimfiler_toggle_mark_current_line)
         " nmap <silent><buffer> <Space>f <Plug>(vimfiler_find)
         nmap <silent><buffer> ,g <Plug>(vimfiler_grep)
@@ -906,13 +958,37 @@ function! MyFeed()
 endfunction
 '''
 
-# [[plugins]]
-# repo = 'gabrielelana/vim-markdown' 
-# hook_add ='''
-# '''
-
 [[plugins]]
 repo = 'plasticboy/vim-markdown' 
+on_ft = 'markdown'
+hook_add ='''
+    let g:vim_markdown_toc_autofit = 1
+'''
+
+[[plugins]]
+repo = 'vim-scripts/DirDiff.vim' 
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'godlygeek/tabular' 
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'LeafCage/yankround.vim' 
+hook_add ='''
+    let g:yankround_max_history = 35
+    nmap p <Plug>(yankround-p)
+    nmap P <Plug>(yankround-P)
+    nmap gp <Plug>(yankround-gp)
+    nmap gP <Plug>(yankround-gP)
+    nmap <C-p> <Plug>(yankround-prev)
+    nmap <C-n> <Plug>(yankround-next)
+'''
+
+[[plugins]]
+repo = 'mhinz/neovim-remote' 
 hook_add ='''
 '''
 
