@@ -857,12 +857,13 @@ hook_add ='''
     nnoremap <silent> <Space>vs :Gstatus<cr>
     nnoremap <silent> <Space>vl :Glog<cr>
     nnoremap <silent> <Space>gr :Gread<cr>
-    nnoremap <silent> <Space>gc :Gcd<cr>
     nnoremap <Space>ge :Gvdiff :%<left><left>
     nnoremap <Space>gp :Gpull 
-    " nnoremap <Space>gs :Gstatus<cr>
+    nnoremap <Space>gs :Gstatus<cr>
     nnoremap <Space>gg :call My_Ggrep()<cr>
     nnoremap <Space>gj :call My_Cursor_Under_Ggrep()<cr>
+    nnoremap <Space>gcc :Gcommit -m ""<left>
+    nnoremap <Space>gca :Gcommit -amend<cr>
     function! My_Cursor_Under_Ggrep()
         :Gcd
         call feedkeys("yiw")
@@ -891,7 +892,7 @@ hook_add ='''
     nnoremap <silent> <Space>gl  :Gitv<CR>
     nnoremap <silent> <Space>gL  :Gitv!<CR>
     " nnoremap <silent> <Space>gr  :<C-u>Unite giti/remote<CR>
-    nnoremap <silent> <Space>gs  :<C-u>Unite giti/status<CR>
+    " nnoremap <silent> <Space>gs  :<C-u>Unite giti/status<CR>
     " nnoremap <silent> <Space>gg  :<C-u>Unite giti/grep<CR>
 '''
 
