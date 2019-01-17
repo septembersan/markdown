@@ -108,7 +108,7 @@ hook_add = '''
         let g:neoterm_autoinsert = 0
         Topen
         Tclear
-        T python3.6 %
+        T python3.6  %
         let g:neoterm_autoinsert = 1
     endfunction
 
@@ -150,8 +150,15 @@ hook_add = '''
 repo = 'majutsushi/tagbar'
 lazy = 1
 hook_add = '''
-    nnoremap <silent> <F8> :TagbarToggle<CR>
-    nnoremap <Space>t :TagbarOpenAutoClose<CR>
+    nnoremap <silent><Space>t :call MyOpenBar()<cr>
+    nnoremap <silent><F8>     :TagbarToggle<cr>
+    function! MyOpenBar()
+        if expand("%:t") =~ ".*\.md"
+            :Toc
+        else
+            :TagbarOpenAutoClose
+        endif
+    endfunction
 '''
 hook_source = '''
     " [Usage]
@@ -466,13 +473,12 @@ hook_post_source = '''
     let g:deoplete#omni_patterns = {}
 '''
 
-[[plugins]]
-repo = 'zchee/deoplete-jedi'
-on_ft = 'python'
-# hook_add = '''
-hook_source = '''
-    " let g:deoplete#sources#jedi#python_path = substitute(system('which python3.6'), "¥n", "", "")
-'''
+# [[plugins]]
+# repo = 'zchee/deoplete-jedi'
+# on_ft = 'python'
+# hook_source = '''
+#     " let g:deoplete#sources#jedi#python_path = substitute(system('which python3.6'), "¥n", "", "")
+# '''
 
 [[plugins]]
 repo = 'davidhalter/jedi-vim'
@@ -526,6 +532,7 @@ hook_add = '''
     let g:ale_linters = { 
                 \   'python3.6': ['flake8'],
                 \   'markdown': ['alex'],
+                \   'javascript': ['eslint'],
                 \   'JSON': ['jq']
                 \}
 
@@ -747,8 +754,8 @@ hook_add ='''
 
     let g:unite_enable_start_insert=1
     nnoremap <silent> <Space>ub :<C-u>Unite buffer<CR>
-    " nnoremap <silent> <Space>uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
-    nnoremap <silent> <Space>ur :<C-u>Unite file_rec<CR>
+    nnoremap <silent> <Space>uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+    " nnoremap <silent> <Space>uf :<C-u>Unite file_rec<CR>
     nnoremap <silent> <Space>o  :<C-u>Unite file_mru<CR>
     nnoremap <silent> <Space>ubk :<C-u>Unite vim_bookmarks<CR>
     nnoremap <silent> <Space>uu :<C-u>Unite buffer file_mru<CR>
@@ -836,6 +843,13 @@ hook_add ='''
 [[plugins]]
 repo = 'tpope/vim-fugitive' 
 hook_add ='''
+    " Usage:
+    "   * reference file in other current branch.
+    "       :Gvsplit origin/other_branch:filename.hoge
+    "   * cancel modification before commit.
+    "       :Gread
+    "   * git add
+    "       :Gwrite
     nnoremap <silent> <Space>vb :Gblame<cr>
     nnoremap <silent> <Space>vd :Gdiff<cr>
     nnoremap <silent> <Space>vs :Gstatus<cr>
@@ -844,6 +858,7 @@ hook_add ='''
     nnoremap <silent> <Space>vr :Gread<cr>
     nnoremap <silent> <Space>gc :Gcd<cr>
     nnoremap <Space>gp :Gpull 
+    " nnoremap <Space>gs :Gstatus<cr>
     nnoremap <Space>gg :call My_Ggrep()<cr>
     nnoremap <Space>gj :call My_Cursor_Under_Ggrep()<cr>
     function! My_Cursor_Under_Ggrep()
@@ -963,6 +978,19 @@ repo = 'plasticboy/vim-markdown'
 on_ft = 'markdown'
 hook_add ='''
     let g:vim_markdown_toc_autofit = 1
+    " let g:vim_markdown_folding_disabled = 1
+'''
+
+[[plugins]]
+repo = 'kannokanno/previm' 
+on_ft = 'markdown'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'tyru/open-browser.vim' 
+on_ft = 'markdown'
+hook_add ='''
 '''
 
 [[plugins]]
@@ -990,5 +1018,65 @@ hook_add ='''
 [[plugins]]
 repo = 'mhinz/neovim-remote' 
 hook_add ='''
+    " Installation: pip3 install neovim-remote
+    " Usage: README.md
 '''
 
+[[plugins]]
+repo = 'honza/vim-snippets' 
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'SirVer/ultisnips' 
+hook_add ='''
+    let g:UltiSnipsExpandTrigger="<tab>"
+    let g:UltiSnipsJumpForwardTrigger="<tab>"
+    let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+
+    " If you want :UltiSnipsEdit to split your window.
+    let g:UltiSnipsEditSplit="vertical"
+'''
+
+[[plugins]]
+repo = 'dhruvasagar/vim-table-mode'
+hook_add ='''
+    nnoremap <c-t> :TableModeToggle<cr>
+    let g:table_mode_corner='|'
+'''
+
+[[plugins]]
+repo = 'billyvg/tigris.nvim'
+on_ft = ['javascript', 'javascript.jsx']
+hook_post_update = '''
+  let g:dein#plugin.build = './install.sh'
+'''
+hook_add ='''
+    let g:tigris#enabled = 1
+    let g:tigris#on_the_fly_enabled = 1
+    let g:tigris#delay = 300
+'''
+
+[[plugins]]
+repo = 'autozimu/LanguageClient-neovim'
+rev = 'next'
+build = 'bash install.sh'
+hook_add ='''
+    " Usage: 
+    " python: pip install python-language-server
+    set hidden
+    let g:LanguageClient_serverCommands = {
+        \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
+        \ 'python': ['/usr/bin/pyls'],
+        \ }
+    nnoremap <F5> :call LanguageClient_contextMenu()<CR>
+    nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
+    nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
+    nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+    " nnoremap <silent> rd :call LanguageClient#textDocument_references()<cr>
+'''
+
+[[plugins]]
+repo = 'ryanoasis/vim-devicons'
+hook_add ='''
+'''

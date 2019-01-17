@@ -18,6 +18,7 @@ set fileformats=unix,dos
 nnoremap j gj
 nnoremap k gk
 nnoremap v <c-v>
+vnoremap / <esc>/\%V
 nnoremap <c-b> <c-^>
 " setting search"{{{
 nnoremap * *Nzz
@@ -127,6 +128,7 @@ function! My_tabclose()
   :tabprevious
 endfunction
 nnoremap <silent>vp gv
+nnoremap dif :windo diffthis<cr>
 "}}}
 " setting fold{{{
 set modeline
@@ -275,4 +277,5 @@ else
 endif"}}}
 " settings md as markdown, instead of modula2
 autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
-vnoremap / <esc>/\%V
+set dictionary=/usr/share/dict/words
+nnoremap ms :Recter<cr>
