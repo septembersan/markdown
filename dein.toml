@@ -846,17 +846,19 @@ hook_add ='''
     " Usage:
     "   * reference file in other current branch.
     "       :Gvsplit origin/other_branch:filename.hoge
+    "       :Gedit other_branch:%
     "   * cancel modification before commit.
     "       :Gread
     "   * git add
     "       :Gwrite
+    " Usage: 3-way diff :Gstatus -> D -> :diffget //2 |diffup -> :diffget //3 |diffup -> ]c -> :only
     nnoremap <silent> <Space>vb :Gblame<cr>
-    nnoremap <silent> <Space>vd :Gdiff<cr>
+    nnoremap <silent> <Space>gd :Gdiff<cr>
     nnoremap <silent> <Space>vs :Gstatus<cr>
     nnoremap <silent> <Space>vl :Glog<cr>
-    " Usage 3-way diff :Gstatus -> D -> :diffget //2 |diffup -> :diffget //3 |diffup -> ]c -> :only
-    nnoremap <silent> <Space>vr :Gread<cr>
+    nnoremap <silent> <Space>gr :Gread<cr>
     nnoremap <silent> <Space>gc :Gcd<cr>
+    nnoremap <Space>ge :Gvdiff :%<left><left>
     nnoremap <Space>gp :Gpull 
     " nnoremap <Space>gs :Gstatus<cr>
     nnoremap <Space>gg :call My_Ggrep()<cr>
@@ -888,7 +890,7 @@ hook_add ='''
     " nnoremap <silent> <Space>gl  :<C-u>Unite giti/log<CR>
     nnoremap <silent> <Space>gl  :Gitv<CR>
     nnoremap <silent> <Space>gL  :Gitv!<CR>
-    nnoremap <silent> <Space>gr  :<C-u>Unite giti/remote<CR>
+    " nnoremap <silent> <Space>gr  :<C-u>Unite giti/remote<CR>
     nnoremap <silent> <Space>gs  :<C-u>Unite giti/status<CR>
     " nnoremap <silent> <Space>gg  :<C-u>Unite giti/grep<CR>
 '''

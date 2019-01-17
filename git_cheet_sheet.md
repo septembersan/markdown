@@ -97,6 +97,5 @@ Git 2.9.0 から diff が賢くなり、compactionHeuristic を ON にしてお�
 git config --global diff.compactionHeuristic true
 # diffコマンドのオプションに --compaction-heuristic をつけるだけでもOK
 
-
-
-kyou
+kajfkajl
+kajflajkfjkla
