@@ -1,0 +1,587 @@
+# Usage
+# @reload:call dein#recache_runtimepath()
+# @lazy  :lazy = 1
+
+[[plugins]]
+repo = 't9md/vim-quickhl'
+hook_add ='''
+    nmap <Space>s <Plug>(quickhl-manual-this)
+    nmap <Space>se <Plug>(quickhl-manual-reset)
+'''
+
+[[plugins]]
+repo = 'vim-airline/vim-airline'
+
+[[plugins]]
+repo = 'vim-airline/vim-airline-themes'
+hook_add ='''
+    set laststatus=2
+    let g:airline_powerline_fonts = 1
+    let g:airline#extensions#whitespace#mixed_indent_algo = 1
+    let g:airline#extensions#tabline#buffer_idx_mode = 1
+    " let g:airline_theme = 'dracula'
+    let g:airline_theme = 'papercolor'
+    " let g:airline_theme = 'tomorrow'
+    let g:airline#extensions#tabline#enabled = 1
+    let g:airline#extensions#tabline#show_buffers = 0
+    let g:airline#extensions#tabline#tab_nr_type = 1
+    let g:airline#extensions#tabline#fnamemod = ':t'
+    " let g:airline_left_sep='>'
+'''
+
+[[plugins]]
+repo = 'MattesGroeger/vim-bookmarks'
+hook_add ='''
+    nnoremap mb :BookmarkToggle<CR>
+'''
+
+[[plugins]]
+repo = 'Shougo/dein.vim'
+
+[[plugins]] # 繧ｫ繝ｼ繧ｽ繝ｫ菴咲ｽｮ縺ｮ繧ｳ繝ｳ繝・く繧ｹ繝医↓蜷医ｏ縺帙※ft繧貞・繧頑崛縺医ｋ
+repo = 'osyo-manga/vim-precious'
+depends = ['context_filetype.vim']
+
+[[plugins]] # 繧ｫ繝ｼ繧ｽ繝ｫ菴咲ｽｮ縺ｮ繧ｳ繝ｳ繝・く繧ｹ繝医・ft繧貞愛螳壹☆繧九Λ繧､繝悶Λ繝ｪ
+repo = 'Shougo/context_filetype.vim'
+
+[[plugins]] # toml syntax
+repo = 'cespare/vim-toml'
+on_ft = 'toml'
+
+[[plugins]]
+repo = 'Shougo/neoyank.vim'
+
+[[plugins]]
+repo = 'kassio/neoterm'
+hook_add = '''
+    let g:neoterm_size = 10
+    let g:neoterm_autoscroll=1
+    " terminal position
+    let g:neoterm_default_mod='belowright'
+    " nnoremap <silent> <C-e> :TREPLSendLine<CR>j0
+    " vnoremap <silent> <C-e> V:TREPLSendSelection<CR>'>j$
+    " nnoremap <silent> <C-e> :call Exec_python()<cr><c-w>ki
+    nnoremap <silent> <C-e> :call Exec_python()<cr>
+    nnoremap <silent> tt :Ttoggle<CR>
+    nnoremap <silent> <F5> :T pdb %<CR><c-w>ki
+    function! Exec_python()
+        :w!
+        :Tclear
+        :T python %
+    endfunction
+
+    if has('vim_starting')
+        let &t_ti.="ﾂ･e[1 q"
+        let &t_SI.="ﾂ･e[5 q"
+        let &t_EI.="ﾂ･e[1 q"
+        let &t_te.="ﾂ･e[0 q"
+    endif
+
+    " Useful maps
+    " hide/close terminal
+    nnoremap <silent> <C-t>    :Topen <cr><c-w>ji
+    "nnoremap <silent> th :call neoterm#close()<cr>
+    " clear terminal
+    "nnoremap <silent> tl :call neoterm#clear()<cr>
+    " kills the current job (send a <c-c>)
+    "nnoremap <silent> tc :call neoterm#kill()<cr>
+'''
+
+[[plugins]]
+repo = 'jonathanfilip/vim-lucius'
+
+[[plugins]]
+repo = 'tomasr/molokai'
+
+[[plugins]]
+repo = 'jacoborus/tender.vim'
+
+[[plugins]]
+repo = 'Shougo/neomru.vim'
+
+[[plugins]]
+repo = 'vim-scripts/Align'
+hook_add = '''
+    vnoremap <Space>a :Align 
+    let g:Align_xstrlen=3
+'''
+
+[[plugins]]
+repo = 'majutsushi/tagbar'
+lazy = 1
+hook_add = '''
+    noremap <silent> <F8> :TagbarToggle<CR>
+'''
+hook_source = '''
+    " [Usage]
+    " tag jump: p
+    let g:tagbar_width = 30
+    let g:tagbar_autoshowtag = 0
+    let g:tagbar_expand = 1
+    " let g:tagbar_left = 1
+    "set statusline=%F%m%r%h%wﾂ･%=%{tagbar#currenttag('[%s]','')}ﾂ･[Pos=%v,%l]ﾂ･[Len=%L]
+'''
+
+[[plugins]]
+repo = 'vim-scripts/zoom.vim'
+hook_add = '''
+'''
+
+[[plugins]]
+repo = 'Lokaltog/vim-easymotion'
+hook_add = '''
+    " let g:EasyMotion_do_mapping = 0
+    " nmap s <Plug>(easymotion-s2)
+    " xmap s <Plug>(easymotion-s2)
+    " omap z <Plug>(easymotion-s2)
+    " nmap g/ <Plug>(easymotion-sn)
+    " xmap g/ <Plug>(easymotion-sn)
+    " omap g/ <Plug>(easymotion-tn)
+    " let g:EasyMotion_smartcase = 1
+    " map <Leader>j <Plug>(easymotion-j)
+    " map <Leader>k <Plug>(easymotion-k)
+    " let g:EasyMotion_startofline = 0
+    " let g:EasyMotion_keys = 'QZASDFGHJKL;'
+    " let g:EasyMotion_use_upper = 1
+    " let g:EasyMotion_enter_jump_first = 1
+    " let g:EasyMotion_space_jump_first = 1
+    " hi EasyMotionTarget guifg=#80a0ff ctermfg=81
+'''
+
+[[plugins]]
+repo = 'thinca/vim-quickrun'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = '5t111111/alt-gtags.vim'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'fuenor/qfixgrep'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'fuenor/qfixhowm'
+hook_add ='''
+    let QFixHown_Key = 'g'
+    if has('win64')
+        let howm_dir = 'c:/howm'
+        let howm_fileencoding = 'cp932'
+        let howm_fileformat = 'dos'
+    else
+        let howm_dir = '/home/okada-hxf'
+        let howm_fileencoding = 'utf-8'
+        let howm_fileencoding = 'unix'
+    endif
+    let howm_filename = '%Y/%m/%Y^%m-%d-%H%M%S.txt'
+    let g:QFixHowm_WildCardChapter = 1
+    let QFixHowm_FoldingChapterTitle = 1
+    let QFixHowm_Folding = 0
+
+    nnoremap <space>a gg<S-v><S-g>
+    vnoremap <space>c "*y
+    nnoremap <space>v "*p
+'''
+
+[[plugins]]
+repo = 'junegunn/vim-easy-align'
+hook_add ='''
+    vnoremap <Enter> <Plug>(EasyAlign)
+    nnoremap ga <Plug>(EasyAlign)
+'''
+
+[[plugins]]
+repo = 'pebble8888/doxygen_comment_creator'
+hook_add ='''
+'''
+
+# [[plugins]]
+# repo = 'vim-scripts/gtags.vim'
+# hook_add ='''
+# '''
+
+[[plugins]]
+repo = 'tomasr/molokai'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'vim-scripts/DoxygenToolkit.vim'
+hook_add ='''
+    noremap ,d :Dox<CR>
+'''
+
+[[plugins]]
+repo = 'Shougo/neosnippet.vim'
+hook_add ='''
+    inoremap <C-k> <Plug>(neosnippet_expand_or_jump)
+    snoremap <C-k> <Plug>(neosnippet_expand_or_jump)
+    xnoremap <C-k> <Plug>(neosnippet_expand_target)
+'''
+
+[[plugins]]
+repo = 'fuenor/qfixgrep'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'tomasr/molokai'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'vim-scripts/DoxygenToolkit.vim'
+hook_add ='''
+    noremap ,d :Dox<CR>
+'''
+
+[[plugins]]
+repo = 'Shougo/neosnippet.vim'
+hook_add ='''
+inoremap <C-k> <Plug>(neosnippet_expand_or_jump)
+snoremap <C-k> <Plug>(neosnippet_expand_or_jump)
+xnoremap <C-k> <Plug>(neosnippet_expand_target)
+let g:neosnippet#snippets_directory='窶ｾ/.vim/bundle/neosnippet-snippets/snippets/,窶ｾ/.vim/snippets'
+'''
+
+[[plugins]]
+repo = 'Shougo/neosnippet-snippets'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'kana/vim-operator-user'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'kana/vim-operator-replace'
+hook_add ='''
+map t <Plug>(operator-replace)
+'''
+
+[[plugins]]
+repo = 'rhysd/vim-operator-surround'
+hook_add ='''
+    " nnoremap sa <Plug>(operator-surround-append-input-in-advance)
+    " nnoremap s( <Plug>(operator-surround-append-input-in-advance)(
+    " nnoremap sb <Plug>(operator-surround-append-input-in-advance)(
+    " nnoremap s{ <Plug>(operator-surround-append-input-in-advance){
+    " nnoremap s[ <Plug>(operator-surround-append-input-in-advance)[
+    " nnoremap s" <Plug>(operator-surround-append-input-in-advance)"
+    " nnoremap s' <Plug>(operator-surround-append-input-in-advance)'
+    map <silent>sa <Plug>(operator-surround-append)
+    map <silent>sd <Plug>(operator-surround-delete)
+    map <silent>sr <Plug>(operator-surround-replace)
+
+    nmap <silent>sdd <Plug>(operator-surround-delete)<Plug>(textobj-multiblock-a)
+    nmap <silent>srr <Plug>(operator-surround-replace)<Plug>(textobj-multiblock-a)
+
+    "map <silent>sdd <Plug>(operator-surround-delete)<Plug>(textobj-anyblock-a)
+    "map <silent>srr <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)
+
+    "map <silent>sdb <Plug>(operator-surround-delete)<Plug>(textobj-between-a)
+    "map <silent>srb <Plug>(operator-surround-replace)<Plug>(textobj-between-a)
+'''
+
+[[plugins]]
+repo = 'emonkak/vim-operator-comment'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'emonkak/vim-operator-sort'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'osyo-manga/vim-operator-search'
+hook_add ='''
+    " nmap <Space>/ <Plug>(operator-search)<cr>
+    " vmap <Space>/ <Plug>(operator-search)
+    " nmap <Space>; <Plug>(operator-search)if
+'''
+
+[[plugins]]
+repo = 'AndrewRadev/linediff.vim'
+hook_add ='''
+let g:linediff_first_buffer_command = 'leftabove new'
+let g:linediff_secommand_buffer_command = 'rightbelow vertical new'
+vnoremap <C-d> :Linediff<CR>
+'''
+
+[[plugins]]
+repo = 'Vimjas/vim-python-pep8-indent'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'Shougo/denite.nvim'
+hook_add ='''
+    " http://replicity.hateblo.jp/entry/2017/06/03/140731
+    call denite#custom#option('default', 'prompt', '>')
+    call denite#custom#option('default', 'direction', 'top')
+    " key mappings
+    " noremap [Denite] <Nop>
+    " nmap <Leader>f [Denite]
+
+    nnoremap <silent> <Space>o :<C-u>Denite -direction=top file_mru<CR>
+    nnoremap <silent> <Space>b :<C-u>Denite -direction=top buffer<CR>
+    nnoremap <silent> <Space>f :<C-u>DeniteBufferDir -direction=top file_rec<CR>
+    nnoremap <silent> <Space>g :<C-u>DeniteBufferDir -direction=top grep<CR>
+    nnoremap <silent> <Space>i :<C-u>Denite line -direction=top<CR>
+    nnoremap <silent> ,g       :<C-u>Denite grep -direction=top -no-empty -no-quit -buffer-name=search-buffer<CR>
+    "nnoremap <silent> <Space>n :<C-u>Denite -resume -immediately -select=+1<CR>
+    "nnoremap <silent> <Space>p :<C-u>Denite -resume -immediately -select=-1<CR>
+    "nnoremap <Space>d :<C-u>Denite -direction=topleft -cursor-wrap=true bookmark<CR>
+    "nnoremap <Space>a :<C-u>DeniteBookmarkAdd<CR>
+    "nnoremap <Space>h :<C-u>Denite help<CR>
+    " 繧ｦ繧｣繝ｳ繝峨え繧貞・蜑ｲ縺励※髢九￥
+    call denite#custom#map('_', "<C-h>", '<denite:do_action:split>')
+    call denite#custom#map('insert', "<C-h>", '<denite:do_action:split>')
+    " 繧ｦ繧｣繝ｳ繝峨え繧堤ｸｦ縺ｫ蛻・牡縺励※髢九￥
+    call denite#custom#map('_', "<C-v>", '<denite:do_action:vsplit>')
+    call denite#custom#map('insert', "<C-v>", '<denite:do_action:vsplit>')
+    " 繧ｦ繧｣繝ｳ繝峨え繧偵ち繝悶〒髢九￥
+    call denite#custom#map('normal', "t", '<denite:do_action:tabopen>')
+    "call denite#custom#map('insert', "t", '<denite:do_action:tabopen>')
+    " 繧､繝ｳ繧ｵ繝ｼ繝遺・繝弱・繝槭Ν繝｢繝ｼ繝・
+    call denite#custom#map('insert', "mm", '<denite:enter_mode:normal>')
+    " denite 邨ゆｺ・
+    " call denite#custom#map('insert', '<C-m>', '<denite:quit>', 'noremap')
+
+    if executable('rg')
+        " 繧ｳ繝槭Φ繝会ｼ伺ile_rec 縺ｧ菴ｿ縺・さ繝槭Φ繝・
+        " call denite#custom#var('file_rec', 'command', ['rg', '--files', '--glob', '!.git'])
+        " 繧ｳ繝槭Φ繝会ｼ使rep 縺ｧ菴ｿ縺・さ繝槭Φ繝・
+        call denite#custom#var('grep', 'command', ['rg'])
+        "call denite#custom#var('grep', 'recursive_opts', )
+        "call denite#custom#var('grep', 'final_opts', )
+        call denite#custom#var('grep', 'separator', ['--'])
+        call denite#custom#var('grep', 'default_opts', ['--vimgrep', '--no-heading'])
+    endif
+'''
+
+[[plugins]]
+repo = 'Shougo/deoplete.nvim'
+if = 'has("nvim")'
+on_i = 1
+hook_source = '''
+    let g:deoplete#enable_at_startup = 1
+'''
+hook_post_source = '''
+    let g:deoplete#omni_patterns = {}
+'''
+
+[[plugins]]
+repo = 'zchee/deoplete-jedi'
+on_ft = 'python'
+# hook_add = '''
+hook_source = '''
+    let g:deoplete#sources#jedi#python_path = '/root/anaconda3/bin/python'
+'''
+
+[[plugins]]
+repo = 'davidhalter/jedi-vim'
+lazy=1
+# hook_add = '''
+# '''
+hook_source = '''
+        let g:jedi#auto_initialization = 1
+        let g:jedi#auto_vim_configuration = 1
+
+        "nnoremap [jedi] <Ctrl>
+        "xnoremap [jedi] <Ctrl>
+        "nnoremap <Leader>j [jedi]
+        "xnoremap <Leader>j [jedi]
+
+        "# 陬懷ｮ後く繝ｼ縺ｮ險ｭ螳壹％縺ｮ蝣ｴ蜷・??Ctrl+Space
+        let g:jedi#completions_command = "<C-Space>"
+        "# 螟画焚縺ｮ螳｣險蝣ｴ謇縺ｸ繧ｸ繝｣繝ｳ繝・??Ctrl + g)
+        let g:jedi#goto_assignments_command = "<C-g>"
+        "# 繧ｯ繝ｩ繧ｹ???髢｢謨ｰ螳夂ｾｩ縺ｫ繧ｸ繝｣繝ｳ繝・??Gtrl + d???
+        let g:jedi#goto_definitions_command = "<C-j>"
+        "# Pydoc繧定｡ｨ遉ｺ???Ctrl + k???
+        let g:jedi#documentation_command = "<C-k>"
+        let g:jedi#rename_command = "[jedi]r"
+        "let g:jedi#usages_command = "<C-h>"
+        let g:jedi#popup_select_first = 0
+        " let g:jedi#popup_on_dot = 0
+        let g:jedi#show_call_signatures = 1
+        let g:jedi#show_call_signatures_delay = 10
+
+        nnoremap <C-j> :call jedi#goto_definitions()<CR>
+        " nnoremap <C-j> :call jedi#goto_definitions()<CR>
+'''
+
+[[plugins]]
+repo = 'iyuuya/denite-ale'
+
+[[plugins]]
+repo = 'w0rp/ale'
+hook_add = '''
+    let g:ale_sign_error = 'x'
+    let g:ale_sign_warning = '?'
+    let g:ale_lint_on_save = 1
+    let g:ale_lint_on_text_changed = 0
+    let g:ale_statusline_format = ['x %d', '? %d', 'o ok']
+    let g:ale_linters = { 'python': ['flake8'], }
+
+    nmap [ale] <Nop>
+    map <C-k> [ale]
+    nmap <silent> [ale]<C-p> <Plug>(ale_previous)
+    nmap <silent> [ale]<C-n> <Plug>(ale_next)
+
+    highlight clear ALEErrorSign
+    highlight clear ALEWarningSign
+    " let g:ale_sign_column_always = 1
+    " let g:ale_lint_on_enter = 1
+    " let g:lightline = {
+    "             \'active': {
+    "             \ 'left': [
+    "             \   ['mode', 'paste'],
+    "             \   ['readonly', 'filename', 'modified', 'ale'],
+    "             \],
+    "             \},
+    "             \'component_function':{
+    "             \   'ale': 'ALEGetStatusLine'
+    "             \}
+    "             \}
+'''
+
+[[plugins]]
+repo = 'Vimjas/vim-python-pep8-indent'
+on_ft = 'python'
+
+[[plugins]]
+repo = 'tpope/vim-dispatch'
+
+[[plugins]]
+repo = 'janko-m/vim-test'
+depends = ['vim-dispatch']
+hook_add = '''
+    let g:test#strategy = 'dispatch'
+'''
+
+[[plugins]]
+repo = 'aliev/vim-compiler-python'
+
+[[plugins]]
+repo = 'hellosputnik/vim-plugin'
+hook_add = '''
+    " let g:kite_auto_complete=0
+    " let g:kite_tab_complete=1
+    " set completeopt-=menu
+    " set completeopt+=menuone
+    " set completeopt-=longest
+    " set completeopt-=preview
+    " set completeopt+=noinsert
+    " set completeopt-=noselect
+    " set completeopt+=preview
+    " autocmd CompleteDone * if !pumvisible() | pclose | endif
+    " set belloff+=ctrlg
+    " nmap <silent> <buffer> gK <Plug>(kite-hover)
+    " let g:kite_documentation_continual=1
+    " let g:kite_preview_code=1
+    " let g:kite_override_sign_column_highlight=0
+    " set statusline=%<%fﾂ･ %h%m%r%{kite#statusline()}%=%-14.(%l,%c%V%)ﾂ･ %P
+    " set laststatus=2
+'''
+
+[[plugins]]
+repo = 'neovim/python-client'
+
+# [[plugins]]
+# repo = 'lighttiger2505/gtags.vim'
+# hook_add = '''
+#     " Options
+#     let g:Gtags_Auto_Map = 0
+#     let g:Gtags_OpenQuickfixWindow = 1
+#     " Keymap
+#     " Show definetion of function cousor word on quickfix
+#     nmap <silent> K :<C-u>exe("Gtags ".expand('<cword>'))<CR>
+#     " Show reference of cousor word on quickfix
+#     nmap <silent> R :<C-u>exe("Gtags -r ".expand('<cword>'))<CR>
+# '''
+
+[[plugins]]
+repo = 'ozelentok/denite-gtags'
+hook_add = '''
+   nmap <C-j> :DeniteCursorWord -buffer-name=gtags_def gtags_def<cr>
+   nmap <C-h> :DeniteCursorWord -buffer-name=gtags_ref gtags_ref<cr>
+'''
+
+[[plugins]]
+repo = 'jsfaint/gen_tags.vim'
+hook_add = '''
+    let g:gen_tags#gtags_auto_gen = 1
+'''
+
+[[plugins]]
+repo = 'tyru/caw.vim.git'
+hook_add ='''
+    nmap cc <Plug>(caw:hatpos:toggle)
+    vmap cc <Plug>(caw:hatpos:toggle)
+'''
+
+[[plugins]]
+repo = 'dracula/vim'
+
+[[plugins]]
+repo = 'scrooloose/nerdtree'
+hook_add ='''
+    " autocmd vimenter * NERDTree
+    nnoremap <F7> :NERDTreeToggle<cr>
+    let g:NERDTreeDirArrows = 1
+    let g:NERDTreeDirArrowExpandable  = '笆ｶ'
+    let g:NERDTreeDirArrowCollapsible = '笆ｼ'
+    let g:NERDTreeMapPreviewSplit = "h"
+    let g:NERDTreeMapOpenVSplit = "v"
+    let g:NERDTreeMapPreviewVSplit = "<C-v>"
+    let g:NERDTreeMapOpenInTabSilent = "<C-t>"
+    let g:NERDTreeMapActivateNode = "<C-j>"
+'''
+
+[[plugins]]
+repo = 'xolox/vim-misc'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'xolox/vim-session'
+depends = ['xolox/vim-misc']
+hook_add ='''
+    nnoremap <F10> :SaveSession 
+    nnoremap <silent> <F11> :OpenSession<CR>
+
+    " 迴ｾ蝨ｨ縺ｮ繝・ぅ繝ｬ繧ｯ繝医Μ逶ｴ荳九・ .vimsessions/ 繧貞叙蠕・
+    let s:local_session_directory = '~/.config/nvim/sessions'
+    " session菫晏ｭ倥ョ繧｣繝ｬ繧ｯ繝医Μ繧偵◎縺ｮ繝・ぅ繝ｬ繧ｯ繝医Μ縺ｮ險ｭ螳・
+    let g:session_directory = s:local_session_directory
+    " vim邨ゆｺ・凾縺ｫ閾ｪ蜍穂ｿ晏ｭ・
+    let g:session_autosave = 'yes'
+    " 蠑墓焚縺ｪ縺励〒vim繧定ｵｷ蜍輔＠縺滓凾縺ｫsession菫晏ｭ倥ョ繧｣繝ｬ繧ｯ繝医Μ縺ｮdefault.vim繧帝幕縺・
+    let g:session_autoload = 'yes'
+    " 5蛻・俣縺ｫ1蝗櫁・蜍穂ｿ晏ｭ・
+    let g:session_autosave_periodic = 5
+    unlet s:local_session_directory
+'''
+
+# [[plugins]]
+# repo = 'mattn/sonictemplate-vim'
+# hook_add ='''
+#     let g:sonictemplate_vim_template_dir = [
+#           \ '~/.config/nvim/template'
+#           \]
+# '''
+
+[[plugins]]
+repo = 'nathanaelkane/vim-indent-guides'
+hook_add ='''
+    nnoremap _i<CR> :IndentGuidesToggle
+    let g:indent_guides_enable_on_vim_startup = 1
+'''

@@ -69,8 +69,8 @@ hook_add = '''
     let g:neoterm_autoinsert = 1
     " terminal position
     let g:neoterm_default_mod='belowright'
-    nnoremap <silent> <C-e><C-e> :call My_TREPLSendSelection()<cr>
-    vnoremap <silent> <C-e><C-e> V:TREPLSendSelection<cr>
+    " nnoremap <silent> <C-e><C-e> :call My_TREPLSendSelection()<cr>
+    " vnoremap <silent> <C-e><C-e> V:TREPLSendSelection<cr>
     nnoremap <silent> <C-e><C-f> :call Exec_python()<cr>
     " nnoremap <silent> <C-e><C-f> :TREPLSendFile<cr>'>j0
     nnoremap <silent> ttn  :Tnew<CR>
@@ -150,7 +150,8 @@ hook_add = '''
 repo = 'majutsushi/tagbar'
 lazy = 1
 hook_add = '''
-    nnoremap <silent><Space>t :call MyOpenBar()<cr>
+    " nnoremap <silent><Space>t :call MyOpenBar()<cr>
+    nnoremap <silent><Space>t :TagbarOpenAutoClose<cr>
     nnoremap <silent><F8>     :TagbarToggle<cr>
     function! MyOpenBar()
         if expand("%:t") =~ ".*\.md"
@@ -419,11 +420,12 @@ hook_add ='''
     " nnoremap <silent> <Space>g :<C-u>DeniteBufferDir -direction=top grep<CR>
     nnoremap <silent> <Space>i :<C-u>Denite line -direction=top<CR>
     nnoremap <silent> ,g       :<C-u>Denite grep -direction=top -no-empty -no-quit -buffer-name=search-buffer<CR>
+    nnoremap <silent> <Space>uh :<C-u>Denite help<CR>
     "nnoremap <silent> <Space>n :<C-u>Denite -resume -immediately -select=+1<CR>
     "nnoremap <silent> <Space>p :<C-u>Denite -resume -immediately -select=-1<CR>
     "nnoremap <Space>d :<C-u>Denite -direction=topleft -cursor-wrap=true bookmark<CR>
     "nnoremap <Space>a :<C-u>DeniteBookmarkAdd<CR>
-    "nnoremap <Space>h :<C-u>Denite help<CR>
+    nnoremap <Space>c :Denite command_history<CR>
     " ウィンドウを分割して開く
     call denite#custom#map('_', "<C-h>", '<denite:do_action:split>')
     call denite#custom#map('insert', "<C-h>", '<denite:do_action:split>')
@@ -524,6 +526,7 @@ repo = 'iyuuya/denite-ale'
 [[plugins]]
 repo = 'w0rp/ale'
 hook_add = '''
+    " Installation: pip3.6 install flake8 flake8-import-order autopep8 black isort
     let g:ale_sign_error = '>>'
     let g:ale_sign_warning = '??'
     let g:ale_lint_on_save = 1
@@ -535,27 +538,18 @@ hook_add = '''
                 \   'javascript': ['eslint'],
                 \   'JSON': ['jq']
                 \}
+    let g:ale_fixers = {
+    \ 'python': ['autopep8', 'black', 'isort'],
+    \ }
 
     nmap [ale] <Nop>
-    map <C-k> [ale]
-    nmap <silent> [ale]<C-p> <Plug>(ale_previous)
-    nmap <silent> [ale]<C-n> <Plug>(ale_next)
+    map <c-a> [ale]
+    nmap <silent> [a <Plug>(ale_previous)
+    nmap <silent> ]a <Plug>(ale_next)
+    nmap <silent> [ale]<c-f> <Plug>(ale_fix)
 
     highlight clear ALEErrorSign
     highlight clear ALEWarningSign
-    " let g:ale_sign_column_always = 1
-    " let g:ale_lint_on_enter = 1
-    " let g:lightline = {
-    "             \'active': {
-    "             \ 'left': [
-    "             \   ['mode', 'paste'],
-    "             \   ['readonly', 'filename', 'modified', 'ale'],
-    "             \],
-    "             \},
-    "             \'component_function':{
-    "             \   'ale': 'ALEGetStatusLine'
-    "             \}
-    "             \}
 '''
 
 [[plugins]]
@@ -800,7 +794,6 @@ depends = 'unite.vim'
 hook_add ='''
 '''
 
-
 [[plugins]]
 repo = 'Shougo/vimproc.vim' 
 build = 'make'
@@ -844,7 +837,7 @@ hook_add ='''
 repo = 'tpope/vim-fugitive' 
 hook_add ='''
     " Usage:
-    "   * reference file in other current branch.
+    "   * reference other branch file in current branch.
     "       :Gvsplit origin/other_branch:filename.hoge
     "       :Gedit other_branch:%
     "   * cancel modification before commit.
@@ -856,14 +849,18 @@ hook_add ='''
     nnoremap <silent> <Space>gd :Gdiff<cr>
     nnoremap <silent> <Space>vs :Gstatus<cr>
     nnoremap <silent> <Space>vl :Glog<cr>
-    nnoremap <silent> <Space>gr :Gread<cr>
+    " nnoremap <silent> <Space>gr :Gread<cr>
     nnoremap <Space>ge :Gvdiff :%<left><left>
     nnoremap <Space>gp :Gpull 
-    nnoremap <Space>gs :Gstatus<cr>
+    nnoremap <Space>gss :Gstatus<cr>
     nnoremap <Space>gg :call My_Ggrep()<cr>
     nnoremap <Space>gj :call My_Cursor_Under_Ggrep()<cr>
     nnoremap <Space>gcc :Gcommit -m ""<left>
     nnoremap <Space>gca :Gcommit -amend<cr>
+    nnoremap <Space>gr :Gvsplit :<left><left>
+    nnoremap gst :Git stash save ""<left>
+    nnoremap <silent> gss :Git stash list<cr>
+    nnoremap gsa :Git stash apply stash@{}<left>
     function! My_Cursor_Under_Ggrep()
         :Gcd
         call feedkeys("yiw")
@@ -892,7 +889,7 @@ hook_add ='''
     nnoremap <silent> <Space>gl  :Gitv<CR>
     nnoremap <silent> <Space>gL  :Gitv!<CR>
     " nnoremap <silent> <Space>gr  :<C-u>Unite giti/remote<CR>
-    " nnoremap <silent> <Space>gs  :<C-u>Unite giti/status<CR>
+    nnoremap <silent> <Space>gsu  :<C-u>Unite giti/status<CR>
     " nnoremap <silent> <Space>gg  :<C-u>Unite giti/grep<CR>
 '''
 
@@ -904,13 +901,22 @@ hook_add ='''
 [[plugins]]
 repo = 'gregsexton/gitv' 
 hook_add ='''
-    " Frequently cmd
+    " Usage: Frequently cmd
     " ------------------------
+    " > https://wonderwall.hatenablog.com/entry/2016/03/26/211710
+    "
     " * ファイルごとのdiffを確認する場合
     "   :Gitv! -> D (diff) # compare file(between HEAD and select commit)
     " * ログからdiffを確認する場合(一覧)
     "   :Gitv  -> Enter -> zM
     "   :Gitv  -> Enter -> Enter on target file
+    nnoremap <Space>gh :GitGutterLineHighlightsToggle<cr>
+    nmap ]g <Plug>GitGutterNextHunk
+    nmap [g <Plug>GitGutterPrevHunk
+    nmap <Space>gha <Plug>GitGutterStageHunk
+    nmap <Space>ghu <Plug>GitGutterUndoHunk
+    nmap <Space>ghp <Plug>GitGutterPreviewHunk
+
     autocmd FileType git call s:gitv_my_settings()
     function! s:gitv_my_settings()
         " set statusline+=%{fugitive#statusline()}
@@ -986,13 +992,13 @@ hook_add ='''
 
 [[plugins]]
 repo = 'kannokanno/previm' 
-on_ft = 'markdown'
+on_ft = ['markdown', 'rst']
 hook_add ='''
 '''
 
 [[plugins]]
 repo = 'tyru/open-browser.vim' 
-on_ft = 'markdown'
+on_ft = ['markdown', 'rst']
 hook_add ='''
 '''
 
@@ -1065,21 +1071,54 @@ repo = 'autozimu/LanguageClient-neovim'
 rev = 'next'
 build = 'bash install.sh'
 hook_add ='''
-    " Usage: 
-    " python: pip install python-language-server
+    " Installation: pip install python-language-server
     set hidden
+    let language_client_python_path = join([substitute(system('which python3.6'), "python3.6\n", "", ""), "pyls"], '/')
     let g:LanguageClient_serverCommands = {
         \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
-        \ 'python': ['/usr/bin/pyls'],
+        \ 'python': [language_client_python_path],
         \ }
     nnoremap <F5> :call LanguageClient_contextMenu()<CR>
-    nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
-    nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
-    nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
-    " nnoremap <silent> rd :call LanguageClient#textDocument_references()<cr>
+    nnoremap <silent> <c-j>k :call LanguageClient#textDocument_hover()<CR>
+    nnoremap <silent> <c-j>jl :call LanguageClient#textDocument_definition()<CR>
+    " nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+    nnoremap <silent> <c-j>r :call LanguageClient#textDocument_references()<cr>
+    " nnoremap <silent> gdi :call LanguageClient#textDocument_implementation()<CR>
+    " nnoremap <silent> gdf :call LanguageClient#textDocument_formatting()<CR>
 '''
 
 [[plugins]]
 repo = 'ryanoasis/vim-devicons'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'szkny/SplitTerm'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'szkny/Ipython'
+hook_add ='''
+    nnoremap  <silent> <c-e><c-e> :Ipython<CR>
+    vnoremap  <silent> <c-e><c-e> :VIpython<CR>
+
+    " ipythonコマンドのコマンドライン引数
+	let g:ipython_startup_options = ['--no-confirm-exit']
+
+	" ipython起動時実行するコマンドリスト
+	" let g:ipython_startup_command = [
+				"\'from pylab import *',
+				"\'import pandas as pd',
+				"\'pd.options.display.max_rows = 10',
+				"\'pd.options.display.max_columns = 10',
+				"\'pd.options.display.precision = 3']
+
+	" ウィンドウ幅 ( 0 にすると自動で設定)
+	let g:ipython_window_width = 0
+'''
+
+[[plugins]]
+repo = 'nelstrom/vim-visual-star-search'
 hook_add ='''
 '''

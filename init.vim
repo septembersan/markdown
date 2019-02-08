@@ -129,6 +129,7 @@ function! My_tabclose()
 endfunction
 nnoremap <silent>vp gv
 nnoremap dif :windo diffthis<cr>
+nnoremap dio :diffoff<cr>
 "}}}
 " setting fold{{{
 set modeline
@@ -279,3 +280,4 @@ endif"}}}
 autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
 set dictionary=/usr/share/dict/words
 nnoremap ms :Recter<cr>
+" set updatetime=250
