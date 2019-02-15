@@ -281,3 +281,16 @@ autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
 set dictionary=/usr/share/dict/words
 nnoremap ms :Recter<cr>
 " set updatetime=250
+nnoremap tbn :split enew<cr>
+nnoremap tbs :vsplit enew<cr>
+
+" settings convert ipynb to python{{{
+" augroup ipynb
+"     autocmd!
+"     autocmd BufRead *.ipynb
+" augroup END
+" command! Nbconvert setlocal
+" jupyter nbconvert --to python expand("%")
+"}}}
+" autocmd BufWritePost ~/.config/nvim/init.vim so ~/.config/nvim/init.vim
+" autocmd BufWritePost ~/.config/nvim/dein.toml execute UpdateRemotePlugins

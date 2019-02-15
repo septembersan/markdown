@@ -309,6 +309,16 @@ hook_add ='''
 '''
 
 [[plugins]]
+repo = 'thinca/vim-textobj-between'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'rhysd/vim-textobj-anyblock'
+hook_add ='''
+'''
+
+[[plugins]]
 repo = 'osyo-manga/vim-operator-stay-cursor'
 hook_add ='''
     map y <Plug>(operator-stay-cursor-yank)
@@ -344,7 +354,7 @@ hook_add ='''
 [[plugins]]
 repo = 'kana/vim-operator-replace'
 hook_add ='''
-map R <Plug>(operator-replace)
+map t <Plug>(operator-replace)
 '''
 
 [[plugins]]
@@ -357,13 +367,13 @@ hook_add ='''
     " nnoremap s[ <Plug>(operator-surround-append-input-in-advance)[
     " nnoremap s" <Plug>(operator-surround-append-input-in-advance)"
     " nnoremap s' <Plug>(operator-surround-append-input-in-advance)'
-    map <silent>sa <Plug>(operator-surround-append)
-    map <silent>sd <Plug>(operator-surround-delete)
-    map <silent>sr <Plug>(operator-surround-replace)
+    nmap <silent>s <Plug>(operator-surround-append)
+    nmap <silent>ds <Plug>(operator-surround-delete)i
+    nmap <silent>cs <Plug>(operator-surround-replace)i
 
-    nmap <silent>saa <Plug>(operator-surround-append)<Plug>(textobj-multiblock-a)
-    nmap <silent>sdd <Plug>(operator-surround-delete)<Plug>(textobj-multiblock-a)
-    nmap <silent>srr <Plug>(operator-surround-replace)<Plug>(textobj-multiblock-a)
+    " nmap <silent>ss <Plug>(operator-surround-append)<Plug>(textobj-multiblock-a)
+    " nmap <silent>ds <Plug>(operator-surround-delete)<Plug>(textobj-multiblock-a)
+    " nmap <silent>cs <Plug>(operator-surround-replace)<Plug>(textobj-multiblock-a)
 
     "map <silent>sdd <Plug>(operator-surround-delete)<Plug>(textobj-anyblock-a)
     "map <silent>srr <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)
@@ -420,7 +430,7 @@ hook_add ='''
     " nnoremap <silent> <Space>g :<C-u>DeniteBufferDir -direction=top grep<CR>
     nnoremap <silent> <Space>i :<C-u>Denite line -direction=top<CR>
     nnoremap <silent> ,g       :<C-u>Denite grep -direction=top -no-empty -no-quit -buffer-name=search-buffer<CR>
-    nnoremap <silent> <Space>uh :<C-u>Denite help<CR>
+    nnoremap <silent> <Space>vh :<C-u>Denite help<CR>
     "nnoremap <silent> <Space>n :<C-u>Denite -resume -immediately -select=+1<CR>
     "nnoremap <silent> <Space>p :<C-u>Denite -resume -immediately -select=-1<CR>
     "nnoremap <Space>d :<C-u>Denite -direction=topleft -cursor-wrap=true bookmark<CR>
@@ -1108,7 +1118,7 @@ hook_add ='''
 
 	" ipython起動時実行するコマンドリスト
 	" let g:ipython_startup_command = [
-				"\'from pylab import *',
+				"\' from pylab import *',
 				"\'import pandas as pd',
 				"\'pd.options.display.max_rows = 10',
 				"\'pd.options.display.max_columns = 10',
