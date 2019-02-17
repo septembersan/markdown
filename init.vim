@@ -188,8 +188,8 @@ colorscheme iceberg
 " set termguicolors
 syntax on
 "}}}
-let g:python_host_prog = substitute(system('which python3.6'), "\n", "", "")
-let g:python3_host_prog = substitute(system('which python3.6'), "\n", "", "")
+let g:python_host_prog = substitute(system('which python3.7'), "\n", "", "")
+let g:python3_host_prog = substitute(system('which python3.7'), "\n", "", "")
 " settings deoplete{{{
 set completeopt=menuone
 "}}}
