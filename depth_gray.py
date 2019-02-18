@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+# references
+# * chrome-extension://lcopgfbpbmionefhhgbamgmejggljpbb/http://rudrapoudel.com/docs/Poudel_ISVC2013.pdf
+# * chrome-extension://lcopgfbpbmionefhhgbamgmejggljpbb/https://www.cv-foundation.org/openaccess/content_cvpr_2014/papers/Qian_Realtime_and_Robust_2014_CVPR_paper.pdf
 
 #############################################
 #      D415 Depth画像の表示&キャプチャ
@@ -9,32 +12,59 @@ import cv2
 
 
 face_cascade_path = 'haarcascade_frontalface_default.xml'
+eyes_cascade_path = 'haarcascade_eye_tree_eyeglasses.xml'
 face_color_hs_map = np.zeros(256*256).reshape(256, 256)
 
 
 def face_detect(color_img):
-    img = color_img.copy()
-    face_cascade = cv2.CascadeClassifier(face_cascade_path)
+    is_detected = False
 
+    img = color_img.copy()
     src_gray = cv2.cvtColor(color_img, cv2.COLOR_BGR2GRAY)
+
+    face_cascade = cv2.CascadeClassifier(face_cascade_path)
+    eyes_cascade = cv2.CascadeClassifier(eyes_cascade_path)
 
     faces = face_cascade.detectMultiScale(src_gray)
 
     for x, y, w, h in faces:
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
-        cx = x + (w//2)
-        cy = y + (h//2)
-        cv2.rectangle(img, (cx+20, cy+20), (cx-20, cy-20), (0, 255, 0), 2)
         hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        small_face = hsv_img[cy-20: cy+20, cx-20: cx+20]
-        # face_gray = src_gray[y: y + h, x: x + w]
+        eyes = eyes_cascade.detectMultiScale(src_gray)
+
+        if len(eyes) < 2:
+            continue
+        is_detected = True
+
+        # draw eyes region
+        for (ex, ey, ew, eh) in eyes:
+            cv2.rectangle(img, (ex, ey), (ex + ew, ey + eh), (0, 0, 255), 2)
+
+        # get nose region
+        ex1, ey1, ew1, eh1 = eyes[0]
+        ex2, ey2, ew2, eh2 = eyes[1]
+
+        nose_points = []
+        if ex1 < ex2:
+            # ex1 is left eye
+            nose_points += [ey1+eh1, ey1+eh1+eh1, ex1+ew1, ex2]
+        else:
+            # ex2 is left eye
+            nose_points += [ey2+eh2, ey2+eh2+eh2, ex2+ew2, ex1]
+
+        cv2.rectangle(img,
+                      (nose_points[2], nose_points[0]),
+                      (nose_points[3], nose_points[1]),
+                      (0, 125, 255), 2)
+        small_face = hsv_img[nose_points[0]:nose_points[1],
+                             nose_points[2]:nose_points[3]]
 
         for pixel_line in small_face:
             for pixel in pixel_line:
                 h, s, v = pixel
                 face_color_hs_map[h][s] = 1
 
-    return img
+    return is_detected, img
 
 
 def skin_color_filter_with_hs_space(filtered_img, hsv_img, face_color_hs_map):
@@ -69,17 +99,28 @@ depth_scale = depth_sensor.get_depth_scale()
 distance_max = TARGET_DISTANCE/depth_scale
 print('Depth Scale = {} -> {}'.format(depth_scale, distance_max))
 
-# OUTPUT_VIDEO_FILE = 'sample_depth.avi'
-# Output file
-# fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-# out = cv2.VideoWriter(OUTPUT_VIDEO_FILE, fourcc, 24, (640, 480))
-#
-# if not out.isOpened():
-#     print('File {0} open error.'.format(OUTPUT_VIDEO_FILE))
-#     exit()
+
+def detect_edge_with_depth(depth_gray_img):
+    xsobel = cv2.Sobel(depth_gray_img, cv2.CV_32F, 1, 0)
+    ysobel = cv2.Sobel(depth_gray_img, cv2.CV_32F, 0, 1)
+
+    # 8ビット符号なし整数変換
+    gray_abs_sobelx = cv2.convertScaleAbs(xsobel)
+    gray_abs_sobely = cv2.convertScaleAbs(ysobel)
+
+    # 重み付き和
+    return cv2.addWeighted(gray_abs_sobelx, 0.5, gray_abs_sobely, 0.5, 0)
+
+
+def detect_hand_with_depth(depth_gray_img):
+    depth_normlized = depth_gray_img / np.amax(depth_gray_img)
+    print(np.amax(depth_normlized))
+    return depth_normlized
+
 
 FACE_DETECT_NUM = 20
 face_detect_count = 0
+
 try:
     while True:
         # フレーム待ち(Depth & Color)
@@ -91,36 +132,31 @@ try:
         color_img_src = np.asanyarray(color_frame.get_data())
         color_img = cv2.resize(color_img_src, dsize=(480, 360))
         if face_detect_count < FACE_DETECT_NUM:
-            face_detect_count += 1
-            face_img = face_detect(color_img)
+            is_detected, face_img = face_detect(color_img)
+            if is_detected:
+                face_detect_count += 1
 
         hsv_img = cv2.cvtColor(color_img, cv2.COLOR_BGR2HSV)
         skin_color_filter_with_hs_space(color_img, hsv_img, face_color_hs_map)
         # Depth画像前処理(2m以内を画像化)
         depth_image = np.asanyarray(depth_frame.get_data())
+        depth_image = cv2.resize(depth_image, dsize=(480, 360))
+
+        # distance_maxより低いもののみ抽出
         depth_image = (depth_image < distance_max) * depth_image
         depth_graymap = depth_image * 255. / distance_max
-        depth_graymap = depth_graymap.reshape((480, 640)).astype(np.uint8)
+        depth_normlized = detect_hand_with_depth(depth_graymap)
+        depth_graymap = depth_graymap.reshape((360, 480)).astype(np.uint8)
         depth_colormap = cv2.cvtColor(depth_graymap, cv2.COLOR_GRAY2BGR)
-
-        # 膨張/収縮処理
-        # color_img = cv2.morphologyEx(color_img,
-        #                              cv2.MORPH_CLOSE,
-        #                              np.ones((3, 3), np.uint8))
-        color_img = cv2.dilate(color_img, np.ones((3, 3), np.uint8),
-                               iterations=1)
-
-        # エッジ検出
-        # canny_img = cv2.Canny(depth_colormap, 100, 200)
-        # canny_img = cv2.copyMakeBorder(depth_colormap,
-        #                                1, 1, 1, 1, cv2.BORDER_REPLICATE)
-
-        # 領域補間
-        # cv2.floodFill(depth_colormap, canny_img, (120, 120), (0, 255, 255))
+        sobel = detect_edge_with_depth(depth_graymap)
+        # cv2.floodFill(color_img, sobel, (120, 120), (0, 255, 255))
 
         # 入力画像表示
         cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
-        cv2.imshow('RealSense', depth_colormap)
+        cv2.namedWindow('RealSense2', cv2.WINDOW_AUTOSIZE)
+        imgs = cv2.hconcat([face_img, color_img])
+        cv2.imshow('RealSense', imgs)
+        cv2.imshow('RealSense2', depth_normlized)
         # out.write(depth_colormap)
         if cv2.waitKey(1) & 0xff == 27:
             break
