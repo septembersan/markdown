@@ -108,7 +108,7 @@ hook_add = '''
         let g:neoterm_autoinsert = 0
         Topen
         Tclear
-        T python3.6  %
+        T python3.7  %
         let g:neoterm_autoinsert = 1
     endfunction
 
@@ -489,7 +489,7 @@ hook_post_source = '''
 # repo = 'zchee/deoplete-jedi'
 # on_ft = 'python'
 # hook_source = '''
-#     " let g:deoplete#sources#jedi#python_path = substitute(system('which python3.6'), "¥n", "", "")
+#     " let g:deoplete#sources#jedi#python_path = substitute(system('which python3.7'), "¥n", "", "")
 # '''
 
 [[plugins]]
@@ -543,7 +543,7 @@ hook_add = '''
     let g:ale_lint_on_text_changed = 0
     let g:ale_statusline_format = ['x %d', '? %d', 'o ok']
     let g:ale_linters = { 
-                \   'python3.6': ['flake8'],
+                \   'python3.7': ['flake8'],
                 \   'markdown': ['alex'],
                 \   'javascript': ['eslint'],
                 \   'JSON': ['jq']
@@ -1083,7 +1083,7 @@ build = 'bash install.sh'
 hook_add ='''
     " Installation: pip install python-language-server
     set hidden
-    let language_client_python_path = join([substitute(system('which python3.6'), "python3.6\n", "", ""), "pyls"], '/')
+    let language_client_python_path = join([substitute(system('which python3.7'), "python3.7\n", "", ""), "pyls"], '/')
     let g:LanguageClient_serverCommands = {
         \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
         \ 'python': [language_client_python_path],
