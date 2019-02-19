@@ -70,7 +70,7 @@ hook_add = '''
     " terminal position
     let g:neoterm_default_mod='belowright'
     " nnoremap <silent> <C-e><C-e> :call My_TREPLSendSelection()<cr>
-    " vnoremap <silent> <C-e><C-e> V:TREPLSendSelection<cr>
+    vnoremap <silent> <C-e><C-e> :TREPLSendSelection<cr>
     nnoremap <silent> <C-e><C-f> :call Exec_python()<cr>
     " nnoremap <silent> <C-e><C-f> :TREPLSendFile<cr>'>j0
     nnoremap <silent> ttn  :Tnew<CR>
@@ -1110,8 +1110,8 @@ hook_add ='''
 [[plugins]]
 repo = 'szkny/Ipython'
 hook_add ='''
-    nnoremap  <silent> <c-e><c-e> :Ipython<CR>
-    vnoremap  <silent> <c-e><c-e> :VIpython<CR>
+    " nnoremap  <silent> <c-e><c-e> :Ipython<CR>
+    " vnoremap  <silent> <c-e><c-e> :VIpython<CR>
 
     " ipythonコマンドのコマンドライン引数
 	let g:ipython_startup_options = ['--no-confirm-exit']
