@@ -113,9 +113,13 @@ def detect_edge_with_depth(depth_gray_img):
 
 
 def detect_hand_with_depth(depth_gray_img):
-    depth_normlized = depth_gray_img / np.amax(depth_gray_img)
-    print(np.amax(depth_normlized))
-    return depth_normlized
+    max_value = np.amax(depth_gray_img)
+    hand_img = np.where(depth_gray_img >= max_value, 255, 0)
+    # depth_normlized = depth_gray_img / np.amax(depth_gray_img)
+    # depth_normlized = cv2.normalize(depth_gray_img, None, 0.0, 1.0, norm_type=cv2.NORM_MINMAX)
+    # depth_binary = np.where(depth_normlized >= 1.0, 1, 0)
+    # return hand_img
+    return depth_gray_img
 
 
 FACE_DETECT_NUM = 20
@@ -141,11 +145,15 @@ try:
         # Depth画像前処理(2m以内を画像化)
         depth_image = np.asanyarray(depth_frame.get_data())
         depth_image = cv2.resize(depth_image, dsize=(480, 360))
+        depth = depth_image.copy()
 
         # distance_maxより低いもののみ抽出
         depth_image = (depth_image < distance_max) * depth_image
         depth_graymap = depth_image * 255. / distance_max
-        depth_normlized = detect_hand_with_depth(depth_graymap)
+
+        hand_img = detect_hand_with_depth(depth)
+        hand_img = hand_img.reshape((360, 480)).astype(np.uint8)
+
         depth_graymap = depth_graymap.reshape((360, 480)).astype(np.uint8)
         depth_colormap = cv2.cvtColor(depth_graymap, cv2.COLOR_GRAY2BGR)
         sobel = detect_edge_with_depth(depth_graymap)
@@ -156,8 +164,7 @@ try:
         cv2.namedWindow('RealSense2', cv2.WINDOW_AUTOSIZE)
         imgs = cv2.hconcat([face_img, color_img])
         cv2.imshow('RealSense', imgs)
-        cv2.imshow('RealSense2', depth_normlized)
-        # out.write(depth_colormap)
+        cv2.imshow('RealSense2', hand_img)
         if cv2.waitKey(1) & 0xff == 27:
             break
 
