@@ -14,6 +14,9 @@ import cv2
 face_cascade_path = 'haarcascade_frontalface_default.xml'
 eyes_cascade_path = 'haarcascade_eye_tree_eyeglasses.xml'
 face_color_hs_map = np.zeros(256*256).reshape(256, 256)
+global_hs_map = np.arange(256*256).reshape(256, 256).astype(bool)
+global_hs_map[:] = False
+
 
 
 def face_detect(color_img):
@@ -100,6 +103,11 @@ distance_max = TARGET_DISTANCE/depth_scale
 print('Depth Scale = {} -> {}'.format(depth_scale, distance_max))
 
 
+# align
+align_to = rs.stream.color
+align = rs.align(align_to)
+
+
 def detect_edge_with_depth(depth_gray_img):
     xsobel = cv2.Sobel(depth_gray_img, cv2.CV_32F, 1, 0)
     ysobel = cv2.Sobel(depth_gray_img, cv2.CV_32F, 0, 1)
@@ -111,15 +119,97 @@ def detect_edge_with_depth(depth_gray_img):
     # 重み付き和
     return cv2.addWeighted(gray_abs_sobelx, 0.5, gray_abs_sobely, 0.5, 0)
 
+def detect_hand_with_depth(depth_gray_img, color_img):
+    global global_hs_map
+    min_value = np.amin(depth_gray_img)
+    print(min_value)
+    hand_img = ((depth_gray_img < (min_value + 70)) & (depth_gray_img > (min_value + 30))) * depth_gray_img
 
-def detect_hand_with_depth(depth_gray_img):
-    max_value = np.amax(depth_gray_img)
-    hand_img = np.where(depth_gray_img >= max_value, 255, 0)
-    # depth_normlized = depth_gray_img / np.amax(depth_gray_img)
-    # depth_normlized = cv2.normalize(depth_gray_img, None, 0.0, 1.0, norm_type=cv2.NORM_MINMAX)
-    # depth_binary = np.where(depth_normlized >= 1.0, 1, 0)
-    # return hand_img
-    return depth_gray_img
+    contours, hierarchy = cv2.findContours(hand_img,
+                                           cv2.RETR_LIST,
+                                           cv2.CHAIN_APPROX_NONE)
+
+    # 各輪郭に対する処理
+    rects = []
+    for i in range(0, len(contours)):
+        # 輪郭の領域を計算
+        area = cv2.contourArea(contours[i])
+
+        # ノイズ（小さすぎる領域）と全体の輪郭（大きすぎる領域）を除外
+        if area < (1e4//2) or 1e5 < area:
+            continue
+
+        # 外接矩形
+        if len(contours[i]) > 0:
+            rect = contours[i]
+            x, y, w, h = cv2.boundingRect(rect)
+            rects.append([w*h, x, y, w, h])
+
+    rects.sort(key=lambda x: x[0])
+    rects.reverse()
+    skin_rois = []
+    for i, rect in enumerate(rects):
+        if i > 1:
+            break
+        roi = Roi(rect[1], rect[2], rect[3], rect[4])
+        skin_rois.append(roi)
+
+    # draw skin
+    hsv_img = cv2.cvtColor(color_img, cv2.COLOR_BGR2HSV)
+    filtered_img = color_img.copy()
+    if len(skin_rois) > 1:
+        for roi in skin_rois:
+            # get skin color region
+            c_roi = roi.get_center_roi()
+            hs_map = get_hs_map_in_roi(c_roi, color_img)
+            global_hs_map = global_hs_map | hs_map
+            for y, pixel_line in enumerate(hsv_img):
+                for x, pixel in enumerate(pixel_line):
+                    h, s, v = pixel
+                    if global_hs_map.item(h, s):
+                        filtered_img[y][x] = [0, 0, 0]
+
+    # draw roi
+    for roi in skin_rois:
+        c_roi = roi.get_center_roi()
+        cv2.rectangle(
+            color_img, (roi.x, roi.y), (roi.xe, roi.ye), (0, 255, 0), 2)
+        cv2.rectangle(
+            color_img, (c_roi.x, c_roi.y), (c_roi.xe, c_roi.ye), (0, 255, 0), 2)
+
+    return hand_img, filtered_img
+
+
+class Roi():
+    def __init__(self, x, y, w, h):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.xe = x + w
+        self.ye = y + h
+        self.area = w * h
+
+    def get_center_roi(self):
+        x = self.x + (self.w//2) - 10
+        y = self.y + (self.h//2) - 10
+        w = 20
+        h = 20
+        return Roi(x, y, w, h)
+
+
+def get_hs_map_in_roi(roi, color_img):
+    hs_map = np.arange(256*256).reshape(256, 256).astype(bool)
+    hs_map[:] = False
+
+    skin_roi_img = color_img[roi.y: roi.ye, roi.x:roi.xe]
+    hsv_img = cv2.cvtColor(skin_roi_img, cv2.COLOR_BGR2HSV)
+    for pixel_line in hsv_img:
+        for pixel in pixel_line:
+            h, s, v = pixel
+            hs_map[h][s] = True
+
+    return hs_map
 
 
 FACE_DETECT_NUM = 20
@@ -129,16 +219,19 @@ try:
     while True:
         # フレーム待ち(Depth & Color)
         frames = pipeline.wait_for_frames()
-        depth_frame = frames.get_depth_frame()
-        color_frame = frames.get_color_frame()
+        # Align the depth frame to color frame
+        aligned_frames = align.process(frames)
+        # Get aligned frames
+        depth_frame = aligned_frames.get_depth_frame()
+        color_frame = aligned_frames.get_color_frame()
         if not depth_frame or not color_frame:
             continue
         color_img_src = np.asanyarray(color_frame.get_data())
         color_img = cv2.resize(color_img_src, dsize=(480, 360))
-        if face_detect_count < FACE_DETECT_NUM:
-            is_detected, face_img = face_detect(color_img)
-            if is_detected:
-                face_detect_count += 1
+        # if face_detect_count < FACE_DETECT_NUM:
+        #     is_detected, face_img = face_detect(color_img)
+        #     if is_detected:
+        #         face_detect_count += 1
 
         hsv_img = cv2.cvtColor(color_img, cv2.COLOR_BGR2HSV)
         skin_color_filter_with_hs_space(color_img, hsv_img, face_color_hs_map)
@@ -150,9 +243,10 @@ try:
         # distance_maxより低いもののみ抽出
         depth_image = (depth_image < distance_max) * depth_image
         depth_graymap = depth_image * 255. / distance_max
+        depth_graymap = depth_graymap.reshape((360, 480)).astype(np.uint8)
 
-        hand_img = detect_hand_with_depth(depth)
-        hand_img = hand_img.reshape((360, 480)).astype(np.uint8)
+        # hand_img = hand_img.reshape((360, 480)).astype(np.uint8)
+        hand_img, filtered_img = detect_hand_with_depth(depth_graymap, color_img)
 
         depth_graymap = depth_graymap.reshape((360, 480)).astype(np.uint8)
         depth_colormap = cv2.cvtColor(depth_graymap, cv2.COLOR_GRAY2BGR)
@@ -162,7 +256,7 @@ try:
         # 入力画像表示
         cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
         cv2.namedWindow('RealSense2', cv2.WINDOW_AUTOSIZE)
-        imgs = cv2.hconcat([face_img, color_img])
+        imgs = cv2.hconcat([color_img, filtered_img])
         cv2.imshow('RealSense', imgs)
         cv2.imshow('RealSense2', hand_img)
         if cv2.waitKey(1) & 0xff == 27:
