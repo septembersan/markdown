@@ -1,0 +1,219 @@
+import shutil
+
+import cv2
+from keras import backend as K
+from keras.layers import (Activation, Conv2D, Dense, Dropout, Flatten,
+                          MaxPooling2D)
+from keras.models import Sequential
+from keras.preprocessing.image import ImageDataGenerator
+from pathlib2 import Path
+
+
+"""
+depth videos -> images
+(ignore color videos)
+
+
+[`video_data`: directory structure of immediately after video recode]
+---------------------------------------------------------------------
+video_data/
+    good_morning/
+        depth/
+            1_depth.avi
+            2_depth.avi
+            ...
+    grad/
+        depth/
+            1_depth.avi
+            2_depth.avi
+            ...
+    thanks/
+        depth/
+            1_depth.avi
+            2_depth.avi
+            ...
+
+[`data_dir`: directory structure of learning possible]
+------------------------------------------------------
+data/
+    train/
+        good_morning/
+            1.png
+            2.png
+            ...
+        grad/
+            1.png
+            2.png
+            ...
+        thanks/
+            1.png
+            2.png
+            ...
+    validation/
+        good_morning/
+            1.png
+            2.png
+            ...
+        grad/
+            1.png
+            2.png
+            ...
+        thanks/
+            1.png
+            2.png
+            ...
+"""
+
+
+# if data directory tree exist, remove it
+def clean_data_dir(data_dir):
+    if data_dir.exists():
+        shutil.rmtree(data_dir)
+
+
+# create data directory tree
+def create_data_dir(video_data_dirs, data_dir):
+    # `data/train/xxxxx`
+    save_dir_dic = {"train": {}, "validation": {}}
+    for d in video_data_dirs:
+        Path(data_dir / "train" / d.name).mkdir(parents=True, exist_ok=True)
+        save_dir_dic["train"][d.name] = Path(data_dir / "train" / d.name)
+    # `data/validation/xxxxx`
+    for d in video_data_dirs:
+        Path(data_dir / "validation" / d.name).mkdir(parents=True, exist_ok=True)
+        save_dir_dic["validation"][d.name] = Path(data_dir / "validation" / d.name)
+
+    return save_dir_dic
+
+
+# translate video to images(./video_data -> ./data)
+def video_in_data_dir_to_images(video_data_dirs, save_dir_dic):
+    def video_to_images(video_file, save_dir, index):
+        # Video to frames
+        cap = cv2.VideoCapture(video_file)
+        while cap.isOpened():
+            flag, image = cap.read()  # Capture frame-by-frame
+            if not flag:
+                break
+            index += 1
+            cv2.imwrite("{}/{}".format(save_dir, str(index) + ".png"), image)
+
+        cap.release()  # When everything done, release the capture
+        return index
+
+    for d in video_data_dirs:
+        index = 0
+        videos = list(d.glob("*depth*"))
+        for video in videos:
+            index = video_to_images(
+                str(video), str(save_dir_dic["train"][d.name]), index
+            )
+
+
+def create_model(channel_num=3, img_width=150, img_height=150):
+
+    if K.image_data_format() == "channels_first":
+        input_shape = (channel_num, img_width, img_height)
+    else:
+        input_shape = (img_width, img_height, channel_num)
+
+    model = Sequential()
+    model.add(Conv2D(32, (3, 3), input_shape=input_shape))
+    model.add(Activation("relu"))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+
+    model.add(Conv2D(32, (3, 3)))
+    model.add(Activation("relu"))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+
+    model.add(Conv2D(64, (3, 3)))
+    model.add(Activation("relu"))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+
+    model.add(Flatten())
+    model.add(Dense(64))
+    model.add(Activation("relu"))
+    model.add(Dropout(0.5))
+    model.add(Dense(1))
+    model.add(Activation("sigmoid"))
+
+    model.compile(loss="binary_crossentropy", optimizer="rmsprop", metrics=["accuracy"])
+
+    return model
+
+
+def generate_input_data(
+    train_data_dir="data/train",
+    validation_data_dir="data/validation",
+    img_width=150,
+    img_height=150,
+    batch_size=16,
+    class_mode="binary",
+):
+    # this is the augmentation configuration we will use for training
+    train_datagen = ImageDataGenerator(
+        rescale=1.0 / 255, shear_range=0.2, zoom_range=0.2, horizontal_flip=True
+    )
+
+    # this is the augmentation configuration we will use for testing:
+    # only rescaling
+    test_datagen = ImageDataGenerator(rescale=1.0 / 255)
+
+    train_generator = train_datagen.flow_from_directory(
+        train_data_dir,
+        target_size=(img_width, img_height),
+        batch_size=batch_size,
+        class_mode=class_mode,
+    )
+
+    validation_generator = test_datagen.flow_from_directory(
+        validation_data_dir,
+        target_size=(img_width, img_height),
+        batch_size=batch_size,
+        class_mode=class_mode,
+    )
+
+    return train_generator, validation_generator
+
+
+def prepare():
+    # `data` directory is for training directory
+    data_dir = Path("data")
+
+    # raw video data
+    video_data_root_dir = Path("video_data")
+    video_data_dirs = [d for d in video_data_root_dir.iterdir() if d.is_dir()]
+
+    # clean to save directory
+    clean_data_dir(data_dir)
+
+    # create `data` directory
+    save_dir_dic = create_data_dir(video_data_dirs, data_dir)
+
+    # translate videos to images
+    video_in_data_dir_to_images(video_data_dirs, save_dir_dic)
+
+
+def main():
+    # prepare()
+
+    model = create_model(channel_num=3)
+
+    train_generator, validation_generator = generate_input_data()
+
+    batch_size = 16
+    nb_train_samples = 2000
+    nb_validation_samples = 800
+
+    model.fit_generator(
+        train_generator,
+        steps_per_epoch=nb_train_samples // batch_size,
+        epochs=50,
+        validation_data=validation_generator,
+        validation_steps=nb_validation_samples // batch_size,
+    )
+
+    model.save_weights("first_try.h5")
+
+
+main()
