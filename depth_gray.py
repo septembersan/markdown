@@ -6,6 +6,7 @@
 #############################################
 #      D415 Depth画像の表示&キャプチャ
 #############################################
+# from numba import jit
 import pyrealsense2 as rs
 import numpy as np
 import cv2
@@ -16,7 +17,6 @@ eyes_cascade_path = 'haarcascade_eye_tree_eyeglasses.xml'
 face_color_hs_map = np.zeros(256*256).reshape(256, 256)
 global_hs_map = np.arange(256*256).reshape(256, 256).astype(bool)
 global_hs_map[:] = False
-
 
 
 def face_detect(color_img):
@@ -119,11 +119,38 @@ def detect_edge_with_depth(depth_gray_img):
     # 重み付き和
     return cv2.addWeighted(gray_abs_sobelx, 0.5, gray_abs_sobely, 0.5, 0)
 
+
+# @jit
+def for_temp(hsv_img, filtered_img):
+    for y, pixel_line in enumerate(hsv_img):
+        for x, pixel in enumerate(pixel_line):
+            h, s, v = pixel
+            if global_hs_map.item(h, s):
+                filtered_img[y][x] = [0, 0, 0]
+
+
+def reduce_color(color_img):
+    img_array = color_img.reshape((-1, 3))
+    img_array = np.float32(img_array)
+
+    CLASS_NUM = 3
+    # define criteria, number of clusters(CLASS_NUM) and apply kmeans()
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+    ret, label, center = cv2.kmeans(img_array, CLASS_NUM, None, criteria, 10,
+                                    cv2.KMEANS_RANDOM_CENTERS)
+
+    # Now convert back into uint8, and make original image
+    center = np.uint8(center)
+    res = center[label.flatten()]
+    return res.reshape((color_img.shape))
+
+
 def detect_hand_with_depth(depth_gray_img, color_img):
     global global_hs_map
     min_value = np.amin(depth_gray_img)
     print(min_value)
-    hand_img = ((depth_gray_img < (min_value + 70)) & (depth_gray_img > (min_value + 30))) * depth_gray_img
+    hand_img = ((depth_gray_img < (min_value + 70)) &
+                (depth_gray_img > (min_value + 30))) * depth_gray_img
 
     contours, hierarchy = cv2.findContours(hand_img,
                                            cv2.RETR_LIST,
@@ -149,25 +176,46 @@ def detect_hand_with_depth(depth_gray_img, color_img):
     rects.reverse()
     skin_rois = []
     for i, rect in enumerate(rects):
-        if i > 1:
+        if i > 2:
             break
         roi = Roi(rect[1], rect[2], rect[3], rect[4])
         skin_rois.append(roi)
 
     # draw skin
     hsv_img = cv2.cvtColor(color_img, cv2.COLOR_BGR2HSV)
-    filtered_img = color_img.copy()
-    if len(skin_rois) > 1:
-        for roi in skin_rois:
-            # get skin color region
-            c_roi = roi.get_center_roi()
-            hs_map = get_hs_map_in_roi(c_roi, color_img)
-            global_hs_map = global_hs_map | hs_map
-            for y, pixel_line in enumerate(hsv_img):
-                for x, pixel in enumerate(pixel_line):
-                    h, s, v = pixel
-                    if global_hs_map.item(h, s):
-                        filtered_img[y][x] = [0, 0, 0]
+    # filtered_img = color_img.copy()
+    reduce_imgs = []
+    reduce_imgs.append(color_img.copy())
+    reduce_imgs.append(color_img.copy())
+    hist = np.arange(256*256).reshape(256, 256)
+    for i, roi in enumerate(skin_rois):
+        # get skin color region
+        c_roi = roi.get_center_roi()
+        temp = reduce_color(hsv_img[roi.y: roi.ye, roi.x:roi.xe])
+        reduce_imgs[i] = np.uint8(cv2.cvtColor(temp, cv2.COLOR_HSV2RGB))
+        for y, pixel_line in enumerate(reduce_imgs[i]):
+            for x, pixel in enumerate(pixel_line):
+                r, g, b = pixel
+                rgb = '{}{}{}'.format(r, g, b)
+                if hist.get(rgb):
+                    hist[rgb] = [(x, y)]
+                else:
+                    hist[rgb].append((x, y))
+        # get max count
+        max_cout = 0
+        max_key = ''
+        for k, v in hist.items():
+            if len(v) > max_count:
+                max_key = k
+
+            # hs_map = get_hs_map_in_roi(c_roi, color_img)
+            # global_hs_map = global_hs_map | hs_map
+                # for_temp(hsv_img, filtered_img)
+            # for y, pixel_line in enumerate(hsv_img):
+            #     for x, pixel in enumerate(pixel_line):
+            #         h, s, v = pixel
+            #         if global_hs_map.item(h, s):
+            #             filtered_img[y][x] = [0, 0, 0]
 
     # draw roi
     for roi in skin_rois:
@@ -177,7 +225,7 @@ def detect_hand_with_depth(depth_gray_img, color_img):
         cv2.rectangle(
             color_img, (c_roi.x, c_roi.y), (c_roi.xe, c_roi.ye), (0, 255, 0), 2)
 
-    return hand_img, filtered_img
+    return hand_img, reduce_imgs[0], reduce_imgs[1]
 
 
 class Roi():
@@ -246,7 +294,7 @@ try:
         depth_graymap = depth_graymap.reshape((360, 480)).astype(np.uint8)
 
         # hand_img = hand_img.reshape((360, 480)).astype(np.uint8)
-        hand_img, filtered_img = detect_hand_with_depth(depth_graymap, color_img)
+        hand_img, reduce_img1, reduce_img2 = detect_hand_with_depth(depth_graymap, color_img)
 
         depth_graymap = depth_graymap.reshape((360, 480)).astype(np.uint8)
         depth_colormap = cv2.cvtColor(depth_graymap, cv2.COLOR_GRAY2BGR)
@@ -256,9 +304,13 @@ try:
         # 入力画像表示
         cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
         cv2.namedWindow('RealSense2', cv2.WINDOW_AUTOSIZE)
-        imgs = cv2.hconcat([color_img, filtered_img])
+        cv2.namedWindow('RealSense3', cv2.WINDOW_AUTOSIZE)
+        cv2.namedWindow('RealSense4', cv2.WINDOW_AUTOSIZE)
+        imgs = cv2.hconcat([color_img])
         cv2.imshow('RealSense', imgs)
         cv2.imshow('RealSense2', hand_img)
+        cv2.imshow('RealSense3', reduce_img1)
+        cv2.imshow('RealSense4', reduce_img2)
         if cv2.waitKey(1) & 0xff == 27:
             break
 
