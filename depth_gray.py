@@ -1,143 +1,51 @@
-# -*- coding: utf-8 -*-
-# references
-# * chrome-extension://lcopgfbpbmionefhhgbamgmejggljpbb/http://rudrapoudel.com/docs/Poudel_ISVC2013.pdf
-# * chrome-extension://lcopgfbpbmionefhhgbamgmejggljpbb/https://www.cv-foundation.org/openaccess/content_cvpr_2014/papers/Qian_Realtime_and_Robust_2014_CVPR_paper.pdf
+# * http://rudrapoudel.com/docs/Poudel_ISVC2013.pdf
+# * https://www.cv-foundation.org/openaccess/content_cvpr_2014/papers/
+#   Qian_Realtime_and_Robust_2014_CVPR_paper.pdf
 
-#############################################
-#      D415 Depth画像の表示&キャプチャ
-#############################################
-# from numba import jit
-import pyrealsense2 as rs
+import matplotlib.pyplot as plt
 import numpy as np
+from sklearn import preprocessing
+import pyrealsense2 as rs
 import cv2
 
 
-face_cascade_path = 'haarcascade_frontalface_default.xml'
-eyes_cascade_path = 'haarcascade_eye_tree_eyeglasses.xml'
-face_color_hs_map = np.zeros(256*256).reshape(256, 256)
-global_hs_map = np.arange(256*256).reshape(256, 256).astype(bool)
-global_hs_map[:] = False
+FACE_CASCADE_PATH = 'haarcascade_frontalface_default.xml'
+EYES_CASCADE_PATH = 'haarcascade_eye_tree_eyeglasses.xml'
+FACE_COLOR_HS_MAP = np.zeros(256*256).reshape(256, 256)
+GLOBAL_HS_MAP = np.arange(256*256).reshape(256, 256).astype(bool)
+GLOBAL_HS_MAP[:] = False
 
 
-def face_detect(color_img):
-    is_detected = False
-
-    img = color_img.copy()
-    src_gray = cv2.cvtColor(color_img, cv2.COLOR_BGR2GRAY)
-
-    face_cascade = cv2.CascadeClassifier(face_cascade_path)
-    eyes_cascade = cv2.CascadeClassifier(eyes_cascade_path)
-
-    faces = face_cascade.detectMultiScale(src_gray)
-
-    for x, y, w, h in faces:
-        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
-        hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        eyes = eyes_cascade.detectMultiScale(src_gray)
-
-        if len(eyes) < 2:
-            continue
-        is_detected = True
-
-        # draw eyes region
-        for (ex, ey, ew, eh) in eyes:
-            cv2.rectangle(img, (ex, ey), (ex + ew, ey + eh), (0, 0, 255), 2)
-
-        # get nose region
-        ex1, ey1, ew1, eh1 = eyes[0]
-        ex2, ey2, ew2, eh2 = eyes[1]
-
-        nose_points = []
-        if ex1 < ex2:
-            # ex1 is left eye
-            nose_points += [ey1+eh1, ey1+eh1+eh1, ex1+ew1, ex2]
-        else:
-            # ex2 is left eye
-            nose_points += [ey2+eh2, ey2+eh2+eh2, ex2+ew2, ex1]
-
-        cv2.rectangle(img,
-                      (nose_points[2], nose_points[0]),
-                      (nose_points[3], nose_points[1]),
-                      (0, 125, 255), 2)
-        small_face = hsv_img[nose_points[0]:nose_points[1],
-                             nose_points[2]:nose_points[3]]
-
-        for pixel_line in small_face:
-            for pixel in pixel_line:
-                h, s, v = pixel
-                face_color_hs_map[h][s] = 1
-
-    return is_detected, img
+def draw_rect(img, roi, rect_color=(255, 0, 0)):
+    '''
+    Draw rectangle(wapper cv2.rectangle)
+    '''
+    cv2.rectangle(img, (roi.x, roi.y), (roi.ex, roi.ey), rect_color, 2)
 
 
 def skin_color_filter_with_hs_space(filtered_img, hsv_img, face_color_hs_map):
-    # filtered_img = color_img.copy()
-
+    '''
+    Skin color is drawn with black color.
+    '''
     for y, pixel_line in enumerate(hsv_img):
         for x, pixel in enumerate(pixel_line):
             h, s, v = pixel
             if face_color_hs_map.item(h, s) == 1:
                 filtered_img[y][x] = [0, 0, 0]
 
-    # return filtered_img
-
-
-# meter
-TARGET_DISTANCE = 2.0
-
-# Configure depth and color streams
-pipeline = rs.pipeline()
-config = rs.config()
-config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
-config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
-
-# ストリーミング開始
-profile = pipeline.start(config)
-
-# Depthスケール取得
-#   距離[m] = depth * depth_scale
-depth_sensor = profile.get_device().first_depth_sensor()
-depth_scale = depth_sensor.get_depth_scale()
-# 対象範囲の閾値
-distance_max = TARGET_DISTANCE/depth_scale
-print('Depth Scale = {} -> {}'.format(depth_scale, distance_max))
-
-
-# align
-align_to = rs.stream.color
-align = rs.align(align_to)
-
-
-def detect_edge_with_depth(depth_gray_img):
-    xsobel = cv2.Sobel(depth_gray_img, cv2.CV_32F, 1, 0)
-    ysobel = cv2.Sobel(depth_gray_img, cv2.CV_32F, 0, 1)
-
-    # 8ビット符号なし整数変換
-    gray_abs_sobelx = cv2.convertScaleAbs(xsobel)
-    gray_abs_sobely = cv2.convertScaleAbs(ysobel)
-
-    # 重み付き和
-    return cv2.addWeighted(gray_abs_sobelx, 0.5, gray_abs_sobely, 0.5, 0)
-
-
-# @jit
-def for_temp(hsv_img, filtered_img):
-    for y, pixel_line in enumerate(hsv_img):
-        for x, pixel in enumerate(pixel_line):
-            h, s, v = pixel
-            if global_hs_map.item(h, s):
-                filtered_img[y][x] = [0, 0, 0]
-
 
 def reduce_color(color_img):
+    '''
+    Reduce color in img by kmean
+    '''
     img_array = color_img.reshape((-1, 3))
     img_array = np.float32(img_array)
 
-    CLASS_NUM = 3
-    # define criteria, number of clusters(CLASS_NUM) and apply kmeans()
+    class_num = 3
+    # define criteria, number of clusters(class_num) and apply kmeans()
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-    ret, label, center = cv2.kmeans(img_array, CLASS_NUM, None, criteria, 10,
-                                    cv2.KMEANS_RANDOM_CENTERS)
+    _, label, center = cv2.kmeans(img_array, class_num, None, criteria, 10,
+                                  cv2.KMEANS_RANDOM_CENTERS)
 
     # Now convert back into uint8, and make original image
     center = np.uint8(center)
@@ -145,87 +53,87 @@ def reduce_color(color_img):
     return res.reshape((color_img.shape))
 
 
-def detect_hand_with_depth(depth_gray_img, color_img):
-    global global_hs_map
-    min_value = np.amin(depth_gray_img)
-    print(min_value)
-    hand_img = ((depth_gray_img < (min_value + 70)) &
-                (depth_gray_img > (min_value + 30))) * depth_gray_img
+def display_hist(img):
+    '''
+    Display histogram
+    '''
+    def min_max(x, axis=None):
+        min_value = x.min(axis=axis, keepdims=True)
+        max_value = x.max(axis=axis, keepdims=True)
+        return (x - min_value) / (max_value - min_value)
 
-    contours, hierarchy = cv2.findContours(hand_img,
-                                           cv2.RETR_LIST,
-                                           cv2.CHAIN_APPROX_NONE)
+    # img = min_max(img)
+    hist, bins = np.histogram(img, bins=256)
+    # print(hist)
+    scales = []
+    for i in range(1, len(bins)):
+        scales.append((bins[i-1]+bins[i])/2)
+    plt.bar(scales, hist)
+    plt.pause(.00001)
 
-    # 各輪郭に対する処理
-    rects = []
-    for i in range(0, len(contours)):
-        # 輪郭の領域を計算
-        area = cv2.contourArea(contours[i])
 
-        # ノイズ（小さすぎる領域）と全体の輪郭（大きすぎる領域）を除外
-        if area < (1e4//2) or 1e5 < area:
+def extract_contours(gray_img):
+    '''
+    Extract contours
+    '''
+    contours, _ = cv2.findContours(gray_img,
+                                   cv2.RETR_LIST,
+                                   cv2.CHAIN_APPROX_NONE)
+    rois = []
+    for contour in contours:
+        # calc contours area
+        area = cv2.contourArea(contour)
+
+        # removeing noise(`too big` area and `too small` area)
+        if area < (1e4//3) or 1e5 < area:
             continue
 
-        # 外接矩形
-        if len(contours[i]) > 0:
-            rect = contours[i]
-            x, y, w, h = cv2.boundingRect(rect)
-            rects.append([w*h, x, y, w, h])
+        # get rect
+        if contour.size > 0:
+            x, y, w, h = cv2.boundingRect(contour)
+            rois.append(Roi(x, y, w, h))
+    return rois
 
-    rects.sort(key=lambda x: x[0])
-    rects.reverse()
+
+SAVE_IMG_COUNT = 0
+
+
+def detect_hand_with_depth(depth_gray_img, color_img):
+    global SAVE_IMG_COUNT
+    global GLOBAL_HS_MAP
+    min_value = np.amin(depth_gray_img)
+    # print(min_value)
+    extract_area_map = ((depth_gray_img < (min_value + 70)) &
+                        (depth_gray_img > (min_value + 30))) * depth_gray_img
+
+    rois = extract_contours(extract_area_map)
+    rois.sort(key=lambda r: r.area)
+    rois.reverse()
+
+    # binary image
+    reduce_imgs = []
+    _, bi_img = cv2.threshold(extract_area_map, 30, 70, cv2.THRESH_BINARY)
+    reduce_imgs.append(bi_img)
+    _, inv_img = cv2.threshold(extract_area_map, 30, 70, cv2.THRESH_BINARY_INV)
+    reduce_imgs.append(inv_img)
+
     skin_rois = []
-    for i, rect in enumerate(rects):
+    for i, roi in enumerate(rois):
         if i > 2:
             break
-        roi = Roi(rect[1], rect[2], rect[3], rect[4])
         skin_rois.append(roi)
-
-    # draw skin
-    hsv_img = cv2.cvtColor(color_img, cv2.COLOR_BGR2HSV)
-    # filtered_img = color_img.copy()
-    reduce_imgs = []
-    reduce_imgs.append(color_img.copy())
-    reduce_imgs.append(color_img.copy())
-    hist = np.arange(256*256).reshape(256, 256)
-    for i, roi in enumerate(skin_rois):
-        # get skin color region
-        c_roi = roi.get_center_roi()
-        temp = reduce_color(hsv_img[roi.y: roi.ye, roi.x:roi.xe])
-        reduce_imgs[i] = np.uint8(cv2.cvtColor(temp, cv2.COLOR_HSV2RGB))
-        for y, pixel_line in enumerate(reduce_imgs[i]):
-            for x, pixel in enumerate(pixel_line):
-                r, g, b = pixel
-                rgb = '{}{}{}'.format(r, g, b)
-                if hist.get(rgb):
-                    hist[rgb] = [(x, y)]
-                else:
-                    hist[rgb].append((x, y))
-        # get max count
-        max_cout = 0
-        max_key = ''
-        for k, v in hist.items():
-            if len(v) > max_count:
-                max_key = k
-
-            # hs_map = get_hs_map_in_roi(c_roi, color_img)
-            # global_hs_map = global_hs_map | hs_map
-                # for_temp(hsv_img, filtered_img)
-            # for y, pixel_line in enumerate(hsv_img):
-            #     for x, pixel in enumerate(pixel_line):
-            #         h, s, v = pixel
-            #         if global_hs_map.item(h, s):
-            #             filtered_img[y][x] = [0, 0, 0]
+        roi_img = bi_img[roi.y:roi.ey, roi.x:roi.ex]
+        # display_hist(roi_img)
+        cv2.imwrite('temp/{}.png'.format(SAVE_IMG_COUNT), roi_img)
+        SAVE_IMG_COUNT = SAVE_IMG_COUNT + 1
 
     # draw roi
     for roi in skin_rois:
         c_roi = roi.get_center_roi()
-        cv2.rectangle(
-            color_img, (roi.x, roi.y), (roi.xe, roi.ye), (0, 255, 0), 2)
-        cv2.rectangle(
-            color_img, (c_roi.x, c_roi.y), (c_roi.xe, c_roi.ye), (0, 255, 0), 2)
+        draw_rect(color_img, roi, (0, 255, 0))
+        draw_rect(color_img, c_roi, (0, 255, 0))
 
-    return hand_img, reduce_imgs[0], reduce_imgs[1]
+    return extract_area_map, reduce_imgs[0], reduce_imgs[1]
 
 
 class Roi():
@@ -234,8 +142,8 @@ class Roi():
         self.y = y
         self.w = w
         self.h = h
-        self.xe = x + w
-        self.ye = y + h
+        self.ex = x + w
+        self.ey = y + h
         self.area = w * h
 
     def get_center_roi(self):
@@ -250,7 +158,7 @@ def get_hs_map_in_roi(roi, color_img):
     hs_map = np.arange(256*256).reshape(256, 256).astype(bool)
     hs_map[:] = False
 
-    skin_roi_img = color_img[roi.y: roi.ye, roi.x:roi.xe]
+    skin_roi_img = color_img[roi.y: roi.ey, roi.x:roi.ex]
     hsv_img = cv2.cvtColor(skin_roi_img, cv2.COLOR_BGR2HSV)
     for pixel_line in hsv_img:
         for pixel in pixel_line:
@@ -260,61 +168,114 @@ def get_hs_map_in_roi(roi, color_img):
     return hs_map
 
 
-FACE_DETECT_NUM = 20
-face_detect_count = 0
+class HandDetection():
+    '''
+    Hand regions detector.
+    '''
+    def __init__(self):
+        pass
 
-try:
-    while True:
-        # フレーム待ち(Depth & Color)
-        frames = pipeline.wait_for_frames()
+
+class RealSenseControl():
+    '''
+    Real Sense Controler.
+    '''
+    def __init__(self, img_width=640, img_height=480, fps=30,
+                 target_distance=2.0):
+        '''
+        Initialize real sense camera
+        '''
+        # Configure depth and color streams
+        pipeline = rs.pipeline()
+        config = rs.config()
+        config.enable_stream(
+            rs.stream.depth, img_width, img_height, rs.format.z16, fps)
+        config.enable_stream(
+            rs.stream.color, img_width, img_height, rs.format.bgr8, fps)
+
+        # start streaming
+        profile = pipeline.start(config)
+
+        # get depth scale
+        #   distance[m] = depth * depth_scale
+        depth_sensor = profile.get_device().first_depth_sensor()
+        depth_scale = depth_sensor.get_depth_scale()
+
+        #   threshold of target region(unit of target_distance is meter)
+        distance_max = target_distance/depth_scale
+        print('Depth Scale = {} -> {}'.format(depth_scale, distance_max))
+
+        # align
+        align_to = rs.stream.color
+        align = rs.align(align_to)
+
+        self.pipeline = pipeline
+        self.distance_max = distance_max
+        self.align = align
+
+    def get_distance_max(self):
+        return self.distance_max
+
+    def get_imgs(self):
+        '''
+        get frames(depth/color)
+        '''
+        frames = self.pipeline.wait_for_frames()
         # Align the depth frame to color frame
-        aligned_frames = align.process(frames)
-        # Get aligned frames
-        depth_frame = aligned_frames.get_depth_frame()
-        color_frame = aligned_frames.get_color_frame()
-        if not depth_frame or not color_frame:
-            continue
-        color_img_src = np.asanyarray(color_frame.get_data())
-        color_img = cv2.resize(color_img_src, dsize=(480, 360))
-        # if face_detect_count < FACE_DETECT_NUM:
-        #     is_detected, face_img = face_detect(color_img)
-        #     if is_detected:
-        #         face_detect_count += 1
+        aligned_frames = self.align.process(frames)
+        # Get aligned frames and get images
+        return (np.asanyarray(aligned_frames.get_depth_frame().get_data()),
+                np.asanyarray(aligned_frames.get_color_frame().get_data()))
 
-        hsv_img = cv2.cvtColor(color_img, cv2.COLOR_BGR2HSV)
-        skin_color_filter_with_hs_space(color_img, hsv_img, face_color_hs_map)
-        # Depth画像前処理(2m以内を画像化)
-        depth_image = np.asanyarray(depth_frame.get_data())
-        depth_image = cv2.resize(depth_image, dsize=(480, 360))
-        depth = depth_image.copy()
+    def stop(self):
+        '''
+        stop pipeline
+        '''
+        self.pipeline.stop()
 
-        # distance_maxより低いもののみ抽出
-        depth_image = (depth_image < distance_max) * depth_image
-        depth_graymap = depth_image * 255. / distance_max
-        depth_graymap = depth_graymap.reshape((360, 480)).astype(np.uint8)
 
-        # hand_img = hand_img.reshape((360, 480)).astype(np.uint8)
-        hand_img, reduce_img1, reduce_img2 = detect_hand_with_depth(depth_graymap, color_img)
+def main():
+    '''
+    entry point
+    '''
+    rsc = RealSenseControl()
+    try:
+        while True:
+            depth_img, color_img = rsc.get_imgs()
+            if depth_img is None or color_img is None:
+                continue
+            color_img = cv2.resize(color_img, dsize=(480, 360))
 
-        depth_graymap = depth_graymap.reshape((360, 480)).astype(np.uint8)
-        depth_colormap = cv2.cvtColor(depth_graymap, cv2.COLOR_GRAY2BGR)
-        sobel = detect_edge_with_depth(depth_graymap)
-        # cv2.floodFill(color_img, sobel, (120, 120), (0, 255, 255))
+            # Depth画像前処理(2m以内を画像化)
+            depth_img = cv2.resize(depth_img, dsize=(480, 360))
 
-        # 入力画像表示
-        cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
-        cv2.namedWindow('RealSense2', cv2.WINDOW_AUTOSIZE)
-        cv2.namedWindow('RealSense3', cv2.WINDOW_AUTOSIZE)
-        cv2.namedWindow('RealSense4', cv2.WINDOW_AUTOSIZE)
-        imgs = cv2.hconcat([color_img])
-        cv2.imshow('RealSense', imgs)
-        cv2.imshow('RealSense2', hand_img)
-        cv2.imshow('RealSense3', reduce_img1)
-        cv2.imshow('RealSense4', reduce_img2)
-        if cv2.waitKey(1) & 0xff == 27:
-            break
+            # distance_maxより低いもののみ抽出
+            depth_img = (depth_img < rsc.get_distance_max()) * depth_img
+            depth_graymap = depth_img * 255. / rsc.get_distance_max()
+            depth_graymap = depth_graymap.reshape((360, 480)).astype(np.uint8)
 
-finally:
-    # ストリーミング停止
-    pipeline.stop()
-    cv2.destroyAllWindows()
+            hand_img, reduce_img1, reduce_img2 = detect_hand_with_depth(
+                depth_graymap, color_img)
+
+            depth_graymap = depth_graymap.reshape((360, 480)).astype(np.uint8)
+
+            # display
+            cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
+            cv2.namedWindow('RealSense2', cv2.WINDOW_AUTOSIZE)
+            cv2.namedWindow('RealSense3', cv2.WINDOW_AUTOSIZE)
+            cv2.namedWindow('RealSense4', cv2.WINDOW_AUTOSIZE)
+            imgs = cv2.hconcat([color_img])
+            cv2.imshow('RealSense', imgs)
+            cv2.imshow('RealSense2', hand_img)
+            cv2.imshow('RealSense3', reduce_img1)
+            cv2.imshow('RealSense4', reduce_img2)
+            if cv2.waitKey(1) & 0xff == 27:
+                break
+
+    finally:
+        # ストリーミング停止
+        rsc.stop()
+        cv2.destroyAllWindows()
+
+
+main()

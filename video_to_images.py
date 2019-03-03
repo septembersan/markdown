@@ -1,6 +1,7 @@
 import shutil
 
 import cv2
+import numpy as np
 from keras import backend as K
 from keras.layers import (Activation, Conv2D, Dense, Dropout, Flatten,
                           MaxPooling2D)
@@ -14,8 +15,8 @@ depth videos -> images
 (ignore color videos)
 
 
-[`video_data`: directory structure of immediately after video recode]
----------------------------------------------------------------------
+[`video_data_dirs`: directory structure of immediately after video recode]
+--------------------------------------------------------------------------
 video_data/
     good_morning/
         depth/
@@ -73,6 +74,26 @@ def clean_data_dir(data_dir):
 
 # create data directory tree
 def create_data_dir(video_data_dirs, data_dir):
+    '''
+    create data dir
+
+    Parameters
+    ----------
+    video_data_dirs: Path
+        Path list of `video_data` directorys
+        e.g)
+        [PosixPath('video_data/thanks'),
+         PosixPath('video_data/good_morning'),
+         PosixPath('video_data/grad')]
+
+    Returns
+    -------
+    save_dir_dic: dict[dict]
+        Created directory names
+        e.g)
+        data/train/xxxxx
+        data/validation/xxxxx
+    '''
     # `data/train/xxxxx`
     save_dir_dic = {"train": {}, "validation": {}}
     for d in video_data_dirs:
@@ -80,8 +101,10 @@ def create_data_dir(video_data_dirs, data_dir):
         save_dir_dic["train"][d.name] = Path(data_dir / "train" / d.name)
     # `data/validation/xxxxx`
     for d in video_data_dirs:
-        Path(data_dir / "validation" / d.name).mkdir(parents=True, exist_ok=True)
-        save_dir_dic["validation"][d.name] = Path(data_dir / "validation" / d.name)
+        Path(data_dir / "validation" / d.name).mkdir(
+            parents=True, exist_ok=True)
+        save_dir_dic["validation"][d.name] = \
+            Path(data_dir / "validation" / d.name)
 
     return save_dir_dic
 
@@ -108,6 +131,43 @@ def video_in_data_dir_to_images(video_data_dirs, save_dir_dic):
             index = video_to_images(
                 str(video), str(save_dir_dic["train"][d.name]), index
             )
+
+
+def divide_into_train_and_validation(
+        train_dir, validate_dir, division_num=0.1):
+    # train_dir : Path
+    # validation_dir : Path
+
+    # scanning tree train_dir tree
+    train_dir = Path('data/train')
+    validate_dir = Path('data/validation')
+    train_dirs = [f for f in train_dir.iterdir() if f.is_dir()]
+
+    # get file count of each directorys
+    file_count_dict = {}
+    for d in train_dirs:
+        file_count_dict[d] = len(list(d.iterdir()))
+
+    # calc validate count
+    for name, count in file_count_dict.items():
+        if count < 10:
+            raise RuntimeError('Too few data count: data count is {}'.format(count))
+        sampling_count = int(count * division_num)
+        sampling_nums = np.random.choice(count, sampling_count, replace=False)
+        # move any file: train -> validation
+        for sn in sampling_nums:
+            move_src = Path(name / '{}.png'.format(sn))
+            move_dst = Path(
+                '{}/{}.png'.format(str(name).replace('train', 'validation'), sn)
+            )
+            shutil.move(move_src, move_dst)
+
+
+def display_file_diff(dir1, dir2):
+    dir1 = Path('data/train')
+    dir1_dict = {}
+    for f in dir1.glob('**/*'):
+        dir1_dict[str(f)] = True
 
 
 def create_model(channel_num=3, img_width=150, img_height=150):
@@ -137,19 +197,19 @@ def create_model(channel_num=3, img_width=150, img_height=150):
     model.add(Dense(1))
     model.add(Activation("sigmoid"))
 
-    model.compile(loss="binary_crossentropy", optimizer="rmsprop", metrics=["accuracy"])
+    model.compile(loss="binary_crossentropy", optimizer="rmsprop",
+                  metrics=["accuracy"])
 
     return model
 
 
 def generate_input_data(
-    train_data_dir="data/train",
-    validation_data_dir="data/validation",
-    img_width=150,
-    img_height=150,
-    batch_size=16,
-    class_mode="binary",
-):
+        train_data_dir="data/train",
+        validation_data_dir="data/validation",
+        img_width=150,
+        img_height=150,
+        batch_size=16,
+        class_mode="binary"):
     # this is the augmentation configuration we will use for training
     train_datagen = ImageDataGenerator(
         rescale=1.0 / 255, shear_range=0.2, zoom_range=0.2, horizontal_flip=True
@@ -214,6 +274,5 @@ def main():
     )
 
     model.save_weights("first_try.h5")
-
 
 main()
