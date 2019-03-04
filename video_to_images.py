@@ -134,13 +134,10 @@ def video_in_data_dir_to_images(video_data_dirs, save_dir_dic):
 
 
 def divide_into_train_and_validation(
-        train_dir, validate_dir, division_num=0.1):
-    # train_dir : Path
-    # validation_dir : Path
+        train_dir, division_num=0.1):
+    # train_dir = Path('data/train')
 
     # scanning tree train_dir tree
-    train_dir = Path('data/train')
-    validate_dir = Path('data/validation')
     train_dirs = [f for f in train_dir.iterdir() if f.is_dir()]
 
     # get file count of each directorys
@@ -151,26 +148,25 @@ def divide_into_train_and_validation(
     # calc validate count
     for name, count in file_count_dict.items():
         if count < 10:
-            raise RuntimeError('Too few data count: data count is {}'.format(count))
+            raise RuntimeError(
+                'Too few data count: data count is {}'.format(count))
         sampling_count = int(count * division_num)
-        sampling_nums = np.random.choice(count, sampling_count, replace=False)
+        # sampling_nums = np.random.choice(count, sampling_count, replace=False)
+        sampling_start_num = count - sampling_count
         # move any file: train -> validation
-        for sn in sampling_nums:
-            move_src = Path(name / '{}.png'.format(sn))
+        sampling_num = 0
+        for i in range(sampling_start_num, count):
+            move_src = Path(name / '{}.png'.format(i))
             move_dst = Path(
-                '{}/{}.png'.format(str(name).replace('train', 'validation'), sn)
+                '{}/{}.png'.format(
+                    str(name).replace('train', 'validation'), sampling_num
+                )
             )
+            sampling_num += 1
             shutil.move(move_src, move_dst)
 
 
-def display_file_diff(dir1, dir2):
-    dir1 = Path('data/train')
-    dir1_dict = {}
-    for f in dir1.glob('**/*'):
-        dir1_dict[str(f)] = True
-
-
-def create_model(channel_num=3, img_width=150, img_height=150):
+def create_model(channel_num=1, img_width=150, img_height=150):
 
     if K.image_data_format() == "channels_first":
         input_shape = (channel_num, img_width, img_height)
@@ -262,8 +258,8 @@ def main():
     train_generator, validation_generator = generate_input_data()
 
     batch_size = 16
-    nb_train_samples = 2000
-    nb_validation_samples = 800
+    nb_train_samples = 1500
+    nb_validation_samples = 100
 
     model.fit_generator(
         train_generator,
