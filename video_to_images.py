@@ -183,7 +183,7 @@ def divide_into_train_and_validation(
             shutil.move(move_src, move_dst)
 
 
-def create_model(channel_num=1, img_width=150, img_height=150):
+def create_model(channel_num=3, img_width=150, img_height=150):
 
     if K.image_data_format() == "channels_first":
         input_shape = (channel_num, img_width, img_height)
@@ -221,6 +221,7 @@ def generate_input_data(
         validation_data_dir="data/validation",
         img_width=150,
         img_height=150,
+        color_mode='rgb',
         batch_size=16,
         class_mode="binary"):
     # this is the augmentation configuration we will use for training
@@ -232,17 +233,22 @@ def generate_input_data(
     # only rescaling
     test_datagen = ImageDataGenerator(rescale=1.0 / 255)
 
+    classes = ['good_morning', 'grad', 'thanks']
     train_generator = train_datagen.flow_from_directory(
         train_data_dir,
         target_size=(img_width, img_height),
+        color_mode=color_mode,
         batch_size=batch_size,
+        classes=classes,
         class_mode=class_mode,
     )
 
     validation_generator = test_datagen.flow_from_directory(
         validation_data_dir,
         target_size=(img_width, img_height),
+        color_mode=color_mode,
         batch_size=batch_size,
+        classes=classes,
         class_mode=class_mode,
     )
 
@@ -290,10 +296,10 @@ def prepare():
 def main():
     # prepare()
 
-    model = create_model(channel_num=3, img_width=320, img_height=240)
+    model = create_model(channel_num=1, img_width=320, img_height=240)
 
     train_generator, validation_generator = generate_input_data(
-        img_width=320, img_height=240)
+        img_width=320, img_height=240, color_mode='grayscale')
 
     batch_size = 16
     nb_train_samples = 1500
