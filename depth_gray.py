@@ -7,6 +7,9 @@ import numpy as np
 from sklearn import preprocessing
 import pyrealsense2 as rs
 import cv2
+from keras.models import load_model
+from keras.preprocessing.image import img_to_array, load_img
+from keras.models import model_from_json
 
 
 FACE_CASCADE_PATH = 'haarcascade_frontalface_default.xml'
@@ -98,6 +101,12 @@ def extract_contours(gray_img):
 SAVE_IMG_COUNT = 0
 
 
+def predict_sign_language(imgs, model):
+    pred = model.predict(imgs[0], batch_size=1, verbose=0)
+    score = np.max(pred)
+    print(score)
+
+
 def detect_hand_with_depth(depth_gray_img, color_img):
     global SAVE_IMG_COUNT
     global GLOBAL_HS_MAP
@@ -111,20 +120,17 @@ def detect_hand_with_depth(depth_gray_img, color_img):
     rois.reverse()
 
     # binary image
-    reduce_imgs = []
-    _, bi_img = cv2.threshold(extract_area_map, 30, 70, cv2.THRESH_BINARY)
-    reduce_imgs.append(bi_img)
-    _, inv_img = cv2.threshold(extract_area_map, 30, 70, cv2.THRESH_BINARY_INV)
-    reduce_imgs.append(inv_img)
+    _, hand_bi_img = cv2.threshold(extract_area_map, 30, 70, cv2.THRESH_BINARY)
 
+    hand_area_bi_imgs = []
     skin_rois = []
     for i, roi in enumerate(rois):
         if i > 2:
             break
         skin_rois.append(roi)
-        roi_img = bi_img[roi.y:roi.ey, roi.x:roi.ex]
-        # display_hist(roi_img)
-        cv2.imwrite('temp/{}.png'.format(SAVE_IMG_COUNT), roi_img)
+        hand_area_bi_imgs.append(hand_bi_img[roi.y:roi.ey, roi.x:roi.ex])
+        # display_hist(hand_area_bi_imgs)
+        cv2.imwrite('temp/{}.png'.format(SAVE_IMG_COUNT), hand_area_bi_imgs[i])
         SAVE_IMG_COUNT = SAVE_IMG_COUNT + 1
 
     # draw roi
@@ -133,7 +139,7 @@ def detect_hand_with_depth(depth_gray_img, color_img):
         draw_rect(color_img, roi, (0, 255, 0))
         draw_rect(color_img, c_roi, (0, 255, 0))
 
-    return extract_area_map, reduce_imgs[0], reduce_imgs[1]
+    return extract_area_map, hand_bi_img, hand_area_bi_imgs
 
 
 class Roi():
@@ -239,6 +245,11 @@ def main():
     entry point
     '''
     rsc = RealSenseControl()
+    # for prediction
+    sign_start = False
+    pred_imgs = []
+    # model = load_model('hand_sign_model.h5')
+    model = model_from_json(open('hand_sign_model.json').read())
     try:
         while True:
             depth_img, color_img = rsc.get_imgs()
@@ -254,21 +265,38 @@ def main():
             depth_graymap = depth_img * 255. / rsc.get_distance_max()
             depth_graymap = depth_graymap.reshape((360, 480)).astype(np.uint8)
 
-            hand_img, reduce_img1, reduce_img2 = detect_hand_with_depth(
+            hand_gray_img, hand_bi_img, hand_area_bi_imgs = detect_hand_with_depth(
                 depth_graymap, color_img)
+
+            if not sign_start and len(hand_area_bi_imgs) > 1:
+                sign_start = True
+            if sign_start and len(hand_area_bi_imgs) > 1:
+                hand_area_bi_imgs[0] = cv2.resize(
+                    hand_area_bi_imgs[0], dsize=(320, 240))
+                hand_area_bi_imgs[1] = cv2.resize(
+                    hand_area_bi_imgs[1], dsize=(320, 240))
+                pred_imgs.append(hand_area_bi_imgs[0])
+                pred_imgs.append(hand_area_bi_imgs[1])
+            if sign_start and len(hand_area_bi_imgs) < 2:
+                predict_sign_language(pred_imgs, model)
+                sign_start = False
+                pred_imgs = []
 
             depth_graymap = depth_graymap.reshape((360, 480)).astype(np.uint8)
 
             # display
             cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
-            cv2.namedWindow('RealSense2', cv2.WINDOW_AUTOSIZE)
+            # cv2.namedWindow('RealSense2', cv2.WINDOW_AUTOSIZE)
             cv2.namedWindow('RealSense3', cv2.WINDOW_AUTOSIZE)
             cv2.namedWindow('RealSense4', cv2.WINDOW_AUTOSIZE)
+            cv2.namedWindow('RealSense5', cv2.WINDOW_AUTOSIZE)
             imgs = cv2.hconcat([color_img])
             cv2.imshow('RealSense', imgs)
-            cv2.imshow('RealSense2', hand_img)
-            cv2.imshow('RealSense3', reduce_img1)
-            cv2.imshow('RealSense4', reduce_img2)
+            # cv2.imshow('RealSense2', hand_gray_img)
+            cv2.imshow('RealSense3', hand_bi_img)
+            if len(hand_area_bi_imgs) > 1:
+                cv2.imshow('RealSense4', hand_area_bi_imgs[0])
+                cv2.imshow('RealSense5', hand_area_bi_imgs[1])
             if cv2.waitKey(1) & 0xff == 27:
                 break
 

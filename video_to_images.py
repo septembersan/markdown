@@ -17,7 +17,7 @@ depth videos -> images
 
 [`video_data_dirs`: directory structure of immediately after video recode]
 --------------------------------------------------------------------------
-video_data/
+raw_data/
     good_morning/
         depth/
             1_depth.avi
@@ -80,11 +80,11 @@ def create_data_dir(video_data_dirs, data_dir):
     Parameters
     ----------
     video_data_dirs: Path
-        Path list of `video_data` directorys
+        Path list of `raw_data` directorys
         e.g)
-        [PosixPath('video_data/thanks'),
-         PosixPath('video_data/good_morning'),
-         PosixPath('video_data/grad')]
+        [PosixPath('raw_data/thanks'),
+         PosixPath('raw_data/good_morning'),
+         PosixPath('raw_data/grad')]
 
     Returns
     -------
@@ -109,7 +109,7 @@ def create_data_dir(video_data_dirs, data_dir):
     return save_dir_dic
 
 
-# translate video to images(./video_data -> ./data)
+# translate video to images(./raw_data -> ./data)
 def video_in_data_dir_to_images(video_data_dirs, save_dir_dic):
     def video_to_images(video_file, save_dir, index):
         # Video to frames
@@ -131,6 +131,23 @@ def video_in_data_dir_to_images(video_data_dirs, save_dir_dic):
             index = video_to_images(
                 str(video), str(save_dir_dic["train"][d.name]), index
             )
+
+
+def zero_origin_numbering(dir_name):
+    dir_name.mkdir(exist_ok=True)
+    temp_dir_name = Path(str(dir_name) + '_temp')
+    temp_dir_name.mkdir(exist_ok=True)
+
+    # 0 origin numbering
+    for i, f in enumerate(dir_name.iterdir()):
+        move_src = str(f)
+        move_dst = '{}/{}.png'.format(str(temp_dir_name), i)
+        shutil.move(move_src, move_dst)
+
+    for f in temp_dir_name.iterdir():
+        shutil.move(str(f), str(dir_name))
+
+    temp_dir_name.rmdir()
 
 
 def divide_into_train_and_validation(
@@ -232,12 +249,29 @@ def generate_input_data(
     return train_generator, validation_generator
 
 
+# def prepare():
+#     # `data` directory is for training directory
+#     data_dir = Path("data")
+#
+#     # raw video data
+#     video_data_root_dir = Path("raw_data")
+#     video_data_dirs = [d for d in video_data_root_dir.iterdir() if d.is_dir()]
+#
+#     # clean to save directory
+#     clean_data_dir(data_dir)
+#
+#     # create `data` directory
+#     save_dir_dic = create_data_dir(video_data_dirs, data_dir)
+#
+#     # translate videos to images
+#     video_in_data_dir_to_images(video_data_dirs, save_dir_dic)
+
 def prepare():
     # `data` directory is for training directory
     data_dir = Path("data")
 
     # raw video data
-    video_data_root_dir = Path("video_data")
+    video_data_root_dir = Path("raw_data")
     video_data_dirs = [d for d in video_data_root_dir.iterdir() if d.is_dir()]
 
     # clean to save directory
@@ -246,16 +280,20 @@ def prepare():
     # create `data` directory
     save_dir_dic = create_data_dir(video_data_dirs, data_dir)
 
+    # copy data(raw_data -> data/train)
+    # TODO
+
     # translate videos to images
-    video_in_data_dir_to_images(video_data_dirs, save_dir_dic)
+    divide_into_train_and_validation(Path('data/train'))
 
 
 def main():
     # prepare()
 
-    model = create_model(channel_num=3)
+    model = create_model(channel_num=3, img_width=320, img_height=240)
 
-    train_generator, validation_generator = generate_input_data()
+    train_generator, validation_generator = generate_input_data(
+        img_width=320, img_height=240)
 
     batch_size = 16
     nb_train_samples = 1500
@@ -269,6 +307,16 @@ def main():
         validation_steps=nb_validation_samples // batch_size,
     )
 
-    model.save_weights("first_try.h5")
+    # save model
+    model_json = model.to_json()
+    open('hand_sign_model.json', 'w').write(model_json)
+    model.save_weights("hand_sign_model.h5")
+
 
 main()
+# for f in Path('data/train').iterdir():
+#     if f.is_dir():
+#         zero_origin_numbering(f)
+# divide_into_train_and_validation(Path('data/train'))
+# prepare()
+# main()
