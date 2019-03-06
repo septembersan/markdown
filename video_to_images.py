@@ -1,13 +1,16 @@
 import shutil
+import argparse
+from textwrap import dedent
+from distutils import dir_util
+from pathlib2 import Path
+import numpy as np
 
 import cv2
-import numpy as np
 from keras import backend as K
 from keras.layers import (Activation, Conv2D, Dense, Dropout, Flatten,
                           MaxPooling2D)
 from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
-from pathlib2 import Path
 
 
 """
@@ -19,19 +22,16 @@ depth videos -> images
 --------------------------------------------------------------------------
 raw_data/
     good_morning/
-        depth/
-            1_depth.avi
-            2_depth.avi
+            1.png
+            2.png
             ...
     grad/
-        depth/
-            1_depth.avi
-            2_depth.avi
+            1.png
+            2.png
             ...
     thanks/
-        depth/
-            1_depth.avi
-            2_depth.avi
+            1.png
+            2.png
             ...
 
 [`data_dir`: directory structure of learning possible]
@@ -207,10 +207,10 @@ def create_model(channel_num=3, img_width=150, img_height=150):
     model.add(Dense(64))
     model.add(Activation("relu"))
     model.add(Dropout(0.5))
-    model.add(Dense(1))
-    model.add(Activation("sigmoid"))
+    model.add(Dense(output_dim=3))
+    model.add(Activation("softmax"))
 
-    model.compile(loss="binary_crossentropy", optimizer="rmsprop",
+    model.compile(loss="categorical_crossentropy", optimizer="sgd",
                   metrics=["accuracy"])
 
     return model
@@ -223,7 +223,7 @@ def generate_input_data(
         img_height=150,
         color_mode='rgb',
         batch_size=16,
-        class_mode="binary"):
+        class_mode="categorical"):
     # this is the augmentation configuration we will use for training
     train_datagen = ImageDataGenerator(
         rescale=1.0 / 255, shear_range=0.2, zoom_range=0.2, horizontal_flip=True
@@ -272,30 +272,8 @@ def generate_input_data(
 #     # translate videos to images
 #     video_in_data_dir_to_images(video_data_dirs, save_dir_dic)
 
-def prepare():
-    # `data` directory is for training directory
-    data_dir = Path("data")
 
-    # raw video data
-    video_data_root_dir = Path("raw_data")
-    video_data_dirs = [d for d in video_data_root_dir.iterdir() if d.is_dir()]
-
-    # clean to save directory
-    clean_data_dir(data_dir)
-
-    # create `data` directory
-    save_dir_dic = create_data_dir(video_data_dirs, data_dir)
-
-    # copy data(raw_data -> data/train)
-    # TODO
-
-    # translate videos to images
-    divide_into_train_and_validation(Path('data/train'))
-
-
-def main():
-    # prepare()
-
+def create():
     model = create_model(channel_num=1, img_width=320, img_height=240)
 
     train_generator, validation_generator = generate_input_data(
@@ -318,11 +296,85 @@ def main():
     open('hand_sign_model.json', 'w').write(model_json)
     model.save_weights("hand_sign_model.h5")
 
+    print(dedent('''
+        Model creation successful.
+            model save file is `hand_sign_model.json`
+            weight save file is `hand_sign_model.h5`
+    '''))
 
-main()
+
+def recreate():
+    # `data` directory is for training directory
+    data_dir = Path("data")
+    data_train_dir = Path("data/train")
+    data_validation_dir = Path("data/validation")
+
+    # raw video data
+    raw_data_dir = Path("raw_data")
+
+    # clean to save directory
+    clean_data_dir(data_dir)
+
+    # create `data` directory
+    data_dir.mkdir()
+    data_train_dir.mkdir()
+    data_validation_dir.mkdir()
+    # raw_data_dir.mkdir(parents=True, exist_ok=True)
+
+    # copy data(raw_data -> data/train)
+    dir_util.copy_tree(str(raw_data_dir), str(data_train_dir))
+    for d in data_train_dir.iterdir():
+        Path('{}/{}'.format(data_validation_dir, d.name)).mkdir()
+
+    # translate videos to images
+    divide_into_train_and_validation(Path('data/train'))
+
+    # create model
+    create()
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--create', action='store_true',
+                        help='Model creation')
+    parser.add_argument(
+        '--recreate', action='store_true',
+        help='model recreate with data updated data in `raw_data`')
+
+    args = parser.parse_args()
+
+    raw_data_dir = Path("raw_data")
+    if not raw_data_dir.is_dir():
+        print(
+            dedent('''
+            Put data!!
+                raw_data/
+                   good_morning/
+                       1.png
+                       2.png
+                       ...
+                    grad/
+                       1.png
+                       2.png
+                       ...
+                    thanks/
+                       1.png
+                       2.png
+                       ...
+            '''))
+
+    if args.create:
+        create()
+    elif args.recreate:
+        recreate()
+    else:
+        print('Refer to help: command is `python video_to_images.py -h`')
+
+
+if __name__ == '__main__':
+    main()
+
 # for f in Path('data/train').iterdir():
 #     if f.is_dir():
 #         zero_origin_numbering(f)
 # divide_into_train_and_validation(Path('data/train'))
-# prepare()
-# main()

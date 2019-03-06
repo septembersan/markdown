@@ -102,9 +102,16 @@ SAVE_IMG_COUNT = 0
 
 
 def predict_sign_language(imgs, model):
-    pred = model.predict(imgs[0], batch_size=1, verbose=0)
-    score = np.max(pred)
-    print(score)
+    print('------------prediction----------')
+    predictions = model.predict(imgs, batch_size=1, verbose=0)
+
+    count = [0] * len(predictions[0])
+    for pre in predictions:
+        index = np.argmax(pre)
+        count[index] += 1
+        print(index)
+
+    print('count: {}\n argmax: {}'.format(count, np.argmax(np.array(count))))
 
 
 def detect_hand_with_depth(depth_gray_img, color_img):
@@ -275,10 +282,12 @@ def main():
                     hand_area_bi_imgs[0], dsize=(320, 240))
                 hand_area_bi_imgs[1] = cv2.resize(
                     hand_area_bi_imgs[1], dsize=(320, 240))
-                pred_imgs.append(hand_area_bi_imgs[0])
-                pred_imgs.append(hand_area_bi_imgs[1])
+                pred_imgs.append(
+                    hand_area_bi_imgs[0].reshape(320, 240, 1) / 255.0)
+                pred_imgs.append(
+                    hand_area_bi_imgs[1].reshape(320, 240, 1) / 255.0)
             if sign_start and len(hand_area_bi_imgs) < 2:
-                predict_sign_language(pred_imgs, model)
+                predict_sign_language(np.array(pred_imgs), model)
                 sign_start = False
                 pred_imgs = []
 
@@ -294,9 +303,9 @@ def main():
             cv2.imshow('RealSense', imgs)
             # cv2.imshow('RealSense2', hand_gray_img)
             cv2.imshow('RealSense3', hand_bi_img)
-            if len(hand_area_bi_imgs) > 1:
-                cv2.imshow('RealSense4', hand_area_bi_imgs[0])
-                cv2.imshow('RealSense5', hand_area_bi_imgs[1])
+            # if len(hand_area_bi_imgs) > 1:
+            #     cv2.imshow('RealSense4', hand_area_bi_imgs[0])
+            #     cv2.imshow('RealSense5', hand_area_bi_imgs[1])
             if cv2.waitKey(1) & 0xff == 27:
                 break
 
