@@ -303,6 +303,19 @@ def create():
     '''))
 
 
+def copy_files_with_0_origin(src, dest):
+    for src_chdir in src.iterdir():
+        if not src_chdir.is_dir():
+            continue
+        dest_chdir = Path('{}/{}'.format(str(dest), src_chdir.name))
+        dest_chdir.mkdir(parents=True, exist_ok=True)
+        for i, src_chdir_file in enumerate(src_chdir.iterdir()):
+            if not src_chdir_file.is_file():
+                continue
+            dest_chdir_file = '{}/{}.png'.format(dest_chdir, i)
+            shutil.copy(src_chdir_file, dest_chdir_file)
+
+
 def recreate():
     # `data` directory is for training directory
     data_dir = Path("data")
@@ -322,7 +335,8 @@ def recreate():
     # raw_data_dir.mkdir(parents=True, exist_ok=True)
 
     # copy data(raw_data -> data/train)
-    dir_util.copy_tree(str(raw_data_dir), str(data_train_dir))
+    copy_files_with_0_origin(raw_data_dir, data_train_dir)
+    # dir_util.copy_tree(str(raw_data_dir), str(data_train_dir))
     for d in data_train_dir.iterdir():
         Path('{}/{}'.format(data_validation_dir, d.name)).mkdir()
 
