@@ -69,9 +69,9 @@ hook_add = '''
     let g:neoterm_autoinsert = 1
     " terminal position
     let g:neoterm_default_mod='belowright'
-    " nnoremap <silent> <C-e><C-e> :call My_TREPLSendSelection()<cr>
+    nnoremap <silent> <C-e><C-e> :call My_TREPLSendLine()<cr>
     vnoremap <silent> <C-e><C-e> :TREPLSendSelection<cr>
-    nnoremap <silent> <C-e><C-f> :call Exec_python()<cr>
+    nnoremap <silent> <C-e><C-f> :TREPLSendFile<cr>
     " nnoremap <silent> <C-e><C-f> :TREPLSendFile<cr>'>j0
     nnoremap <silent> ttn  :Tnew<CR>
     nnoremap <silent> tti  :Topen<cr>
@@ -81,9 +81,20 @@ hook_add = '''
     nnoremap <silent> tts  :call My_New_Terminal_VSplit()<cr>
     nnoremap <silent> ttk  :Tkill<cr>
     nnoremap <silent> <F5> :T pdb %<CR><c-w>ki
-    function! My_TREPLSendSelection()
-        Topen
-        :TREPLSendLine
+    function! My_TREPLSendLine()
+        if !get(t:, 'neoterm_id')
+            Tnew
+            exec 'TREPLSetTerm'.t:neoterm_id
+            TREPLSendLine
+        else
+            if t:neoterm_id == g:neoterm.repl.instance_id
+                TREPLSendLine
+                return
+            endif
+            g:neoterm.repl.instance_id = t:neoterm_id
+            " exec 'TREPLSetTerm'.t:neoterm_id
+            TREPLSendLine
+        endif
     endfunction
 
     function! My_New_Terminal_Tab()
@@ -101,15 +112,6 @@ hook_add = '''
         " wincmd h
         " call feedkeys("i")
         let g:neoterm_size = 10
-    endfunction
-
-    function! Exec_python()
-        :w!
-        let g:neoterm_autoinsert = 0
-        Topen
-        Tclear
-        T python3.7  %
-        let g:neoterm_autoinsert = 1
     endfunction
 
     if has('vim_starting')
@@ -426,11 +428,11 @@ hook_add ='''
 
     nnoremap <silent> <Space>uo :<C-u>Denite -direction=top file_mru<CR>
     " nnoremap <silent> <Space>b :<C-u>Denite -direction=top buffer<CR>
-    nnoremap <silent> <Space>f :<C-u>DeniteBufferDir -direction=top file_rec<CR>
+   " nnoremap <silent> <Space>f :<C-u>DeniteBufferDir -direction=top file_rec<CR>
     " nnoremap <silent> <Space>g :<C-u>DeniteBufferDir -direction=top grep<CR>
     nnoremap <silent> <Space>i :<C-u>Denite line -direction=top<CR>
     nnoremap <silent> ,g       :<C-u>Denite grep -direction=top -no-empty -no-quit -buffer-name=search-buffer<CR>
-    nnoremap <silent> <Space>vh :<C-u>Denite help<CR>
+    " nnoremap <silent> <Space>vh :<C-u>Denite help<CR>
     "nnoremap <silent> <Space>n :<C-u>Denite -resume -immediately -select=+1<CR>
     "nnoremap <silent> <Space>p :<C-u>Denite -resume -immediately -select=-1<CR>
     "nnoremap <Space>d :<C-u>Denite -direction=topleft -cursor-wrap=true bookmark<CR>
@@ -447,7 +449,8 @@ hook_add ='''
     call denite#custom#map('insert', "<c-t>", '<denite:do_action:tabswitch>')
     call denite#custom#map('normal', "l", '<denite:do_action:default>')
     " インサート→ノーマルモード
-    call denite#custom#map('insert', "mm", '<denite:enter_mode:normal>')
+    call denite#custom#map('insert', "jj", '<denite:enter_mode:normal>')
+    call denite#custom#map('insert', "<c-c>", '<denite:quit>')
 
     if executable('rg')
         " コマンド．file_rec で使うコマンド
@@ -461,9 +464,9 @@ hook_add ='''
     endif
 
     ".git以下のディレクトリ検索
-    nnoremap <silent> <Space>gf :<C-u>Denite -direction=topleft -cursor-wrap=true
-          \ -path=`substitute(finddir('.git', './;'), '.git', '', 'g')`
-          \ file_rec/git<CR>
+    " nnoremap <silent> <Space>gf :<C-u>Denite -direction=topleft -cursor-wrap=true
+    "      \ -path=`substitute(finddir('.git', './;'), '.git', '', 'g')`
+    "      \ file_rec/git<CR>
     " call denite#custom#source('file'    , 'matchers', ['matcher_cpsm', 'matcher_fuzzy'])
     call denite#custom#source('file'    , 'matchers', ['matcher_substring'])
     call denite#custom#source('buffer'  , 'matchers', ['matcher_substring'])
@@ -478,12 +481,35 @@ hook_add ='''
 repo = 'Shougo/deoplete.nvim'
 if = 'has("nvim")'
 on_i = 1
+# on_event="InsertCharPre"
+on_event="InsertEnter"
 hook_source = '''
     let g:deoplete#enable_at_startup = 1
+    let g:deoplete#auto_complete_delay = 0
+    let g:deoplete#auto_complete_start_length = 1
+    let g:deoplete#enable_camel_case = 0
+    let g:deoplete#enable_ignore_case = 0
+    let g:deoplete#enable_refresh_always = 0
+    let g:deoplete#enable_smart_case = 1
+    let g:deoplete#file#enable_buffer_path = 1
+    let g:deoplete#max_list = 10000
+    inoremap <expr><tab> pumvisible() ? "\<C-n>" :
+      \ neosnippet#expandable_or_jumpable() ?
+      \    "\<Plug>(neosnippet_expand_or_jump)" : "\<tab>"
+    " let g:deoplete#omni_patterns.python='[^. *\t]\.\w*'
 '''
 hook_post_source = '''
-    let g:deoplete#omni_patterns = {}
+    let g:deoplete#omni_patterns = {
+       \ 'python': '[^. *\t]\.\w*',
+       \}
 '''
+
+[[plugins]]
+repo = 'Shougo/deoplete-lsp'
+hook_source = '''
+    call lsp#server#add('python', 'pyls')
+'''
+
 
 # [[plugins]]
 # repo = 'zchee/deoplete-jedi'
@@ -707,7 +733,7 @@ hook_add ='''
 repo = 'tweekmonster/braceless.vim'
 on_ft = 'python'
 hook_add ='''
-    autocmd FileType python BracelessEnable +fold +highlight
+    " autocmd FileType python BracelessEnable +fold +highlight
     let g:braceless_jump_prev_key = '['
     let g:braceless_jump_next_key = ']'
     let g:braceless_segment_prev_key = 'k'
@@ -760,7 +786,7 @@ hook_add ='''
     nnoremap <silent> <Space>ub :<C-u>Unite buffer<CR>
     nnoremap <silent> <Space>uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
     " nnoremap <silent> <Space>uf :<C-u>Unite file_rec<CR>
-    nnoremap <silent> <Space>o  :<C-u>Unite file_mru<CR>
+    " nnoremap <silent> <Space>o  :<C-u>Unite file_mru<CR>
     nnoremap <silent> <Space>ubk :<C-u>Unite vim_bookmarks<CR>
     nnoremap <silent> <Space>uu :<C-u>Unite buffer file_mru<CR>
     nnoremap <silent> <Space>y :<C-u>Unite history/yank<CR>
@@ -770,7 +796,7 @@ hook_add ='''
     nnoremap <silent> <Space>r  :<C-u>UniteResume search-buffer<CR>
     nnoremap <silent> ,ug       :<C-u>Unite grep:. -no-empty -no-quit -buffer-name=search-buffer<CR>
     " nnoremap <silent> <Space>m  :<C-u>UniteResume search-buffer<CR>
-    nnoremap <silent> <Space>ul :<C-u>Unite line<CR>
+    " nnoremap <silent> <Space>ul :<C-u>Unite line<CR>
     nnoremap <silent> <Space>uc :<C-u>Unite -auto-preview colorscheme<CR>
     " nnoremap <silent> <Space>gf :<C-u>Unite file_rec/async:!<CR>
     "nnoremap <silent> <Space>d :<C-u>UniteWithBufferDir -buffer-name=files buffer file_mru bookmark file<CR>
@@ -781,11 +807,12 @@ hook_add ='''
     "au FileType unite inoremap <silent> <buffer> <expr> <C-v> unite#do_action('vsplit')
     au FileType unite nnoremap <silent> <buffer> <expr> t unite#do_action('tabswitch')
     au FileType unite inoremap <silent> <buffer> <expr> <c-t> unite#do_action('tabswitch')
+    au FileType unite inoremap <silent> <buffer> <expr> <c-c> <Plug> (unite_exit)
     au FileType unite nnoremap <silent> <buffer> <ESC><ESC> q
     au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>q
 
     
-    inoremap <buffer> <mm> <Plug> (uite_insert_leave)
+    inoremap <buffer> <jj> <Plug> (uite_insert_leave)
     " nnoremap <silent> <buffer> <expr> <C-q> <Plug> (unite_exit)
     " inoremap <silent> <buffer> <expr> <C-q> <Plug> (unite_exit)
 
@@ -814,7 +841,7 @@ repo = 'Shougo/vimfiler.vim'
 depends = 'unite.vim'
 hook_add ='''
     let g:vimfiler_max_directories_history = 100
-    autocmd VimEnter * VimFilerBufferDir -split -simple -no-quit -winwidth=30 -toggle -no-focus -auto-cd
+   " autocmd VimEnter * VimFilerBufferDir -split -simple -no-quit -winwidth=30 -toggle -no-focus -auto-cd
     nnoremap <silent> <Space>e :VimFilerBufferDir -split -simple -no-quit -winwidth=30 -toggle -auto-cd<cr>
     function! Vimfiler_mysplit()
         wincmd l
@@ -862,8 +889,8 @@ hook_add ='''
     " nnoremap <silent> <Space>gr :Gread<cr>
     nnoremap <Space>ge :Gvdiff :%<left><left>
     nnoremap <Space>gp :Gpull 
-    nnoremap <Space>gss :Gstatus<cr>
-    nnoremap <Space>gg :call My_Ggrep()<cr>
+    " nnoremap <Space>gss :Gstatus<cr>
+    " nnoremap <Space>gg :call My_Ggrep()<cr>
     nnoremap <Space>gj :call My_Cursor_Under_Ggrep()<cr>
     nnoremap <Space>gcc :Gcommit -m ""<left>
     nnoremap <Space>gca :Gcommit -amend<cr>
@@ -1076,9 +1103,11 @@ hook_add ='''
     let g:tigris#delay = 300
 '''
 
+
 [[plugins]]
 repo = 'autozimu/LanguageClient-neovim'
 rev = 'next'
+depends = ['deoplete.nvim']
 build = 'bash install.sh'
 hook_add ='''
     " Installation: pip install python-language-server
@@ -1088,6 +1117,7 @@ hook_add ='''
         \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
         \ 'python': [language_client_python_path],
         \ }
+    let g:LanguageClient_loadSettings = 1
     nnoremap <F5> :call LanguageClient_contextMenu()<CR>
     nnoremap <silent> <c-j>k :call LanguageClient#textDocument_hover()<CR>
     nnoremap <silent> <c-j>jl :call LanguageClient#textDocument_definition()<CR>
@@ -1131,4 +1161,138 @@ hook_add ='''
 [[plugins]]
 repo = 'nelstrom/vim-visual-star-search'
 hook_add ='''
+'''
+
+[[plugins]]
+repo = 'szymonmaszke/vimpyter'
+hook_add ='''
+    autocmd Filetype ipynb nmap <silent><Leader>b :VimpyterInsertPythonBlock<CR>
+    autocmd Filetype ipynb nmap <silent><Leader>j :VimpyterStartJupyter<CR>
+    autocmd Filetype ipynb nmap <silent><Leader>n :VimpyterStartNteract<CR>
+'''
+
+[[plugins]]
+repo = 'junegunn/fzf.vim'
+hook_add ='''
+    autocmd! FileType fzf nnoremap <silent> <buffer> q :q<cr>
+    let $FZF_DEFAULT_OPTS = '--reverse'
+    let g:fzf_layout = {
+        \ 'up': '~30%' }
+
+    let g:fzf_action = {
+        \ 'ctrl-t': 'tab split',
+        \ 'ctrl-s': 'split',
+        \ 'ctrl-v': 'vsplit',
+        \ 'ctrl-l': 'e' }
+
+    nnoremap <Space>ff :Files<cr>
+    nnoremap <Space>fh :Files ~/<cr>
+    nnoremap <Space>gf :GFiles<cr>
+    nnoremap <Space>gss :GFiles?<cr>
+    nnoremap <Space>ul :BLines<cr>
+    nnoremap <Space>gg :Rg<cr>
+    nnoremap <Space>gj :Rg <c-r><c-w><cr>
+    " vnoremap <Space>gj :<c-u>call Visual_search()<cr>
+    vnoremap <Space>gj :<c-u>Rg <c-r>0<cr>
+    nnoremap <Space>o :History<cr>
+    nnoremap <Space>vh :Helptags<cr>
+
+    function! Visual_search()
+      let [l:lnum1, l:col1] = getpos("'<")[1:2]
+      let [l:lnum2, l:col2] = getpos("'>")[1:2]
+      if &selection ==# 'exclusive'
+        let l:col2 -= 1
+      endif
+      let l:lines = getline(l:lnum1, l:lnum2)
+      let l:lines[-1] = l:lines[-1][:l:col2 - 1]
+      let l:lines[0] = l:lines[0][l:col1 - 1:]
+      " echomsg l:lines[0]
+      :Rg <c-r>0
+    endfunction
+'''
+
+
+[[plugins]]
+repo = 'junegunn/fzf'
+build = './install --all'
+hook_add ='''
+'''
+
+
+[[plugins]]
+repo = 'skanehira/translate.vim'
+hook_add = '''
+    " Reqiurement: installed go lang
+    let g:translate_source = "en"
+    let g:translate_target = "ja"
+    let g:translate_winsize = 10
+'''
+
+
+[[plugins]]
+repo = 'tpope/vim-scriptease'
+hook_add = '''
+    " Usage:
+    " :Breakadd
+    " <target command>
+    " >echom <variable name>
+    nnoremap <silent> <Space>vb :call MybreakToggle()<cr>
+
+    fu! MybreakToggle()
+        if !exists('g:bp_idx')
+            let g:bp_idx = 0
+        endif
+
+        let file_name = expand('%:p')
+        if file_name == ""
+            return
+        endif
+
+        let line_nr = line('.')
+        let break_point_dict = MybreakReferenceOnBuffer(file_name)
+        if has_key(break_point_dict, printf('%d', line_nr))
+            let sign_id = break_point_dict[line_nr]
+            call Mybreakdel(file_name, sign_id)
+            return
+        endif
+        call Mybreakadd(file_name, line_nr)
+    endfu
+
+    fu! Mybreakadd(file_name, line_nr)
+        sign define breakpoint text=B texthl=ZenSpace
+        let name = 'breakpoint'
+        let g:bp_idx += 1
+        let g:line_dict = {a:line_nr: g:bp_idx}
+
+        " add sign
+        exe "sign place ". g:bp_idx ." line=" . a:line_nr ." name=". name ." file=" . a:file_name
+        breakadd here
+    endfu
+
+    fu! Mybreakdel(file_name, sign_id)
+        exe "sign unplace ". a:sign_id ." file=". a:file_name
+        breakdel here
+    endfu
+
+    fu! MybreakReferenceOnBuffer(file_name)
+        let sign_raw = MyRedirToVariable("sign place file=" . a:file_name)
+        let sign_infos = split(sign_raw, '\n')
+
+        let break_point_dict = {} "line_nr: sign_id
+        for sign_info in sign_infos
+            let result = matchlist(sign_info, 'line=\(\d\+\)\W\+id=\(\d\+\)\W\+name=breakpoint\c')
+            if len(result) <# 1
+                continue
+            endif
+            let break_point_dict[result[1]] = result[2]
+        endfor
+        return break_point_dict
+    endfu
+
+    fu! MyRedirToVariable(cmd)
+        redir => output
+        silent exe a:cmd
+        redir END
+        return output
+    endfu
 '''

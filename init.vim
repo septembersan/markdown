@@ -39,10 +39,10 @@ set shiftwidth=4
 set softtabstop=0
 set ttimeoutlen=50
 " setting move mode"{{{
-inoremap mm <ESC>
-nnoremap mm <ESC>
+inoremap jj <ESC>
+" nnoremap jj <ESC>
 vnoremap mm <ESC>
-cnoremap mm <ESC>
+cnoremap jj <ESC>
 "}}}
 " setting guioption"{{{
 set guioptions-=T
@@ -82,7 +82,7 @@ cnoremap <C-d> <Del>
 cnoremap <C-e> <End>
 cnoremap <C-n> <Down>
 cnoremap <C-p> <Up>
-cnoremap <Space>p <C-r>0
+cnoremap <Space>; <C-r>0
 "}}}
 " setting gui font"{{{
 if has('win64')
@@ -115,10 +115,12 @@ set iminsert=0
 set imsearch=-1
 nnoremap <Space>l gt
 nnoremap <Space>h gT
-nnoremap tm :tabnext
+nnoremap tm :tabm 
 nnoremap tn :tabnew<CR>
 nnoremap to :tabonly<CR>
 nnoremap tp :tab sp<CR>
+nnoremap tl :+tabm<cr>
+nnoremap th :-tabm<cr> 
 nnoremap <Space>x :call My_tabclose()<CR>
 nnoremap <Space>q :call My_tabclose()<CR>
 nnoremap <Space>a gg<S-v><S-g>
@@ -130,6 +132,8 @@ endfunction
 nnoremap <silent>vp gv
 nnoremap dif :windo diffthis<cr>
 nnoremap dio :diffoff<cr>
+nnoremap vs :vnew<cr>
+nnoremap hs :new<cr>
 "}}}
 " setting fold{{{
 set modeline
@@ -188,8 +192,8 @@ colorscheme iceberg
 " set termguicolors
 syntax on
 "}}}
-let g:python_host_prog = substitute(system('which python3.7'), "\n", "", "")
-let g:python3_host_prog = substitute(system('which python3.7'), "\n", "", "")
+let g:python_host_prog = substitute(system('which python'), "\n", "", "")
+let g:python3_host_prog = substitute(system('which python3'), "\n", "", "")
 " settings deoplete{{{
 set completeopt=menuone
 "}}}
@@ -217,7 +221,7 @@ nnoremap <Space>p :cp<cr>
 nnoremap <Space>n :cn<cr>
 " tnoremap <silent> mm <c-\><c-n><c-w>p
 " tnoremap <silent> tm <c-\><c-n>
-tnoremap <silent> mm <c-\><c-n>
+tnoremap <silent> jj <c-\><c-n>
 "}}}
 " settings dev env{{{
 nnoremap <silent> <F9> :call Display_DevEnv_Toggle()<cr>
@@ -294,3 +298,20 @@ nnoremap tbs :vsplit enew<cr>
 "}}}
 " autocmd BufWritePost ~/.config/nvim/init.vim so ~/.config/nvim/init.vim
 " autocmd BufWritePost ~/.config/nvim/dein.toml execute UpdateRemotePlugins
+set clipboard=unnamed
+nnoremap ss :%s/ *$//g
+
+nnoremap <c-e>i :call setline(".", "inspect.getmembers(".getline('.').")")<cr>
+
+
+function! s:search_by_google() 
+    let line = line(".")
+    let col  = col(".")
+    let searchWord = expand("<cword>")
+    if searchWord  != ''
+        execute 'read !open https://www.google.co.jp/search\?q\=' . searchWord
+        execute 'call cursor(' . line . ',' . col . ')'
+    endif
+endfunction
+command! SearchByGoogle call s:search_by_google()
+nnoremap <silent> <Space>g :SearchByGoogle<CR>
