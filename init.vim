@@ -43,7 +43,6 @@ inoremap jj <ESC>
 " nnoremap jj <ESC>
 vnoremap mm <ESC>
 cnoremap jj <ESC>
-tnoremap <silent> jj <c-\><c-n>
 "}}}
 " setting guioption"{{{
 set guioptions-=T
@@ -193,8 +192,8 @@ colorscheme iceberg
 " set termguicolors
 syntax on
 "}}}
-let g:python_host_prog = substitute(system('which python3.6'), "\n", "", "")
-let g:python3_host_prog = substitute(system('which python3.6'), "\n", "", "")
+let g:python_host_prog = substitute(system('which python'), "\n", "", "")
+let g:python3_host_prog = substitute(system('which python3'), "\n", "", "")
 " settings deoplete{{{
 set completeopt=menuone
 "}}}
@@ -222,6 +221,7 @@ nnoremap <Space>p :cp<cr>
 nnoremap <Space>n :cn<cr>
 " tnoremap <silent> mm <c-\><c-n><c-w>p
 " tnoremap <silent> tm <c-\><c-n>
+tnoremap <silent> jj <c-\><c-n>
 "}}}
 " settings dev env{{{
 nnoremap <silent> <F9> :call Display_DevEnv_Toggle()<cr>
@@ -303,3 +303,20 @@ nnoremap ss :%s/ *$//g<cr>
 " xnoremap SWP :!rm -f ~/.local/share/nvim/swap/*
 let &colorcolumn=join(range(90,999),",")                                                                                                                                                                                         
 hi ColorColumn ctermbg=235 guibg=#2c2d27 
+=======
+nnoremap ss :%s/ *$//g
+
+nnoremap <c-e>i :call setline(".", "inspect.getmembers(".getline('.').")")<cr>
+
+
+function! s:search_by_google() 
+    let line = line(".")
+    let col  = col(".")
+    let searchWord = expand("<cword>")
+    if searchWord  != ''
+        execute 'read !open https://www.google.co.jp/search\?q\=' . searchWord
+        execute 'call cursor(' . line . ',' . col . ')'
+    endif
+endfunction
+command! SearchByGoogle call s:search_by_google()
+nnoremap <silent> <Space>g :SearchByGoogle<CR>
