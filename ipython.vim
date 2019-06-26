@@ -161,6 +161,16 @@ fun! ipython#run_visual() abort range
         if &filetype ==# 'python'
             exe 'silent normal gvy'
             let paste_str1 = strpart(getreg(), 0, strlen(getreg()) - 1)
+            let paste_str1 = split(paste_str1, "\n")
+            let paste_str1 = filter(paste_str1, 'v:val != ""')
+            let indent = 0
+            if paste_str1[len(paste_str1) - 1][0] == " "
+                let indent = 1
+            endif
+            let paste_str1 = join(paste_str1, "\n")
+            if indent == 1
+                let paste_str1 = paste_str1 . "\n"
+            endif
             call splitterm#jobsend_id(s:ipython[tabpagenr()].info, paste_str1)
             " call splitterm#jobsend_id(s:ipython[tabpagenr()].info, paste_str1)
         endif
