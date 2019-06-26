@@ -887,17 +887,17 @@ hook_add ='''
     nnoremap gst :Git stash save ""<left>
     nnoremap <silent> gss :Git stash list<cr>
     nnoremap gsa :Git stash apply stash@{}<left>
-    function! My_Cursor_Under_Ggrep()
-        :Gcd
-        call feedkeys("yiw")
-        call feedkeys(",ug")
-        call feedkeys("\<Space>p")
-        call feedkeys("\<cr>")
-    endfunction
-    function! My_Ggrep()
-        :Gcd
-        call feedkeys(",ug")
-    endfunction
+    " function! My_Cursor_Under_Ggrep()
+    "     :Gcd
+    "     call feedkeys("yiw")
+    "     call feedkeys(",ug")
+    "     call feedkeys("\<Space>p")
+    "     call feedkeys("\<cr>")
+    " endfunction
+    " function! My_Ggrep()
+    "     :Gcd
+    "     call feedkeys(",ug")
+    " endfunction
 '''
 
 [[plugins]]
@@ -1188,15 +1188,22 @@ hook_add ='''
     nnoremap <Space>gf :GFiles<cr>
     nnoremap <Space>gss :GFiles?<cr>
     nnoremap <Space>ul :BLines<cr>
-    nnoremap <Space>gg :Rg<cr>
+    nnoremap <Space>gg :call My_Ggrep()<cr>
     nnoremap <Space>o :History<cr>
     nnoremap <Space>vh :Helptags<cr>
-    nnoremap <Space>d :Directorys<cr>
+    nnoremap <Space>dd :Directorys<cr>
+    nnoremap <Space>dh :DirectorysOnHome<cr>
     nnoremap <Space>fr :Repos<cr>
+    nnoremap <Space>gj :call My_Ggrep()<cr>
     vnoremap <Space>gj :<c-u>Rg <c-r>0<cr>
 
     command! -bang -nargs=? Directorys
-      \ call fzf#run(fzf#wrap({'source': 'find -type d', 'up': '30%'}))
+      "\ call fzf#run(fzf#wrap({'source': 'find -type d', 'up': '30%'}))
+      \ call fzf#run({'source': 'find -type d', 'sink': 'e', 'up': '30%'})
+
+    command! -bang -nargs=? DirectorysOnHome
+      "\ call fzf#run(fzf#wrap({'source': 'cd; find -type d', 'up': '30%'}))
+      \ call fzf#run({'source': 'cd; find -type d', 'sink': 'e', 'up': '30%'})
 
     command! -bang -nargs=0 Repos
       \ call fzf#run(fzf#wrap({'source': 'ghq list -p', 'up': '30%'}))
@@ -1211,6 +1218,22 @@ hook_add ='''
       \ call fzf#vim#grep(
       \   'rg --line-number --no-heading '.shellescape(<q-args>), 0,
       \   fzf#vim#with_preview({'options': '--exact --reverse'}, 'right:50%:wrap'))
+
+    function! My_Cursor_Under_Ggrep()
+        if exists('Gcd')
+            Gcd
+        endif
+        call fzf#vim#grep(
+          \   'rg --line-number --no-heading '.expand('<cword>'), 0,
+          \   fzf#vim#with_preview({'options': '--exact --reverse'}, 'right:50%:wrap'))
+    endfunction
+
+    function! My_Ggrep()
+        if exists('Gcd')
+            Gcd
+        endif
+        Rg
+    endfunction
 '''
 [[plugins]]
 repo = 'skanehira/translate.vim'

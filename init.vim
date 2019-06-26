@@ -134,7 +134,7 @@ nnoremap <silent>vp gv
 nnoremap dif :windo diffthis<cr>
 nnoremap dio :diffoff<cr>
 nnoremap vs :vnew<cr>
-nnoremap hs :new<cr>
+nnoremap sp :new<cr>
 "}}}
 " setting fold{{{
 set modeline
