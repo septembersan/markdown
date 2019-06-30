@@ -261,12 +261,30 @@ hook_add ='''
 '''
 
 [[plugins]]
+repo = 'Shougo/neosnippet-snippets'
+hook_add ='''
+'''
+
+[[plugins]]
 repo = 'Shougo/neosnippet.vim'
 hook_add ='''
-    inoremap <C-k> <Plug>(neosnippet_expand_or_jump)
-    snoremap <C-k> <Plug>(neosnippet_expand_or_jump)
-    xnoremap <C-k> <Plug>(neosnippet_expand_target)
+    imap <C-k> <Plug>(neosnippet_expand_or_jump)
+    smap <C-k> <Plug>(neosnippet_expand_or_jump)
+    xmap <C-k> <Plug>(neosnippet_expand_target)
     let g:neosnippet#snippets_directory='~/home/aapfuser/.cache/neosnippet/my'
+    " ドットでオムニ補完候補を出す
+    " inoremap <expr><tab> pumvisible() ? "\<C-n>" :
+    "\ neosnippet#expandable_or_jumpable() ?
+    "\    "\<Plug>(neosnippet_expand_or_jump)" : "\<tab>"
+    imap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+      \ "\<Plug>(neosnippet_expand_or_jump)"
+      \: pumvisible() ? "\<C-n>" : "\<TAB>"
+    smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+          \ "\<Plug>(neosnippet_expand_or_jump)"
+          \: "\<TAB>"
+    if has('conceal')
+      set conceallevel=2 concealcursor=i
+endif
 '''
 
 [[plugins]]
@@ -278,11 +296,6 @@ hook_add ='''
 repo = 'vim-scripts/DoxygenToolkit.vim'
 hook_add ='''
     noremap ,d :Dox<CR>
-'''
-
-[[plugins]]
-repo = 'Shougo/neosnippet-snippets'
-hook_add ='''
 '''
 
 [[plugins]]
@@ -475,32 +488,38 @@ on_i = 1
 hook_source = '''
     let g:deoplete#enable_at_startup = 1
     let g:deoplete#auto_complete_delay = 0
-    let g:deoplete#auto_complete_start_length = 1
-    let g:deoplete#enable_camel_case = 0
-    let g:deoplete#enable_ignore_case = 0
+    " let g:deoplete#auto_complete_start_length = 1
+    " let g:deoplete#enable_camel_case = 0
+    " let g:deoplete#enable_ignore_case = 0
     let g:deoplete#enable_refresh_always = 0
-    let g:deoplete#enable_smart_case = 1
-    let g:deoplete#file#enable_buffer_path = 1
-    let g:deoplete#max_list = 10000
-    inoremap <expr><tab> pumvisible() ? "\<C-n>" :
-      \ neosnippet#expandable_or_jumpable() ?
-      \    "\<Plug>(neosnippet_expand_or_jump)" : "\<tab>"
-    " let g:deoplete#omni_patterns.python='[^. *\t]\.\w*'
-'''
-hook_post_source = '''
+    " let g:deoplete#enable_smart_case = 1
+    " let g:deoplete#file#enable_buffer_path = 1
+    " let g:deoplete#max_list = 10000
     let g:deoplete#omni_patterns = {
        \ 'python': '[^. *\t]\.\w*',
        \}
 '''
 
 [[plugins]]
-repo = 'Shougo/deoplete-lsp'
-hook_source = '''
-    call lsp#server#add('python', 'pyls')
+repo = 'prabirshrestha/vim-lsp'
+hook_add = '''
 '''
-# hook_post_source = '''
-#     let g:deoplete#omni_patterns = {}
-# '''
+
+[[plugins]]
+repo = 'lighttiger2505/deoplete-vim-lsp'
+hook_source = '''
+    if (executable('pyls'))
+        let s:pyls_path = fnamemodify(g:python_host_prog, ':h') . '/'. 'pyls'
+        augroup LspPython
+            autocmd!
+            autocmd User lsp_setup call lsp#register_server({
+          \ 'name': 'pyls',
+          \ 'cmd': {server_info->['pyls']},
+          \ 'whitelist': ['python']
+          \ })
+        augroup END
+    endif
+'''
 
 # [[plugins]]
 # repo = 'zchee/deoplete-jedi'
@@ -509,43 +528,43 @@ hook_source = '''
 #     " let g:deoplete#sources#jedi#python_path = substitute(system('which python3.6'), "¥n", "", "")
 # '''
 
-[[plugins]]
-repo = 'davidhalter/jedi-vim'
-on_ft = 'python'
-# lazy=1
-# hook_add = '''
-hook_source = '''
-        let g:jedi#auto_initialization = 1
-        let g:jedi#auto_vim_configuration = 1
-
-        "# 補完キーの設定この場合???Ctrl+Space
-        let g:jedi#completions_command = "<C-Space>"
-        "# 変数の宣言場所へジャンプ???Ctrl + g)
-        " let g:jedi#goto_assignments_command = "<C-g>"
-        "# クラス???関数定義にジャンプ???Gtrl + d???
-        " let g:jedi#goto_definitions_command = "<C-j>"
-        nnoremap <C-j><C-j> :call jedi#goto_definitions()<cr>
-        nnoremap <C-j>s :call Jedi_my_setting_sp()<cr>
-        nnoremap <C-j>t :call Jedi_my_setting_tab()<cr>
-        function! Jedi_my_setting_sp()
-            :vs
-            :call jedi#goto_definitions()
-        endfunction
-        function! Jedi_my_setting_tab()
-            :tab sp
-            :call jedi#goto_definitions()
-        endfunction
-        "# Pydocを表示???Ctrl + k???
-        " let g:jedi#documentation_command = "<C-k>"
-        let g:jedi#usages_command = "<C-k>"
-        let g:jedi#popup_select_first = 0
-        " let g:jedi#popup_on_dot = 0
-        let g:jedi#show_call_signatures = 1
-        let g:jedi#show_call_signatures_delay = 10
-
-        nnoremap <silent><C-n> :cnext<cr>
-        nnoremap <silent><C-p> :cprev<cr>
-'''
+# [[plugins]]
+# repo = 'davidhalter/jedi-vim'
+# on_ft = 'python'
+# # lazy=1
+# # hook_add = '''
+# hook_source = '''
+#         let g:jedi#auto_initialization = 1
+#         let g:jedi#auto_vim_configuration = 1
+#
+#         "# 補完キーの設定この場合???Ctrl+Space
+#         let g:jedi#completions_command = "<C-Space>"
+#         "# 変数の宣言場所へジャンプ???Ctrl + g)
+#         " let g:jedi#goto_assignments_command = "<C-g>"
+#         "# クラス???関数定義にジャンプ???Gtrl + d???
+#         " let g:jedi#goto_definitions_command = "<C-j>"
+#         nnoremap <C-j><C-j> :call jedi#goto_definitions()<cr>
+#         nnoremap <C-j>s :call Jedi_my_setting_sp()<cr>
+#         nnoremap <C-j>t :call Jedi_my_setting_tab()<cr>
+#         function! Jedi_my_setting_sp()
+#             :vs
+#             :call jedi#goto_definitions()
+#         endfunction
+#         function! Jedi_my_setting_tab()
+#             :tab sp
+#             :call jedi#goto_definitions()
+#         endfunction
+#         "# Pydocを表示???Ctrl + k???
+#         " let g:jedi#documentation_command = "<C-k>"
+#         let g:jedi#usages_command = "<C-k>"
+#         let g:jedi#popup_select_first = 0
+#         " let g:jedi#popup_on_dot = 0
+#         let g:jedi#show_call_signatures = 1
+#         let g:jedi#show_call_signatures_delay = 10
+#
+#         " nnoremap <silent><C-n> :cnext<cr>
+#         " nnoremap <silent><C-p> :cprev<cr>
+# '''
 
 [[plugins]]
 repo = 'iyuuya/denite-ale'
@@ -554,6 +573,7 @@ repo = 'iyuuya/denite-ale'
 repo = 'w0rp/ale'
 hook_add = '''
     " Installation: pip3.6 install flake8 flake8-import-order autopep8 black isort
+    let g:ale_enabled = 0
     let g:ale_sign_error = '>>'
     let g:ale_sign_warning = '??'
     " let g:ale_lint_on_save = 1
@@ -782,7 +802,7 @@ hook_add ='''
     nnoremap <silent> <Space>bb  :<C-u>Unite -default-action=vimfiler bookmark<CR>
     nnoremap <silent> <Space>bf  :<C-u>Unite buffer<CR>
     " nnoremap <silent> <Space>r  :<C-u>Unite vimfiler/history<CR>
-    nnoremap <silent> <Space>r  :<C-u>UniteResume search-buffer<CR>
+    " nnoremap <silent> <Space>r  :<C-u>UniteResume search-buffer<CR>
     nnoremap <silent> ,ug       :<C-u>Unite grep:. -no-empty -no-quit -buffer-name=search-buffer<CR>
     " nnoremap <silent> <Space>m  :<C-u>UniteResume search-buffer<CR>
     " nnoremap <silent> <Space>ul :<C-u>Unite line<CR>
@@ -883,7 +903,7 @@ hook_add ='''
     nnoremap <Space>gj :call My_Cursor_Under_Ggrep()<cr>
     nnoremap <Space>gcc :Gcommit -m ""<left>
     nnoremap <Space>gca :Gcommit -amend<cr>
-    nnoremap <Space>gr :Gvsplit :<left><left>
+    " nnoremap <Space>gr :Gvsplit :<left><left>
     nnoremap gst :Git stash save ""<left>
     nnoremap <silent> gss :Git stash list<cr>
     nnoremap gsa :Git stash apply stash@{}<left>
@@ -1095,23 +1115,40 @@ hook_add ='''
 [[plugins]]
 repo = 'autozimu/LanguageClient-neovim'
 rev = 'next'
+depends = ['deoplete.nvim']
 build = 'bash install.sh'
-hook_add ='''
+hook_add = '''
     " Installation: pip install python-language-server
     set hidden
+    " imap <expr> . pumvisible() ? "\<C-E>.\<C-X>\<C-O>\<C-P>" : ".\<C-X>\<C-O>\<C-P>"
     let language_client_python_path = join([substitute(system('which python3.6'), "python3.6\n", "", ""), "pyls"], '/')
+    " let g:LanguageClient_hasSnippetSupport = 0
+    " set completefunc=LanguageClient#complete
     let g:LanguageClient_serverCommands = {
-        \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
         \ 'python': [language_client_python_path],
-        \ 'vim': ['vim-language-server', '--stdio'],
+        "\ 'vim': ['vim-language-server', '--stdio'],
         \ }
-    nnoremap <F5> :call LanguageClient_contextMenu()<CR>
-    nnoremap <silent> <c-j>k :call LanguageClient#textDocument_hover()<CR>
-    nnoremap <silent> <c-j>jl :call LanguageClient#textDocument_definition()<CR>
-    " nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
-    nnoremap <silent> <c-j>r :call LanguageClient#textDocument_references()<cr>
     " nnoremap <silent> gdi :call LanguageClient#textDocument_implementation()<CR>
     " nnoremap <silent> gdf :call LanguageClient#textDocument_formatting()<CR>
+    nnoremap <F5> :call LanguageClient_contextMenu()<CR>
+    nnoremap <silent> <c-j>k :call LanguageClient#textDocument_hover()<CR>
+    nnoremap <c-j><c-j> :call LanguageClient#textDocument_definition()<CR>
+    nnoremap <c-j>v :call LC_operation('vs')<cr>
+    nnoremap <c-j>s :call LC_operation('split')<cr>
+    nnoremap <c-j>t :call LC_operation('tab')<cr>
+    " nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+    nnoremap <silent> <c-j>r :call LanguageClient#textDocument_references()<cr>
+
+    fu! LC_operation(operation)
+        if a:operation == 'vs'
+            vs
+        elseif a:operation == 'split'
+            split
+        else
+            tab sp
+        endif
+        call LanguageClient#textDocument_definition()
+    endfu
 '''
 
 [[plugins]]
@@ -1178,6 +1215,7 @@ hook_add ='''
         \ 'ctrl-t': 'tab split',
         \ 'ctrl-s': 'split',
         \ 'ctrl-v': 'vsplit',
+        \ 'ctrl-m': 'cd',
         \ 'ctrl-l': 'e' }
 
     " nmap <Space>f <plug>(fzf-maps-n)
@@ -1186,20 +1224,25 @@ hook_add ='''
     nnoremap <Space>ff :Rgf<cr>
     nnoremap <Space>fh :Files ~/<cr>
     nnoremap <Space>gf :GFiles<cr>
-    nnoremap <Space>gss :GFiles?<cr>
-    nnoremap <Space>ul :BLines<cr>
+    " nnoremap <Space>gss :GFiles?<cr>
+    nnoremap <Space>bl :BLines<cr>
     nnoremap <Space>gg :call My_Ggrep()<cr>
     nnoremap <Space>o :History<cr>
     nnoremap <Space>vh :Helptags<cr>
     nnoremap <Space>dd :Directorys<cr>
     nnoremap <Space>dh :DirectorysOnHome<cr>
-    nnoremap <Space>fr :Repos<cr>
+    nnoremap <Space>fg :FilesRepository<cr>
+    nnoremap <Space>gr :Repos<cr>
     nnoremap <Space>gj :call My_Ggrep()<cr>
     vnoremap <Space>gj :<c-u>Rg <c-r>0<cr>
 
     command! -bang -nargs=? Directorys
       "\ call fzf#run(fzf#wrap({'source': 'find -type d', 'up': '30%'}))
       \ call fzf#run({'source': 'find -type d', 'sink': 'e', 'up': '30%'})
+
+    command! -bang -nargs=? FilesRepository
+      "\ call fzf#run(fzf#wrap({'source': 'cd; find -type d', 'up': '30%'}))
+      \ call fzf#run({'source': 'cd $(ghq root); find -type d', 'sink': 'e', 'up': '30%'})
 
     command! -bang -nargs=? DirectorysOnHome
       "\ call fzf#run(fzf#wrap({'source': 'cd; find -type d', 'up': '30%'}))
@@ -1258,12 +1301,12 @@ hook_add = '''
         if !exists('g:bp_idx')
             let g:bp_idx = 0
         endif
-
+    
         let file_name = expand('%:p')
         if file_name == ""
             return
         endif
-
+    
         let line_nr = line('.')
         let break_point_dict = MybreakReferenceOnBuffer(file_name)
         if has_key(break_point_dict, printf('%d', line_nr))
@@ -1273,27 +1316,27 @@ hook_add = '''
         endif
         call Mybreakadd(file_name, line_nr)
     endfu
-
+    
     fu! Mybreakadd(file_name, line_nr)
         sign define breakpoint text=B texthl=ZenSpace
         let name = 'breakpoint'
         let g:bp_idx += 1
         let g:line_dict = {a:line_nr: g:bp_idx}
-
+    
         " add sign
         exe "sign place ". g:bp_idx ." line=" . a:line_nr ." name=". name ." file=" . a:file_name
         breakadd here
     endfu
-
+    
     fu! Mybreakdel(file_name, sign_id)
         exe "sign unplace ". a:sign_id ." file=". a:file_name
         breakdel here
     endfu
-
+    
     fu! MybreakReferenceOnBuffer(file_name)
         let sign_raw = MyRedirToVariable("sign place file=" . a:file_name)
         let sign_infos = split(sign_raw, '\n')
-
+    
         let break_point_dict = {} "line_nr: sign_id
         for sign_info in sign_infos
             let result = matchlist(sign_info, 'line=\(\d\+\)\W\+id=\(\d\+\)\W\+name=breakpoint\c')
@@ -1304,7 +1347,7 @@ hook_add = '''
         endfor
         return break_point_dict
     endfu
-
+    
     fu! MyRedirToVariable(cmd)
         redir => output
         silent exe a:cmd
@@ -1320,4 +1363,3 @@ hook_add ='''
     autocmd Filetype ipynb nmap <silent><Space>jj :VimpyterStartJupyter<CR>
     autocmd Filetype ipynb nmap <silent><Space>jn :VimpyterStartNteract<CR>
 '''
-
