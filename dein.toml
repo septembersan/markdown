@@ -892,16 +892,16 @@ hook_add ='''
     "       :Gwrite
     " Usage: 3-way diff :Gstatus -> D -> :diffget //2 |diffup -> :diffget //3 |diffup -> ]c -> :only
     " nnoremap <silent> <Space>vb :Gblame<cr>
+    autocmd FileType fugitive nnoremap <silent> <buffer> <c-c> :q<cr>
     nnoremap <silent> <Space>gd :Gdiff<cr>
-    nnoremap <silent> <Space>vs :Gstatus<cr>
-    nnoremap <silent> <Space>vl :Glog<cr>
+    " nnoremap <silent> <Space>vl :Glog<cr>
     " nnoremap <silent> <Space>gr :Gread<cr>
     nnoremap <Space>ge :Gvdiff :%<left><left>
     nnoremap <Space>gp :Gpull 
     nnoremap <Space>gss :Gstatus<cr>
     nnoremap <Space>gg :call My_Ggrep()<cr>
     nnoremap <Space>gj :call My_Cursor_Under_Ggrep()<cr>
-    nnoremap <Space>gcc :Gcommit -m ""<left>
+    nnoremap <Space>gco :Gcommit -m ""<left>
     nnoremap <Space>gca :Gcommit -amend<cr>
     " nnoremap <Space>gr :Gvsplit :<left><left>
     nnoremap gst :Git stash save ""<left>
