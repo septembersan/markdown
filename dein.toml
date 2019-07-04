@@ -1223,8 +1223,13 @@ hook_add ='''
     nnoremap <Space>o :History<cr>
     nnoremap <Space>vh :Helptags<cr>
     nnoremap <Space>dd :Directorys<cr>
+<<<<<<< HEAD
     nnoremap <Space>dh :call DirectorysOnHome()<cr>
     nnoremap <Space>fg :call FilesRepository()<cr>
+=======
+    nnoremap <Space>dh :DirectorysOnHome<cr>
+    nnoremap <Space>fg :FilesRepository<cr>
+>>>>>>> b40745399f561fb20426476062820929aa07c17a
     nnoremap <Space>gr :Repos<cr>
     nnoremap <Space>gj :call My_Ggrep()<cr>
     vnoremap <Space>gj :<c-u>Rg <c-r>0<cr>
@@ -1233,6 +1238,7 @@ hook_add ='''
       "\ call fzf#run(fzf#wrap({'source': 'find -type d', 'up': '30%'}))
       \ call fzf#run(fzf#wrap({'source': 'find -type d', 'sink': 'e', 'up': '30%'}))
 
+<<<<<<< HEAD
     fu! FilesRepository()
         silent cd `ghq root`
         call fzf#run(fzf#wrap({'source': 'rg --files', 'up': '30%'}))
@@ -1243,6 +1249,13 @@ hook_add ='''
         call fzf#run(fzf#wrap({'source': 'find -type d', 'up': '30%'}))
     endfu
       "\ call fzf#run(fzf#wrap({'source': 'cd; find -type d', 'up': '30%'}))
+=======
+    command! -bang -nargs=? FilesRepository
+      "\ call fzf#run(fzf#wrap({'source': 'cd; find -type d', 'up': '30%'}))
+      \ call fzf#run({'source': 'cd $(ghq root); find -type d', 'sink': 'e', 'up': '30%'})
+
+    command! -bang -nargs=? DirectorysOnHome
+>>>>>>> b40745399f561fb20426476062820929aa07c17a
       "\ call fzf#run(fzf#wrap({'source': 'cd; find -type d', 'up': '30%'}))
 
     command! -bang -nargs=0 Repos
@@ -1360,6 +1373,7 @@ hook_add ='''
     autocmd Filetype ipynb nmap <silent><Space>jj :VimpyterStartJupyter<CR>
     autocmd Filetype ipynb nmap <silent><Space>jn :VimpyterStartNteract<CR>
 '''
+<<<<<<< HEAD
 
 [[plugins]]
 repo = 'Shougo/echodoc.vim'
@@ -1368,3 +1382,5 @@ hook_add ='''
     set cmdheight=2
     let g:echodoc_enable_at_startup = 1
 '''
+=======
+>>>>>>> b40745399f561fb20426476062820929aa07c17a
