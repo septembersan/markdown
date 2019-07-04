@@ -852,12 +852,6 @@ hook_add ='''
     let g:vimfiler_max_directories_history = 120
     " autocmd VimEnter * VimFilerBufferDir -split -simple -no-quit -winwidth=30 -toggle -no-focus -auto-cd
     nnoremap <silent> <Space>e :VimFilerBufferDir -split -simple -no-quit -winwidth=30 -toggle -auto-cd<cr>
-    function! Vimfiler_mysplit()
-        wincmd l
-        vsplit
-        wincmd h
-        call feedkeys("ls")
-    endfunction
 
     autocmd FileType vimfiler call s:vimfiler_my_settings()
     function! s:vimfiler_my_settings() abort
@@ -867,7 +861,6 @@ hook_add ='''
         " File open is cr
         " nmap <silent><buffer><expr> <cr> vimfiler#smart_cursor_map("¥<Plug>(vimfiler_cd_file)", "¥<Plug>(vimfiler_open_file_in_another_vimfiler)")
         " nmap <buffer><silent> <Space>o <Plug>(vimfiler_switch_to_history_directory)
-        " nmap <buffer><silent> <C-v> :call Vimfiler_mysplit()<cr>
         nmap <silent><buffer> ? :help vimfiler-default-key-mappings<cr>
         nmap <silent><buffer><expr> <C-v> vimfiler#do_switch_action('vsplit')
         nmap <silent><buffer><expr> <C-h> vimfiler#do_switch_action('split')
@@ -1230,23 +1223,27 @@ hook_add ='''
     nnoremap <Space>o :History<cr>
     nnoremap <Space>vh :Helptags<cr>
     nnoremap <Space>dd :Directorys<cr>
-    nnoremap <Space>dh :DirectorysOnHome<cr>
-    nnoremap <Space>fg :FilesRepository<cr>
+    nnoremap <Space>dh :call DirectorysOnHome()<cr>
+    nnoremap <Space>fg :call FilesRepository()<cr>
     nnoremap <Space>gr :Repos<cr>
     nnoremap <Space>gj :call My_Ggrep()<cr>
     vnoremap <Space>gj :<c-u>Rg <c-r>0<cr>
 
     command! -bang -nargs=? Directorys
       "\ call fzf#run(fzf#wrap({'source': 'find -type d', 'up': '30%'}))
-      \ call fzf#run({'source': 'find -type d', 'sink': 'e', 'up': '30%'})
+      \ call fzf#run(fzf#wrap({'source': 'find -type d', 'sink': 'e', 'up': '30%'}))
 
-    command! -bang -nargs=? FilesRepository
-      "\ call fzf#run(fzf#wrap({'source': 'cd; find -type d', 'up': '30%'}))
-      \ call fzf#run({'source': 'cd $(ghq root); find -type d', 'sink': 'e', 'up': '30%'})
+    fu! FilesRepository()
+        silent cd `ghq root`
+        call fzf#run(fzf#wrap({'source': 'rg --files', 'up': '30%'}))
+    endfu
 
-    command! -bang -nargs=? DirectorysOnHome
+    fu! DirectorysOnHome()
+        silent cd
+        call fzf#run(fzf#wrap({'source': 'find -type d', 'up': '30%'}))
+    endfu
       "\ call fzf#run(fzf#wrap({'source': 'cd; find -type d', 'up': '30%'}))
-      \ call fzf#run({'source': 'cd; find -type d', 'sink': 'e', 'up': '30%'})
+      "\ call fzf#run(fzf#wrap({'source': 'cd; find -type d', 'up': '30%'}))
 
     command! -bang -nargs=0 Repos
       \ call fzf#run(fzf#wrap({'source': 'ghq list -p', 'up': '30%'}))
@@ -1362,4 +1359,12 @@ hook_add ='''
     autocmd Filetype ipynb nmap <silent><Space>jb :VimpyterInsertPythonBlock<CR>
     autocmd Filetype ipynb nmap <silent><Space>jj :VimpyterStartJupyter<CR>
     autocmd Filetype ipynb nmap <silent><Space>jn :VimpyterStartNteract<CR>
+'''
+
+[[plugins]]
+repo = 'Shougo/echodoc.vim'
+hook_add ='''
+    " To use echodoc, you must increase 'cmdheight' value.
+    set cmdheight=2
+    let g:echodoc_enable_at_startup = 1
 '''
