@@ -18,6 +18,7 @@ set fileformats=unix,dos
 nnoremap j gj
 nnoremap k gk
 nnoremap v <c-v>
+vnoremap / <esc>/\%V
 nnoremap <c-b> <c-^>
 " setting search"{{{
 nnoremap * *Nzz
@@ -38,10 +39,11 @@ set shiftwidth=4
 set softtabstop=0
 set ttimeoutlen=50
 " setting move mode"{{{
-inoremap mm <ESC>
-nnoremap mm <ESC>
+inoremap jj <ESC>
+" nnoremap jj <ESC>
 vnoremap mm <ESC>
-cnoremap mm <ESC>
+cnoremap jj <ESC>
+tnoremap <silent> jj <c-\><c-n>
 "}}}
 " setting guioption"{{{
 set guioptions-=T
@@ -81,7 +83,7 @@ cnoremap <C-d> <Del>
 cnoremap <C-e> <End>
 cnoremap <C-n> <Down>
 cnoremap <C-p> <Up>
-cnoremap <Space>p <C-r>0
+cnoremap <Space>; <C-r>0
 "}}}
 " setting gui font"{{{
 if has('win64')
@@ -114,10 +116,12 @@ set iminsert=0
 set imsearch=-1
 nnoremap <Space>l gt
 nnoremap <Space>h gT
-nnoremap tm :tabnext
+nnoremap tm :tabm 
 nnoremap tn :tabnew<CR>
 nnoremap to :tabonly<CR>
 nnoremap tp :tab sp<CR>
+nnoremap tl :+tabm<cr>
+nnoremap th :-tabm<cr> 
 nnoremap <Space>x :call My_tabclose()<CR>
 nnoremap <Space>q :call My_tabclose()<CR>
 nnoremap <Space>a gg<S-v><S-g>
@@ -127,6 +131,10 @@ function! My_tabclose()
   :tabprevious
 endfunction
 nnoremap <silent>vp gv
+nnoremap dif :windo diffthis<cr>
+nnoremap dio :diffoff<cr>
+nnoremap vs :vnew<cr>
+nnoremap sp :new<cr>
 "}}}
 " setting fold{{{
 set modeline
@@ -185,8 +193,8 @@ colorscheme iceberg
 " set termguicolors
 syntax on
 "}}}
-let g:python_host_prog = substitute(system('which python3.6'), "\n", "", "")
-let g:python3_host_prog = substitute(system('which python3.6'), "\n", "", "")
+let g:python_host_prog = substitute(system('which python'), "\n", "", "")
+let g:python3_host_prog = substitute(system('which python3'), "\n", "", "")
 " settings deoplete{{{
 set completeopt=menuone
 "}}}
@@ -214,7 +222,6 @@ nnoremap <Space>p :cp<cr>
 nnoremap <Space>n :cn<cr>
 " tnoremap <silent> mm <c-\><c-n><c-w>p
 " tnoremap <silent> tm <c-\><c-n>
-tnoremap <silent> mm <c-\><c-n>
 "}}}
 " settings dev env{{{
 nnoremap <silent> <F9> :call Display_DevEnv_Toggle()<cr>
@@ -275,4 +282,24 @@ else
 endif"}}}
 " settings md as markdown, instead of modula2
 autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
-vnoremap / <esc>/\%V
+set dictionary=/usr/share/dict/words
+nnoremap ms :Recter<cr>
+" set updatetime=250
+nnoremap tbs :split enew<cr>
+nnoremap tbv :vsplit enew<cr>
+
+" settings convert ipynb to python{{{
+" augroup ipynb
+"     autocmd!
+"     autocmd BufRead *.ipynb
+" augroup END
+" command! Nbconvert setlocal
+" jupyter nbconvert --to python expand("%")
+"}}}
+" autocmd BufWritePost ~/.config/nvim/init.vim so ~/.config/nvim/init.vim
+" autocmd BufWritePost ~/.config/nvim/dein.toml execute UpdateRemotePlugins
+set clipboard=unnamed
+nnoremap ss :%s/ *$//g<cr>
+" xnoremap SWP :!rm -f ~/.local/share/nvim/swap/*
+let &colorcolumn=join(range(90,999),",")                                                                                                                                                                                         
+hi ColorColumn ctermbg=235 guibg=#2c2d27 

@@ -69,11 +69,13 @@ hook_add = '''
     let g:neoterm_autoinsert = 1
     " terminal position
     let g:neoterm_default_mod='belowright'
-    nnoremap <silent> <C-e><C-e> :call My_TREPLSendSelection()<cr>
-    vnoremap <silent> <C-e><C-e> V:TREPLSendSelection<cr>
+    " nnoremap <silent> <C-e><C-e> :call My_TREPLSendSelection()<cr>
+    " vnoremap <silent> <C-e><C-e> :TREPLSendSelection<cr>
+    " nnoremap <silent> <C-e><C-e> :TREPLSendLine<cr>
     nnoremap <silent> <C-e><C-f> :call Exec_python()<cr>
     " nnoremap <silent> <C-e><C-f> :TREPLSendFile<cr>'>j0
     nnoremap <silent> ttn  :Tnew<CR>
+    nnoremap <silent> ttl   :Tclear<CR>
     nnoremap <silent> tti  :Topen<cr>
     nnoremap <silent> ttc  :Tclose<cr>
     nnoremap <silent> tto  :Ttoggle<CR>
@@ -108,7 +110,7 @@ hook_add = '''
         let g:neoterm_autoinsert = 0
         Topen
         Tclear
-        T python3.6 %
+        T python3.6  %
         let g:neoterm_autoinsert = 1
     endfunction
 
@@ -150,8 +152,16 @@ hook_add = '''
 repo = 'majutsushi/tagbar'
 lazy = 1
 hook_add = '''
-    nnoremap <silent> <F8> :TagbarToggle<CR>
-    nnoremap <Space>t :TagbarOpenAutoClose<CR>
+    " nnoremap <silent><Space>t :call MyOpenBar()<cr>
+    nnoremap <silent><Space>t :TagbarOpenAutoClose<cr>
+    nnoremap <silent><F8>     :TagbarToggle<cr>
+    function! MyOpenBar()
+        if expand("%:t") =~ ".*\.md"
+            :Toc
+        else
+            :TagbarOpenAutoClose
+        endif
+    endfunction
 '''
 hook_source = '''
     " [Usage]
@@ -159,7 +169,7 @@ hook_source = '''
     let g:tagbar_width = 30
     let g:tagbar_autoshowtag = 0
     let g:tagbar_expand = 1
-    " let g:tagbar_left = 1
+    let g:tagbar_left = 1
     "set statusline=%F%m%r%h%w¥%=%{tagbar#currenttag('[%s]','')}¥[Pos=%v,%l]¥[Len=%L]
 '''
 
@@ -245,36 +255,6 @@ hook_add ='''
 # '''
 
 [[plugins]]
-repo = 'tomasr/molokai'
-hook_add ='''
-'''
-
-[[plugins]]
-repo = 'vim-scripts/DoxygenToolkit.vim'
-hook_add ='''
-    noremap ,d :Dox<CR>
-'''
-
-[[plugins]]
-repo = 'Shougo/neosnippet.vim'
-hook_add ='''
-    inoremap <C-k> <Plug>(neosnippet_expand_or_jump)
-    snoremap <C-k> <Plug>(neosnippet_expand_or_jump)
-    xnoremap <C-k> <Plug>(neosnippet_expand_target)
-    let g:neosnippet#snippets_directory='~/home/aapfuser/.cache/neosnippet/my'
-'''
-
-[[plugins]]
-repo = 'fuenor/qfixgrep'
-hook_add ='''
-'''
-
-[[plugins]]
-repo = 'tomasr/molokai'
-hook_add ='''
-'''
-
-[[plugins]]
 repo = 'vim-scripts/DoxygenToolkit.vim'
 hook_add ='''
     noremap ,d :Dox<CR>
@@ -283,6 +263,38 @@ hook_add ='''
 [[plugins]]
 repo = 'Shougo/neosnippet-snippets'
 hook_add ='''
+'''
+
+[[plugins]]
+repo = 'Shougo/neosnippet.vim'
+hook_add ='''
+    imap <C-k> <Plug>(neosnippet_expand_or_jump)
+    smap <C-k> <Plug>(neosnippet_expand_or_jump)
+    xmap <C-k> <Plug>(neosnippet_expand_target)
+    let g:neosnippet#snippets_directory='~/home/aapfuser/.cache/neosnippet/my'
+    " inoremap <expr><tab> pumvisible() ? "\<C-n>" :
+    "\ neosnippet#expandable_or_jumpable() ?
+    "\    "\<Plug>(neosnippet_expand_or_jump)" : "\<tab>"
+    imap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+      \ "\<Plug>(neosnippet_expand_or_jump)"
+      \: pumvisible() ? "\<C-n>" : "\<TAB>"
+    smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+          \ "\<Plug>(neosnippet_expand_or_jump)"
+          \: "\<TAB>"
+    if has('conceal')
+      set conceallevel=2 concealcursor=i
+endif
+'''
+
+[[plugins]]
+repo = 'fuenor/qfixgrep'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'vim-scripts/DoxygenToolkit.vim'
+hook_add ='''
+    noremap ,d :Dox<CR>
 '''
 
 [[plugins]]
@@ -297,6 +309,16 @@ hook_add ='''
 
 [[plugins]]
 repo = 'osyo-manga/vim-textobj-multiblock'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'thinca/vim-textobj-between'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'rhysd/vim-textobj-anyblock'
 hook_add ='''
 '''
 
@@ -336,7 +358,7 @@ hook_add ='''
 [[plugins]]
 repo = 'kana/vim-operator-replace'
 hook_add ='''
-map R <Plug>(operator-replace)
+map t <Plug>(operator-replace)
 '''
 
 [[plugins]]
@@ -349,13 +371,13 @@ hook_add ='''
     " nnoremap s[ <Plug>(operator-surround-append-input-in-advance)[
     " nnoremap s" <Plug>(operator-surround-append-input-in-advance)"
     " nnoremap s' <Plug>(operator-surround-append-input-in-advance)'
-    map <silent>sa <Plug>(operator-surround-append)
-    map <silent>sd <Plug>(operator-surround-delete)
-    map <silent>sr <Plug>(operator-surround-replace)
+    nmap <silent>s <Plug>(operator-surround-append)
+    nmap <silent>ds <Plug>(operator-surround-delete)i
+    nmap <silent>cs <Plug>(operator-surround-replace)i
 
-    nmap <silent>saa <Plug>(operator-surround-append)<Plug>(textobj-multiblock-a)
-    nmap <silent>sdd <Plug>(operator-surround-delete)<Plug>(textobj-multiblock-a)
-    nmap <silent>srr <Plug>(operator-surround-replace)<Plug>(textobj-multiblock-a)
+    " nmap <silent>ss <Plug>(operator-surround-append)<Plug>(textobj-multiblock-a)
+    " nmap <silent>ds <Plug>(operator-surround-delete)<Plug>(textobj-multiblock-a)
+    " nmap <silent>cs <Plug>(operator-surround-replace)<Plug>(textobj-multiblock-a)
 
     "map <silent>sdd <Plug>(operator-surround-delete)<Plug>(textobj-anyblock-a)
     "map <silent>srr <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)
@@ -387,7 +409,8 @@ repo = 'AndrewRadev/linediff.vim'
 hook_add ='''
 let g:linediff_first_buffer_command = 'leftabove new'
 let g:linediff_secommand_buffer_command = 'rightbelow vertical new'
-vnoremap <C-d> :Linediff<CR>
+vnoremap dl :Linediff<CR>
+nnoremap dl :Linediff<CR>
 '''
 
 [[plugins]]
@@ -408,15 +431,16 @@ hook_add ='''
 
     nnoremap <silent> <Space>uo :<C-u>Denite -direction=top file_mru<CR>
     " nnoremap <silent> <Space>b :<C-u>Denite -direction=top buffer<CR>
-    nnoremap <silent> <Space>f :<C-u>DeniteBufferDir -direction=top file_rec<CR>
+    " nnoremap <silent> <Space>f :<C-u>DeniteBufferDir -direction=top file_rec<CR>
     " nnoremap <silent> <Space>g :<C-u>DeniteBufferDir -direction=top grep<CR>
     nnoremap <silent> <Space>i :<C-u>Denite line -direction=top<CR>
     nnoremap <silent> ,g       :<C-u>Denite grep -direction=top -no-empty -no-quit -buffer-name=search-buffer<CR>
+    " nnoremap <silent> <Space>vh :<C-u>Denite help<CR>
     "nnoremap <silent> <Space>n :<C-u>Denite -resume -immediately -select=+1<CR>
     "nnoremap <silent> <Space>p :<C-u>Denite -resume -immediately -select=-1<CR>
-    "nnoremap <Space>d :<C-u>Denite -direction=topleft -cursor-wrap=true bookmark<CR>
+    " nnoremap <Space>bk :<C-u>Denite -direction=topleft -cursor-wrap=true bookmark<CR>
     "nnoremap <Space>a :<C-u>DeniteBookmarkAdd<CR>
-    "nnoremap <Space>h :<C-u>Denite help<CR>
+    " nnoremap <Space>c :Denite command_history<CR>
     " ウィンドウを分割して開く
     call denite#custom#map('_', "<C-h>", '<denite:do_action:split>')
     call denite#custom#map('insert', "<C-h>", '<denite:do_action:split>')
@@ -428,7 +452,8 @@ hook_add ='''
     call denite#custom#map('insert', "<c-t>", '<denite:do_action:tabswitch>')
     call denite#custom#map('normal', "l", '<denite:do_action:default>')
     " インサート→ノーマルモード
-    call denite#custom#map('insert', "mm", '<denite:enter_mode:normal>')
+    call denite#custom#map('insert', "jj", '<denite:enter_mode:normal>')
+    call denite#custom#map('insert', "<c-c>", '<denite:quit>')
 
     if executable('rg')
         " コマンド．file_rec で使うコマンド
@@ -442,9 +467,9 @@ hook_add ='''
     endif
 
     ".git以下のディレクトリ検索
-    nnoremap <silent> <Space>gf :<C-u>Denite -direction=topleft -cursor-wrap=true
-          \ -path=`substitute(finddir('.git', './;'), '.git', '', 'g')`
-          \ file_rec/git<CR>
+    " nnoremap <silent> <Space>gf :<C-u>Denite -direction=topleft -cursor-wrap=true
+    "      \ -path=`substitute(finddir('.git', './;'), '.git', '', 'g')`
+    "      \ file_rec/git<CR>
     " call denite#custom#source('file'    , 'matchers', ['matcher_cpsm', 'matcher_fuzzy'])
     call denite#custom#source('file'    , 'matchers', ['matcher_substring'])
     call denite#custom#source('buffer'  , 'matchers', ['matcher_substring'])
@@ -461,56 +486,84 @@ if = 'has("nvim")'
 on_i = 1
 hook_source = '''
     let g:deoplete#enable_at_startup = 1
-'''
-hook_post_source = '''
-    let g:deoplete#omni_patterns = {}
+    let g:deoplete#auto_complete_delay = 0
+    " let g:deoplete#auto_complete_start_length = 1
+    " let g:deoplete#enable_camel_case = 0
+    " let g:deoplete#enable_ignore_case = 0
+    let g:deoplete#enable_refresh_always = 0
+    " let g:deoplete#enable_smart_case = 1
+    " let g:deoplete#file#enable_buffer_path = 1
+    " let g:deoplete#max_list = 10000
+    let g:deoplete#omni_patterns = {
+       \ 'python': '[^. *\t]\.\w*',
+       \}
 '''
 
 [[plugins]]
-repo = 'zchee/deoplete-jedi'
-on_ft = 'python'
-# hook_add = '''
-hook_source = '''
-    " let g:deoplete#sources#jedi#python_path = substitute(system('which python3.6'), "¥n", "", "")
+repo = 'prabirshrestha/vim-lsp'
+hook_add = '''
 '''
 
 [[plugins]]
-repo = 'davidhalter/jedi-vim'
-on_ft = 'python'
-# lazy=1
-# hook_add = '''
+repo = 'lighttiger2505/deoplete-vim-lsp'
 hook_source = '''
-        let g:jedi#auto_initialization = 1
-        let g:jedi#auto_vim_configuration = 1
-
-        "# 補完キーの設定この場合???Ctrl+Space
-        let g:jedi#completions_command = "<C-Space>"
-        "# 変数の宣言場所へジャンプ???Ctrl + g)
-        " let g:jedi#goto_assignments_command = "<C-g>"
-        "# クラス???関数定義にジャンプ???Gtrl + d???
-        " let g:jedi#goto_definitions_command = "<C-j>"
-        nnoremap <C-j><C-j> :call jedi#goto_definitions()<cr>
-        nnoremap <C-j>s :call Jedi_my_setting_sp()<cr>
-        nnoremap <C-j>t :call Jedi_my_setting_tab()<cr>
-        function! Jedi_my_setting_sp()
-            :vs
-            :call jedi#goto_definitions()
-        endfunction
-        function! Jedi_my_setting_tab()
-            :tab sp
-            :call jedi#goto_definitions()
-        endfunction
-        "# Pydocを表示???Ctrl + k???
-        " let g:jedi#documentation_command = "<C-k>"
-        let g:jedi#usages_command = "<C-k>"
-        let g:jedi#popup_select_first = 0
-        " let g:jedi#popup_on_dot = 0
-        let g:jedi#show_call_signatures = 1
-        let g:jedi#show_call_signatures_delay = 10
-
-        nnoremap <silent><C-n> :cnext<cr>
-        nnoremap <silent><C-p> :cprev<cr>
+    if (executable('pyls'))
+        let s:pyls_path = fnamemodify(g:python_host_prog, ':h') . '/'. 'pyls'
+        augroup LspPython
+            autocmd!
+            autocmd User lsp_setup call lsp#register_server({
+          \ 'name': 'pyls',
+          \ 'cmd': {server_info->['pyls']},
+          \ 'whitelist': ['python']
+          \ })
+        augroup END
+    endif
 '''
+
+# [[plugins]]
+# repo = 'zchee/deoplete-jedi'
+# on_ft = 'python'
+# hook_source = '''
+#     " let g:deoplete#sources#jedi#python_path = substitute(system('which python3.6'), "¥n", "", "")
+# '''
+
+# [[plugins]]
+# repo = 'davidhalter/jedi-vim'
+# on_ft = 'python'
+# # lazy=1
+# # hook_add = '''
+# hook_source = '''
+#         let g:jedi#auto_initialization = 1
+#         let g:jedi#auto_vim_configuration = 1
+#
+#         "# 補完キーの設定この場合???Ctrl+Space
+#         let g:jedi#completions_command = "<C-Space>"
+#         "# 変数の宣言場所へジャンプ???Ctrl + g)
+#         " let g:jedi#goto_assignments_command = "<C-g>"
+#         "# クラス???関数定義にジャンプ???Gtrl + d???
+#         " let g:jedi#goto_definitions_command = "<C-j>"
+#         nnoremap <C-j><C-j> :call jedi#goto_definitions()<cr>
+#         nnoremap <C-j>s :call Jedi_my_setting_sp()<cr>
+#         nnoremap <C-j>t :call Jedi_my_setting_tab()<cr>
+#         function! Jedi_my_setting_sp()
+#             :vs
+#             :call jedi#goto_definitions()
+#         endfunction
+#         function! Jedi_my_setting_tab()
+#             :tab sp
+#             :call jedi#goto_definitions()
+#         endfunction
+#         "# Pydocを表示???Ctrl + k???
+#         " let g:jedi#documentation_command = "<C-k>"
+#         let g:jedi#usages_command = "<C-k>"
+#         let g:jedi#popup_select_first = 0
+#         " let g:jedi#popup_on_dot = 0
+#         let g:jedi#show_call_signatures = 1
+#         let g:jedi#show_call_signatures_delay = 10
+#
+#         " nnoremap <silent><C-n> :cnext<cr>
+#         " nnoremap <silent><C-p> :cprev<cr>
+# '''
 
 [[plugins]]
 repo = 'iyuuya/denite-ale'
@@ -518,42 +571,32 @@ repo = 'iyuuya/denite-ale'
 [[plugins]]
 repo = 'w0rp/ale'
 hook_add = '''
+    " Installation: pip install flake8 flake8-import-order autopep8 black isort
+    let g:ale_enabled = 0
     let g:ale_sign_error = '>>'
     let g:ale_sign_warning = '??'
-    let g:ale_lint_on_save = 1
+    " let g:ale_lint_on_save = 1
     let g:ale_lint_on_text_changed = 0
     let g:ale_statusline_format = ['x %d', '? %d', 'o ok']
     let g:ale_linters = { 
                 \   'python3.6': ['flake8'],
                 \   'markdown': ['alex'],
+                \   'javascript': ['eslint'],
                 \   'JSON': ['jq']
                 \}
+    let g:ale_fixers = {
+    \ 'python': ['autopep8', 'black', 'isort'],
+    \ }
 
     nmap [ale] <Nop>
-    map <C-k> [ale]
-    nmap <silent> [ale]<C-p> <Plug>(ale_previous)
-    nmap <silent> [ale]<C-n> <Plug>(ale_next)
+    map <c-a> [ale]
+    nmap <silent> [a <Plug>(ale_previous)
+    nmap <silent> ]a <Plug>(ale_next)
+    nmap <silent> [ale]<c-f> <Plug>(ale_fix)
 
     highlight clear ALEErrorSign
     highlight clear ALEWarningSign
-    " let g:ale_sign_column_always = 1
-    " let g:ale_lint_on_enter = 1
-    " let g:lightline = {
-    "             \'active': {
-    "             \ 'left': [
-    "             \   ['mode', 'paste'],
-    "             \   ['readonly', 'filename', 'modified', 'ale'],
-    "             \],
-    "             \},
-    "             \'component_function':{
-    "             \   'ale': 'ALEGetStatusLine'
-    "             \}
-    "             \}
 '''
-
-[[plugins]]
-repo = 'Vimjas/vim-python-pep8-indent'
-on_ft = 'python'
 
 [[plugins]]
 repo = 'tpope/vim-dispatch'
@@ -633,21 +676,21 @@ hook_add ='''
 [[plugins]]
 repo = 'dracula/vim'
 
-[[plugins]]
-repo = 'scrooloose/nerdtree'
-hook_add ='''
-    " autocmd vimenter * NERDTree
-    nnoremap <F7> :NERDTreeToggle<cr>
-    let g:NERDTreeDirArrows = 1
-    let g:NERDTreeDirArrowExpandable  = '▶'
-    let g:NERDTreeDirArrowCollapsible = '▼'
-    let g:NERDTreeMapUpdir = "h"
-    " let g:NERDTreeMapPreviewSplit = "h"
-    let g:NERDTreeMapOpenVSplit = "v"
-    let g:NERDTreeMapPreviewVSplit = "<C-v>"
-    let g:NERDTreeMapOpenInTabSilent = "<C-t>"
-    let g:NERDTreeMapActivateNode = "l"
-'''
+# [[plugins]]
+# repo = 'scrooloose/nerdtree'
+# hook_add ='''
+#     " autocmd vimenter * NERDTree
+#     nnoremap <F7> :NERDTreeToggle<cr>
+#     let g:NERDTreeDirArrows = 1
+#     let g:NERDTreeDirArrowExpandable  = '▶'
+#     let g:NERDTreeDirArrowCollapsible = '▼'
+#     let g:NERDTreeMapUpdir = "h"
+#     " let g:NERDTreeMapPreviewSplit = "h"
+#     let g:NERDTreeMapOpenVSplit = "v"
+#     let g:NERDTreeMapPreviewVSplit = "<C-v>"
+#     let g:NERDTreeMapOpenInTabSilent = "<C-t>"
+#     let g:NERDTreeMapActivateNode = "l"
+# '''
 
 [[plugins]]
 repo = 'xolox/vim-misc'
@@ -694,9 +737,10 @@ hook_add ='''
 
 [[plugins]]
 repo = 'tweekmonster/braceless.vim'
-on_ft = 'python'
+on_ft = ['python', 'cpp']
 hook_add ='''
-    autocmd FileType python BracelessEnable +fold +highlight
+    " autocmd FileType python BracelessEnable +fold +highlight
+    autocmd FileType cpp BracelessEnable +fold +highlight
     let g:braceless_jump_prev_key = '['
     let g:braceless_jump_next_key = ']'
     let g:braceless_segment_prev_key = 'k'
@@ -741,25 +785,26 @@ hook_add ='''
 repo = 'Shougo/unite.vim' 
 depends = ['vimproc.vim']
 hook_add ='''
-    nnoremap <Space>d :<C-u>Unite -default-action=vimfiler directory directory_mru<cr>
+    " nnoremap <Space>d :<C-u>Unite -default-action=vimfiler directory directory_mru<cr>
     " autocmd FileType unite nmap <silent><buffer><Space> <NOP>
     autocmd FileType unite nmap <silent><buffer><expr> f unite#do_action('vimfiler')
 
+    let g:vimfiler_as_default_explorer=1
     let g:unite_enable_start_insert=1
     nnoremap <silent> <Space>ub :<C-u>Unite buffer<CR>
-    " nnoremap <silent> <Space>uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
-    nnoremap <silent> <Space>ur :<C-u>Unite file_rec<CR>
-    nnoremap <silent> <Space>o  :<C-u>Unite file_mru<CR>
-    nnoremap <silent> <Space>ubk :<C-u>Unite vim_bookmarks<CR>
+    nnoremap <silent> <Space>uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+    " nnoremap <silent> <Space>uf :<C-u>Unite file_rec<CR>
+    " nnoremap <silent> <Space>o  :<C-u>Unite file_mru<CR>
+    nnoremap <silent> <Space>bk :<C-u>Unite vim_bookmarks<CR>
     nnoremap <silent> <Space>uu :<C-u>Unite buffer file_mru<CR>
     nnoremap <silent> <Space>y :<C-u>Unite history/yank<CR>
-    nnoremap <silent> <Space>bk  :<C-u>Unite bookmark<CR>
+    nnoremap <silent> <Space>bb  :<C-u>Unite -default-action=vimfiler bookmark<CR>
     nnoremap <silent> <Space>bf  :<C-u>Unite buffer<CR>
     " nnoremap <silent> <Space>r  :<C-u>Unite vimfiler/history<CR>
-    nnoremap <silent> <Space>r  :<C-u>UniteResume search-buffer<CR>
+    " nnoremap <silent> <Space>r  :<C-u>UniteResume search-buffer<CR>
     nnoremap <silent> ,ug       :<C-u>Unite grep:. -no-empty -no-quit -buffer-name=search-buffer<CR>
     " nnoremap <silent> <Space>m  :<C-u>UniteResume search-buffer<CR>
-    nnoremap <silent> <Space>ul :<C-u>Unite line<CR>
+    " nnoremap <silent> <Space>ul :<C-u>Unite line<CR>
     nnoremap <silent> <Space>uc :<C-u>Unite -auto-preview colorscheme<CR>
     " nnoremap <silent> <Space>gf :<C-u>Unite file_rec/async:!<CR>
     "nnoremap <silent> <Space>d :<C-u>UniteWithBufferDir -buffer-name=files buffer file_mru bookmark file<CR>
@@ -770,11 +815,12 @@ hook_add ='''
     "au FileType unite inoremap <silent> <buffer> <expr> <C-v> unite#do_action('vsplit')
     au FileType unite nnoremap <silent> <buffer> <expr> t unite#do_action('tabswitch')
     au FileType unite inoremap <silent> <buffer> <expr> <c-t> unite#do_action('tabswitch')
+    au FileType unite inoremap <silent> <buffer> <expr> <c-c> <Plug> (unite_exit)
     au FileType unite nnoremap <silent> <buffer> <ESC><ESC> q
     au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>q
 
     
-    inoremap <buffer> <mm> <Plug> (uite_insert_leave)
+    inoremap <buffer> <jj> <Plug> (unite_insert_leave)
     " nnoremap <silent> <buffer> <expr> <C-q> <Plug> (unite_exit)
     " inoremap <silent> <buffer> <expr> <C-q> <Plug> (unite_exit)
 
@@ -793,7 +839,6 @@ depends = 'unite.vim'
 hook_add ='''
 '''
 
-
 [[plugins]]
 repo = 'Shougo/vimproc.vim' 
 build = 'make'
@@ -803,15 +848,9 @@ on_source = ['vimfiler.vim']
 repo = 'Shougo/vimfiler.vim' 
 depends = 'unite.vim'
 hook_add ='''
-    let g:vimfiler_max_directories_history = 100
-    autocmd VimEnter * VimFilerBufferDir -split -simple -no-quit -winwidth=30 -toggle -no-focus -auto-cd
+    let g:vimfiler_max_directories_history = 120
+    " autocmd VimEnter * VimFilerBufferDir -split -simple -no-quit -winwidth=30 -toggle -no-focus -auto-cd
     nnoremap <silent> <Space>e :VimFilerBufferDir -split -simple -no-quit -winwidth=30 -toggle -auto-cd<cr>
-    function! Vimfiler_mysplit()
-        wincmd l
-        vsplit
-        wincmd h
-        call feedkeys("ls")
-    endfunction
 
     autocmd FileType vimfiler call s:vimfiler_my_settings()
     function! s:vimfiler_my_settings() abort
@@ -821,10 +860,9 @@ hook_add ='''
         " File open is cr
         " nmap <silent><buffer><expr> <cr> vimfiler#smart_cursor_map("¥<Plug>(vimfiler_cd_file)", "¥<Plug>(vimfiler_open_file_in_another_vimfiler)")
         " nmap <buffer><silent> <Space>o <Plug>(vimfiler_switch_to_history_directory)
-        " nmap <buffer><silent> <C-v> :call Vimfiler_mysplit()<cr>
         nmap <silent><buffer> ? :help vimfiler-default-key-mappings<cr>
         nmap <silent><buffer><expr> <C-v> vimfiler#do_switch_action('vsplit')
-        nmap <silent><buffer><expr> <C-h> vimfiler#do_switch_action('split')
+        nmap <silent><buffer><expr> <C-s> vimfiler#do_switch_action('split')
         nmap <silent><buffer><expr> <C-t> vimfiler#do_switch_action('tabswitch')
         nmap <silent><buffer> <C-m> <Plug>(vimfiler_toggle_mark_current_line)
         " nmap <silent><buffer> <Space>f <Plug>(vimfiler_find)
@@ -836,27 +874,42 @@ hook_add ='''
 [[plugins]]
 repo = 'tpope/vim-fugitive' 
 hook_add ='''
-    nnoremap <silent> <Space>vb :Gblame<cr>
-    nnoremap <silent> <Space>vd :Gdiff<cr>
-    nnoremap <silent> <Space>vs :Gstatus<cr>
-    nnoremap <silent> <Space>vl :Glog<cr>
-    " Usage 3-way diff :Gstatus -> D -> :diffget //2 |diffup -> :diffget //3 |diffup -> ]c -> :only
-    nnoremap <silent> <Space>vr :Gread<cr>
-    nnoremap <silent> <Space>gc :Gcd<cr>
+    " Usage:
+    "   * reference other branch file in current branch.
+    "       :Gvsplit origin/other_branch:filename.hoge
+    "       :Gedit other_branch:%
+    "   * cancel modification before commit.
+    "       :Gread
+    "   * git add
+    "       :Gwrite
+    " Usage: 3-way diff :Gstatus -> D -> :diffget //2 |diffup -> :diffget //3 |diffup -> ]c -> :only
+    " nnoremap <silent> <Space>vb :Gblame<cr>
+    autocmd FileType fugitive nnoremap <silent> <buffer> <c-c> :q<cr>
+    nnoremap <silent> <Space>gd :Gdiff<cr>
+    " nnoremap <silent> <Space>vl :Glog<cr>
+    " nnoremap <silent> <Space>gr :Gread<cr>
+    nnoremap <Space>ge :Gvdiff :%<left><left>
     nnoremap <Space>gp :Gpull 
+    nnoremap <Space>gss :Gstatus<cr>
     nnoremap <Space>gg :call My_Ggrep()<cr>
     nnoremap <Space>gj :call My_Cursor_Under_Ggrep()<cr>
-    function! My_Cursor_Under_Ggrep()
-        :Gcd
-        call feedkeys("yiw")
-        call feedkeys(",ug")
-        call feedkeys("\<Space>p")
-        call feedkeys("\<cr>")
-    endfunction
-    function! My_Ggrep()
-        :Gcd
-        call feedkeys(",ug")
-    endfunction
+    nnoremap <Space>gco :Gcommit -m ""<left>
+    nnoremap <Space>gca :Gcommit -amend<cr>
+    " nnoremap <Space>gr :Gvsplit :<left><left>
+    nnoremap gst :Git stash save ""<left>
+    nnoremap <silent> gss :Git stash list<cr>
+    nnoremap gsa :Git stash apply stash@{}<left>
+    " function! My_Cursor_Under_Ggrep()
+    "     :Gcd
+    "     call feedkeys("yiw")
+    "     call feedkeys(",ug")
+    "     call feedkeys("\<Space>p")
+    "     call feedkeys("\<cr>")
+    " endfunction
+    " function! My_Ggrep()
+    "     :Gcd
+    "     call feedkeys(",ug")
+    " endfunction
 '''
 
 [[plugins]]
@@ -873,8 +926,8 @@ hook_add ='''
     " nnoremap <silent> <Space>gl  :<C-u>Unite giti/log<CR>
     nnoremap <silent> <Space>gl  :Gitv<CR>
     nnoremap <silent> <Space>gL  :Gitv!<CR>
-    nnoremap <silent> <Space>gr  :<C-u>Unite giti/remote<CR>
-    nnoremap <silent> <Space>gs  :<C-u>Unite giti/status<CR>
+    " nnoremap <silent> <Space>gr  :<C-u>Unite giti/remote<CR>
+    nnoremap <silent> <Space>gsu  :<C-u>Unite giti/status<CR>
     " nnoremap <silent> <Space>gg  :<C-u>Unite giti/grep<CR>
 '''
 
@@ -886,13 +939,22 @@ hook_add ='''
 [[plugins]]
 repo = 'gregsexton/gitv' 
 hook_add ='''
-    " Frequently cmd
+    " Usage: Frequently cmd
     " ------------------------
+    " > https://wonderwall.hatenablog.com/entry/2016/03/26/211710
+    "
     " * ファイルごとのdiffを確認する場合
     "   :Gitv! -> D (diff) # compare file(between HEAD and select commit)
     " * ログからdiffを確認する場合(一覧)
     "   :Gitv  -> Enter -> zM
     "   :Gitv  -> Enter -> Enter on target file
+    nnoremap <Space>gh :GitGutterLineHighlightsToggle<cr>
+    nmap ]g <Plug>GitGutterNextHunk
+    nmap [g <Plug>GitGutterPrevHunk
+    nmap <Space>gha <Plug>GitGutterStageHunk
+    nmap <Space>ghu <Plug>GitGutterUndoHunk
+    nmap <Space>ghp <Plug>GitGutterPreviewHunk
+
     autocmd FileType git call s:gitv_my_settings()
     function! s:gitv_my_settings()
         " set statusline+=%{fugitive#statusline()}
@@ -963,6 +1025,19 @@ repo = 'plasticboy/vim-markdown'
 on_ft = 'markdown'
 hook_add ='''
     let g:vim_markdown_toc_autofit = 1
+    " let g:vim_markdown_folding_disabled = 1
+'''
+
+[[plugins]]
+repo = 'kannokanno/previm' 
+on_ft = ['markdown', 'rst']
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'tyru/open-browser.vim' 
+on_ft = ['markdown', 'rst']
+hook_add ='''
 '''
 
 [[plugins]]
@@ -990,5 +1065,351 @@ hook_add ='''
 [[plugins]]
 repo = 'mhinz/neovim-remote' 
 hook_add ='''
+    " Installation: pip3 install neovim-remote
+    " Usage: README.md
 '''
 
+[[plugins]]
+repo = 'honza/vim-snippets' 
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'SirVer/ultisnips' 
+hook_add ='''
+    let g:UltiSnipsExpandTrigger="<tab>"
+    let g:UltiSnipsJumpForwardTrigger="<tab>"
+    let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+
+    " If you want :UltiSnipsEdit to split your window.
+    let g:UltiSnipsEditSplit="vertical"
+'''
+
+[[plugins]]
+repo = 'dhruvasagar/vim-table-mode'
+hook_add ='''
+    nnoremap <c-t> :TableModeToggle<cr>
+    let g:table_mode_corner='|'
+'''
+
+[[plugins]]
+repo = 'billyvg/tigris.nvim'
+on_ft = ['javascript', 'javascript.jsx']
+hook_post_update = '''
+  let g:dein#plugin.build = './install.sh'
+'''
+hook_add ='''
+    let g:tigris#enabled = 1
+    let g:tigris#on_the_fly_enabled = 1
+    let g:tigris#delay = 300
+'''
+
+[[plugins]]
+repo = 'autozimu/LanguageClient-neovim'
+rev = 'next'
+depends = ['deoplete.nvim']
+build = 'bash install.sh'
+hook_add = '''
+    " Installation: pip install python-language-server
+    set hidden
+    " imap <expr> . pumvisible() ? "\<C-E>.\<C-X>\<C-O>\<C-P>" : ".\<C-X>\<C-O>\<C-P>"
+    let language_client_python_path = join([substitute(system('which python3'), "python3\n", "", ""), "pyls"], '/')
+    " let g:LanguageClient_hasSnippetSupport = 0
+    " set completefunc=LanguageClient#complete
+    let g:LanguageClient_serverCommands = {
+        \ 'python': [language_client_python_path],
+        "\ 'vim': ['vim-language-server', '--stdio'],
+        \ }
+    " nnoremap <silent> gdi :call LanguageClient#textDocument_implementation()<CR>
+    " nnoremap <silent> gdf :call LanguageClient#textDocument_formatting()<CR>
+    nnoremap <F5> :call LanguageClient_contextMenu()<CR>
+    nnoremap <silent> <c-j>k :call LanguageClient#textDocument_hover()<CR>
+    nnoremap <c-j><c-j> :call LanguageClient#textDocument_definition()<CR>
+    nnoremap <c-j>v :call LC_operation('vs')<cr>
+    nnoremap <c-j>s :call LC_operation('split')<cr>
+    nnoremap <c-j>t :call LC_operation('tab')<cr>
+    " nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+    nnoremap <silent> <c-j>r :call LanguageClient#textDocument_references()<cr>
+
+    let g:LanguageClient_diagnosticsEnable = 0
+
+    fu! LC_operation(operation)
+        if a:operation == 'vs'
+            vs
+        elseif a:operation == 'split'
+            split
+        else
+            tab sp
+        endif
+        call LanguageClient#textDocument_definition()
+    endfu
+'''
+
+[[plugins]]
+repo = 'ryanoasis/vim-devicons'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'szkny/SplitTerm'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'szkny/Ipython'
+on_ft = 'python'
+hook_add ='''
+    nnoremap  <silent> <c-e><c-e> :IpythonLine<CR>
+    nnoremap  <silent> <c-e><c-f> :IpythonRun<CR>
+    vnoremap  <silent> <c-e><c-e> :VIpython<CR>
+    nnoremap  <silent> <c-e><c-u> :VIpython<CR>
+    nnoremap  <silent> <c-e>i :IpythonInspection<CR>
+    nnoremap  <silent> <c-e>d :IpythonDebug<CR>
+
+    " nnoremap <c-e>i :call setline(".", "inspect.getmembers(".getline('.').")")<cr>
+
+    " ipythonコマンドのコマンドライン引数
+	let g:ipython_startup_options = ['--no-confirm-exit']
+
+	" ipython起動時実行するコマンドリスト
+	let g:ipython_startup_command = [
+				"\' from pylab import *',
+				\'import pandas as pd',
+				\'import numpy as np',
+				\'import inspect',
+				\'pd.options.display.max_rows = 10',
+				\'pd.options.display.max_columns = 10',
+				\'pd.options.display.precision = 3']
+
+	" ウィンドウ幅 ( 0 にすると自動で設定)
+	let g:ipython_window_width = 0
+'''
+
+[[plugins]]
+repo = 'nelstrom/vim-visual-star-search'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'thaerkh/vim-workspace'
+hook_add ='''
+'''
+
+[[plugins]]
+repo = 'junegunn/fzf'
+build = './install --all'
+
+[[plugins]]
+repo = 'junegunn/fzf.vim'
+hook_add ='''
+    autocmd! FileType fzf nnoremap <buffer> <silent> q :q<cr>
+    let $FZF_DEFAULT_OPTS = '--reverse'
+    let g:fzf_layout = { 
+     \ 'up': '~30%' }
+
+    let g:fzf_action = {
+        \ 'ctrl-t': 'tab split',
+        \ 'ctrl-s': 'split',
+        \ 'ctrl-v': 'vsplit',
+        \ 'ctrl-m': 'cd',
+        \ 'ctrl-l': 'e' }
+
+    " nmap <Space>f <plug>(fzf-maps-n)
+    " xmap <Space>f <plug>(fzf-maps-x)
+    " omap <Space>f <plug>(fzf-maps-o)
+    nnoremap <Space>ff :Rgf<cr>
+    nnoremap <Space>fh :Files ~/<cr>
+    nnoremap <Space>gf :GFiles<cr>
+    " nnoremap <Space>gss :GFiles?<cr>
+    nnoremap <Space>bl :BLines<cr>
+    nnoremap <Space>gg :call My_Ggrep()<cr>
+    nnoremap <Space>o :History<cr>
+    nnoremap <Space>vh :Helptags<cr>
+    nnoremap <Space>dd :Directorys<cr>
+    nnoremap <Space>dh :call DirectorysOnHome()<cr>
+    nnoremap <Space>fg :call FilesRepository()<cr>
+    nnoremap <Space>gr :Repos<cr>
+    nnoremap <Space>gj :call My_Ggrep()<cr>
+    vnoremap <Space>gj :<c-u>Rg <c-r>0<cr>
+
+    command! -bang -nargs=? Directorys
+      "\ call fzf#run(fzf#wrap({'source': 'find -type d', 'up': '30%'}))
+      \ call fzf#run(fzf#wrap({'source': 'find -type d', 'sink': 'e', 'up': '30%'}))
+
+    fu! FilesRepository()
+        silent cd `ghq root`
+        call fzf#run(fzf#wrap({'source': 'rg --files', 'up': '30%'}))
+    endfu
+
+    fu! DirectorysOnHome()
+        silent cd
+        call fzf#run(fzf#wrap({'source': 'find -type d', 'up': '30%'}))
+    endfu
+
+    command! -bang -nargs=0 Repos
+      \ call fzf#run(fzf#wrap({'source': 'ghq list -p', 'up': '30%'}))
+
+    command! -bang -nargs=? -complete=dir Files
+      \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
+
+    command! -bang -nargs=0 Rgf
+      \ call fzf#run(fzf#wrap({'source': 'rg --files', 'up': '30%'}))
+
+    command! -bang -nargs=* Rg
+      \ call fzf#vim#grep(
+      \   'rg --line-number --no-heading '.shellescape(<q-args>), 0,
+      \   fzf#vim#with_preview({'options': '--exact --reverse'}, 'right:50%:wrap'))
+
+    function! My_Cursor_Under_Ggrep()
+        if exists('Gcd')
+            Gcd
+        endif
+        call fzf#vim#grep(
+          \   'rg --line-number --no-heading '.expand('<cword>'), 0,
+          \   fzf#vim#with_preview({'options': '--exact --reverse'}, 'right:50%:wrap'))
+    endfunction
+
+    function! My_Ggrep()
+        if exists('Gcd')
+            Gcd
+        endif
+        Rg
+    endfunction
+'''
+[[plugins]]
+repo = 'skanehira/translate.vim'
+hook_add = '''
+    " Reqiurement: installed go lang
+    let g:translate_source = "en"
+    let g:translate_target = "ja"
+    let g:translate_winsize = 10
+'''
+
+
+[[plugins]]
+repo = 'tpope/vim-scriptease'
+hook_add = '''
+    " Usage:
+    " :Breakadd
+    " <target command>
+    " >echom <variable name>
+    nnoremap <silent> <Space>vb :call MybreakToggle()<cr>
+
+    fu! MybreakToggle()
+        if !exists('g:bp_idx')
+            let g:bp_idx = 0
+        endif
+    
+        let file_name = expand('%:p')
+        if file_name == ""
+            return
+        endif
+    
+        let line_nr = line('.')
+        let break_point_dict = MybreakReferenceOnBuffer(file_name)
+        if has_key(break_point_dict, printf('%d', line_nr))
+            let sign_id = break_point_dict[line_nr]
+            call Mybreakdel(file_name, sign_id)
+            return
+        endif
+        call Mybreakadd(file_name, line_nr)
+    endfu
+    
+    fu! Mybreakadd(file_name, line_nr)
+        sign define breakpoint text=B texthl=ZenSpace
+        let name = 'breakpoint'
+        let g:bp_idx += 1
+        let g:line_dict = {a:line_nr: g:bp_idx}
+    
+        " add sign
+        exe "sign place ". g:bp_idx ." line=" . a:line_nr ." name=". name ." file=" . a:file_name
+        breakadd here
+    endfu
+    
+    fu! Mybreakdel(file_name, sign_id)
+        exe "sign unplace ". a:sign_id ." file=". a:file_name
+        breakdel here
+    endfu
+    
+    fu! MybreakReferenceOnBuffer(file_name)
+        let sign_raw = MyRedirToVariable("sign place file=" . a:file_name)
+        let sign_infos = split(sign_raw, '\n')
+    
+        let break_point_dict = {} "line_nr: sign_id
+        for sign_info in sign_infos
+            let result = matchlist(sign_info, 'line=\(\d\+\)\W\+id=\(\d\+\)\W\+name=breakpoint\c')
+            if len(result) <# 1
+                continue
+            endif
+            let break_point_dict[result[1]] = result[2]
+        endfor
+        return break_point_dict
+    endfu
+    
+    fu! MyRedirToVariable(cmd)
+        redir => output
+        silent exe a:cmd
+        redir END
+        return output
+    endfu
+'''
+
+[[plugins]]
+repo = 'szymonmaszke/vimpyter'
+hook_add ='''
+    autocmd Filetype ipynb nmap <silent><Space>jb :VimpyterInsertPythonBlock<CR>
+    autocmd Filetype ipynb nmap <silent><Space>jj :VimpyterStartJupyter<CR>
+    autocmd Filetype ipynb nmap <silent><Space>jn :VimpyterStartNteract<CR>
+'''
+
+[[plugins]]
+repo = 'Shougo/echodoc.vim'
+hook_add ='''
+    " To use echodoc, you must increase 'cmdheight' value.
+    set cmdheight=2
+    let g:echodoc_enable_at_startup = 1
+'''
+
+[[plugins]]
+repo = 'numirias/semshi'
+hook_add ='''
+    let g:semshi#error_sign = v:false
+'''
+
+[[plugins]]
+repo = 'azadkuh/vim-cmus'
+hook_add ='''
+    " Usage: sudo sshfs -o allow_other -o IdentityFile=/home/hiroomi/.ssh/id_rsa root@192.168.11.204:/var/samba_dir/hobby/music /mnt/mount/music
+'''
+
+[[plugins]]
+repo = 'sakhnik/nvim-gdb'
+build = 'bash install.sh'
+hook_add ='''
+    let g:nvimgdb_config_override = {
+      \ 'key_until': '<f4>',
+      \ 'key_continue': 'c',
+      \ 'key_next': 'n',
+      \ 'key_step': 's',
+      \ 'key_finish': 'f',
+      \ 'key_breakpoint': 'b',
+      \ 'key_eval': 'p',
+      \ 'set_tkeymaps': "NvimGdbNoTKeymaps",
+      \ 'sign_current_line': "=>",
+      \ 'sign_breakpoint': ['B', 'B2', 'B3', 'B4', 'B5'],
+      \ 'split_command': 'vertical split'
+      \ }
+
+    autocmd FileType python call s:nvimgdb_python_settings()
+    function! s:nvimgdb_python_settings() abort
+        nnoremap <silent> <c-e><c-d> :GdbStartPDB python -m pdb %:p<cr>
+        nnoremap <silent> <c-q><c-q> :GdbDebugStop<cr>
+        vnoremap <silent> p :GdbEvalRange<cr>
+    endfunction
+
+    autocmd FileType bash call s:nvimgdb_bash_settings()
+    function! s:nvimgdb_bash_settings() abort
+        nnoremap <silent> <c-e><c-d> :GdbStartPDB bashdb pdb %:p<cr>
+        nnoremap <silent> <c-q><c-q> :GdbDebugStop<cr>
+    endfunction
+'''
