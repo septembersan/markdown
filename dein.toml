@@ -1413,3 +1413,4 @@ hook_add ='''
         nnoremap <silent> <c-q><c-q> :GdbDebugStop<cr>
     endfunction
 '''
+
