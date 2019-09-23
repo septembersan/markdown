@@ -1,6 +1,7 @@
 # Usage
 # @reload:call dein#recache_runtimepath()
 # @lazy  :lazy = 1
+# pip install notedown
 
 [[plugins]]
 repo = 't9md/vim-quickhl'
@@ -72,9 +73,8 @@ hook_add = '''
     " nnoremap <silent> <C-e><C-e> :call My_TREPLSendSelection()<cr>
     " vnoremap <silent> <C-e><C-e> :TREPLSendSelection<cr>
     " nnoremap <silent> <C-e><C-e> :TREPLSendLine<cr>
-    nnoremap <silent> <C-e><C-f> :call Exec_python()<cr>
     " nnoremap <silent> <C-e><C-f> :TREPLSendFile<cr>'>j0
-    nnoremap <silent> ttn  :Tnew<CR>
+    nnoremap <silent> ttn  :call My_ActivateCondaEnv()<CR>
     nnoremap <silent> ttl   :Tclear<CR>
     nnoremap <silent> tti  :Topen<cr>
     nnoremap <silent> ttc  :Tclose<cr>
@@ -83,6 +83,21 @@ hook_add = '''
     nnoremap <silent> tts  :call My_New_Terminal_VSplit()<cr>
     nnoremap <silent> ttk  :Tkill<cr>
     nnoremap <silent> <F5> :T pdb %<CR><c-w>ki
+
+    let g:terminal_count_id = 1
+    function! My_ActivateCondaEnv()
+        Tnew
+        call My_New_Terminal()
+    endfunction
+
+    function! My_New_Terminal()
+        let env_name = split(substitute(system('which python'), "/bin/python", "", ""), '/')[-1]
+        let cmd = 'conda activate ' . env_name
+        exec g:terminal_count_id . "T" cmd
+        exec g:terminal_count_id . "Tclear"
+        let g:terminal_count_id = g:terminal_count_id + 1
+    endfunction
+
     function! My_TREPLSendSelection()
         Topen
         :TREPLSendLine
@@ -93,6 +108,7 @@ hook_add = '''
         let g:neoterm_size = winheight(0)
         tabnew
         Tnew
+        call My_New_Terminal()
         let g:neoterm_size = 10
     endfunction
 
@@ -100,18 +116,8 @@ hook_add = '''
         " let g:neoterm_fixedsize = winfixheight
         let g:neoterm_size = winwidth(0) / 2
         vertical Tnew
-        " wincmd h
-        " call feedkeys("i")
+        call My_New_Terminal()
         let g:neoterm_size = 10
-    endfunction
-
-    function! Exec_python()
-        :w!
-        let g:neoterm_autoinsert = 0
-        Topen
-        Tclear
-        T python3.6  %
-        let g:neoterm_autoinsert = 1
     endfunction
 
     if has('vim_starting')
@@ -570,6 +576,7 @@ repo = 'iyuuya/denite-ale'
 
 [[plugins]]
 repo = 'w0rp/ale'
+build = 'pip install flake8 flake8-import-order autopep8 black isort'
 hook_add = '''
     " Installation: pip install flake8 flake8-import-order autopep8 black isort
     let g:ale_enabled = 0
@@ -585,7 +592,8 @@ hook_add = '''
                 \   'JSON': ['jq']
                 \}
     let g:ale_fixers = {
-    \ 'python': ['autopep8', 'black', 'isort'],
+    "\ 'python': ['autopep8', 'black', 'isort'],
+    \ 'python': ['black', 'isort'],
     \ }
 
     nmap [ale] <Nop>
@@ -891,8 +899,8 @@ hook_add ='''
     nnoremap <Space>ge :Gvdiff :%<left><left>
     nnoremap <Space>gp :Gpull 
     nnoremap <Space>gss :Gstatus<cr>
-    nnoremap <Space>gg :call My_Ggrep()<cr>
-    nnoremap <Space>gj :call My_Cursor_Under_Ggrep()<cr>
+    " nnoremap <Space>gg :call My_Ggrep()<cr>
+    " nnoremap <Space>gj :call My_Cursor_Under_Ggrep()<cr>
     nnoremap <Space>gco :Gcommit -m ""<left>
     nnoremap <Space>gca :Gcommit -amend<cr>
     " nnoremap <Space>gr :Gvsplit :<left><left>
@@ -1064,6 +1072,7 @@ hook_add ='''
 
 [[plugins]]
 repo = 'mhinz/neovim-remote' 
+build = 'pip install neovim-remote'
 hook_add ='''
     " Installation: pip3 install neovim-remote
     " Usage: README.md
@@ -1229,7 +1238,7 @@ hook_add ='''
     nnoremap <Space>dh :call DirectorysOnHome()<cr>
     nnoremap <Space>fg :call FilesRepository()<cr>
     nnoremap <Space>gr :Repos<cr>
-    nnoremap <Space>gj :call My_Ggrep()<cr>
+    nnoremap <Space>gj :call My_Cursor_Under_Ggrep()<cr>
     vnoremap <Space>gj :<c-u>Rg <c-r>0<cr>
 
     command! -bang -nargs=? Directorys
@@ -1261,18 +1270,14 @@ hook_add ='''
       \   fzf#vim#with_preview({'options': '--exact --reverse'}, 'right:50%:wrap'))
 
     function! My_Cursor_Under_Ggrep()
-        if exists('Gcd')
-            Gcd
-        endif
+        Gcd
         call fzf#vim#grep(
           \   'rg --line-number --no-heading '.expand('<cword>'), 0,
           \   fzf#vim#with_preview({'options': '--exact --reverse'}, 'right:50%:wrap'))
     endfunction
 
     function! My_Ggrep()
-        if exists('Gcd')
-            Gcd
-        endif
+        Gcd
         Rg
     endfunction
 '''
@@ -1386,31 +1391,136 @@ hook_add ='''
 repo = 'sakhnik/nvim-gdb'
 build = 'bash install.sh'
 hook_add ='''
+    " nnoremap <c-e><c-d> :GdbStartPDB python -m pdb %:p<cr>
+    " let g:nvimgdb_config_override = {
+    "  \ 'key_until':      'u',
+    "  \ 'key_continue':   'c',
+    "  \ 'key_next':       'n',
+    "  \ 'key_step':       's',
+    "  \ 'key_finish':     'E',
+    "  \ 'key_breakpoint': 'b',
+    "  \ 'key_frameup':    '<c-p>',
+    "  \ 'key_framedown':  '<c-n>',
+    "  \ 'key_eval':       'p',
+    "  \ 'set_tkeymaps': "NvimGdbNoTKeymaps",
+    "  \ 'set_tkeymaps':   'function("GdbCallAsync", "keymaps.set_t")',
+    "  \ 'set_keymaps':    'function("GdbCallAsync", "keymaps.set")',
+    "  \ 'unset_keymaps':  'function("GdbCallAsync", "keymaps.unset")',
+    "  \ 'sign_current_line': "=>",
+    "  \ 'sign_breakpoint': ['B', 'B2', 'B3', 'B4', 'B5'],
+    "  \ 'split_command': 'vertical split'
+    "  \ }
     let g:nvimgdb_config_override = {
-      \ 'key_until': '<f4>',
-      \ 'key_continue': 'c',
-      \ 'key_next': 'n',
-      \ 'key_step': 's',
-      \ 'key_finish': 'f',
-      \ 'key_breakpoint': 'b',
-      \ 'key_eval': 'p',
-      \ 'set_tkeymaps': "NvimGdbNoTKeymaps",
-      \ 'sign_current_line': "=>",
-      \ 'sign_breakpoint': ['B', 'B2', 'B3', 'B4', 'B5'],
-      \ 'split_command': 'vertical split'
-      \ }
+    "\ 'set_tkeymaps': "NvimGdbNoTKeymaps",
+    \ 'sign_current_line': "=>",
+    \ 'sign_breakpoint': ['B', 'B2', 'B3', 'B4', 'B5'],
+    \ 'split_command': 'vertical split'
+    \ }
+    augroup nvimgdb_python_keymaps
+        autocmd!
+        autocmd User NvimGdbStart call s:nvimgdb_python_keymaps()
+        autocmd User NvimGdbCleanup call s:nvimgdb_python_keymaps_cleanup()
+    augroup END
 
-    autocmd FileType python call s:nvimgdb_python_settings()
-    function! s:nvimgdb_python_settings() abort
-        nnoremap <silent> <c-e><c-d> :GdbStartPDB python -m pdb %:p<cr>
-        nnoremap <silent> <c-q><c-q> :GdbDebugStop<cr>
-        vnoremap <silent> p :GdbEvalRange<cr>
+    augroup nvimgdb_python_settings
+        autocmd!
+        autocmd FileType python call s:nvimgdb_python_settings()
+    augroup END
+
+    function! s:nvimgdb_python_keymaps_cleanup() abort
+        nunmap <space>k
+        nunmap <space>j
+        nunmap r
+        nunmap c
+        nunmap <space>n
+        nunmap u
+        nunmap s
+        nunmap f
+        nunmap <space>br
+        nunmap <c-p>
+        nunmap <c-n>
+        nunmap p
+        vunmap p
+        nnoremap <space>q :call My_tabclose()<cr>
     endfunction
 
-    autocmd FileType bash call s:nvimgdb_bash_settings()
+    function! s:nvimgdb_python_keymaps() abort
+        nnoremap <silent><space>k :call My_GdbDebugBack()<cr>
+        nnoremap <silent><space>j :call My_GdbDebugJump()<cr>
+        nnoremap <silent>r :call My_GdbDebugReturn()<cr>
+        nnoremap <silent>u :GdbUntil<cr>
+        nnoremap <silent>c :GdbContinue<cr>
+        nnoremap <silent><space>n :GdbNext<cr>
+        nnoremap <silent>s :GdbStep<cr>
+        nnoremap <silent>f :GdbFinish<cr>
+        nnoremap <silent><space>br :GdbBreakpointToggle<cr>
+        nnoremap <silent><c-p> :GdbFrameUp<cr>
+        nnoremap <silent><c-n> :GdbFrameDown<cr>
+        nnoremap <silent>p :GdbEvalWord<cr>
+        vnoremap <silent>p :GdbEvalRange<cr>
+        nnoremap <silent><space>q :call My_GdbDebugStop()<cr>
+    endfunction
+
+    function! My_GdbDebugBack()
+        let line_number = line('.') - 2
+        call GdbCustomCommand("jump " . line_number)
+        GdbNext
+    endfunction
+
+    function! My_GdbDebugJump()
+        let line_number = line('.') - 1
+        call GdbCustomCommand("jump " . line_number)
+        GdbNext
+    endfunction
+
+    function! My_GdbDebugReturn()
+        call GdbCustomCommand("r")
+        GdbNext
+    endfunction
+
+    function! My_GdbDebugStop()
+        GdbDebugStop
+        tabprevious
+    endfunction
+
+    function! s:nvimgdb_python_settings() abort
+        nnoremap <silent> <c-e><c-d> :call My_GdbStartPDB()<cr>
+    endfunction
+
+    function! My_GdbStartPDB()
+        let pos = getpos(".")
+        GdbStartPDB python -m pdb %:p<cr>
+        call feedkeys("jj")
+        exec "normal \<c-w>\<c-w>"
+        sleep 750ms
+        call setpos('.', pos)
+        GdbUntil
+    endfunction
+
+    " augroup nvimgdb_bash_settings
+    "     autocmd!
+    "     autocmd FileType bash call s:nvimgdb_bash_settings()
+    " augroup END
     function! s:nvimgdb_bash_settings() abort
         nnoremap <silent> <c-e><c-d> :GdbStartPDB bashdb pdb %:p<cr>
         nnoremap <silent> <c-q><c-q> :GdbDebugStop<cr>
     endfunction
 '''
 
+[[plugins]]
+repo = 'yuttie/comfortable-motion.vim'
+hook_add ='''
+    let g:comfortable_motion_no_default_key_mappings = 1
+    nnoremap <silent> <C-d> :call comfortable_motion#flick(100)<cr>
+    nnoremap <silent> <C-u> :call comfortable_motion#flick(-100)<cr>
+
+    nnoremap <silent> <C-f> :call comfortable_motion#flick(200)<cr>
+    " nnoremap <silent> <C-b> :call comfortable_motion#flick(-200)<cr>
+'''
+
+[[plugins]]
+repo = 'justinmk/vim-sneak'
+hook_add ='''
+    map f <Plug>Sneak_f
+    map F <Plug>Sneak_F
+'''
