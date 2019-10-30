@@ -75,7 +75,7 @@ hook_add = '''
     " nnoremap <silent> <C-e><C-e> :TREPLSendLine<cr>
     " nnoremap <silent> <C-e><C-f> :TREPLSendFile<cr>'>j0
     nnoremap <silent> ttn  :call My_ActivateCondaEnv()<CR>
-    nnoremap <silent> ttl   :Tclear<CR>
+    nnoremap <silent> ttl  :Tclear<CR>
     nnoremap <silent> tti  :Topen<cr>
     nnoremap <silent> ttc  :Tclose<cr>
     nnoremap <silent> tto  :Ttoggle<CR>
@@ -83,6 +83,7 @@ hook_add = '''
     nnoremap <silent> tts  :call My_New_Terminal_VSplit()<cr>
     nnoremap <silent> ttk  :Tkill<cr>
     nnoremap <silent> <F5> :T pdb %<CR><c-w>ki
+    " tnoremap <silent> <space>h cd ..<cr>
 
     let g:terminal_count_id = 1
     function! My_ActivateCondaEnv()
@@ -264,32 +265,6 @@ hook_add ='''
 repo = 'vim-scripts/DoxygenToolkit.vim'
 hook_add ='''
     noremap ,d :Dox<CR>
-'''
-
-[[plugins]]
-repo = 'Shougo/neosnippet-snippets'
-hook_add ='''
-'''
-
-[[plugins]]
-repo = 'Shougo/neosnippet.vim'
-hook_add ='''
-    imap <C-k> <Plug>(neosnippet_expand_or_jump)
-    smap <C-k> <Plug>(neosnippet_expand_or_jump)
-    xmap <C-k> <Plug>(neosnippet_expand_target)
-    let g:neosnippet#snippets_directory='~/home/aapfuser/.cache/neosnippet/my'
-    " inoremap <expr><tab> pumvisible() ? "\<C-n>" :
-    "\ neosnippet#expandable_or_jumpable() ?
-    "\    "\<Plug>(neosnippet_expand_or_jump)" : "\<tab>"
-    imap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-      \ "\<Plug>(neosnippet_expand_or_jump)"
-      \: pumvisible() ? "\<C-n>" : "\<TAB>"
-    smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-          \ "\<Plug>(neosnippet_expand_or_jump)"
-          \: "\<TAB>"
-    if has('conceal')
-      set conceallevel=2 concealcursor=i
-endif
 '''
 
 [[plugins]]
@@ -486,45 +461,48 @@ hook_add ='''
       \ ['git', 'ls-files', '-co', '--exclude-standard'])
 '''
 
-[[plugins]]
-repo = 'Shougo/deoplete.nvim'
-if = 'has("nvim")'
-on_i = 1
-hook_source = '''
-    let g:deoplete#enable_at_startup = 1
-    let g:deoplete#auto_complete_delay = 0
-    " let g:deoplete#auto_complete_start_length = 1
-    " let g:deoplete#enable_camel_case = 0
-    " let g:deoplete#enable_ignore_case = 0
-    let g:deoplete#enable_refresh_always = 0
-    " let g:deoplete#enable_smart_case = 1
-    " let g:deoplete#file#enable_buffer_path = 1
-    " let g:deoplete#max_list = 10000
-    let g:deoplete#omni_patterns = {
-       \ 'python': '[^. *\t]\.\w*',
-       \}
-'''
+# [[plugins]]
+# repo = 'Shougo/deoplete.nvim'
+# if = 'has("nvim")'
+# on_i = 1
+# hook_source = '''
+#     let g:deoplete#enable_at_startup = 1
+#     let g:deoplete#auto_complete_start_length = 1
+#     let g:deoplete#enable_smart_case = 1
+#     let g:deoplete#auto_complete_delay = 0
+#     " let g:deoplete#enable_camel_case = 1
+#     " let g:deoplete#enable_ignore_case = 0
+#     let g:deoplete#enable_refresh_always = 0
+#     " let g:deoplete#file#enable_buffer_path = 1
+#     " let g:deoplete#max_list = 10000
+#     call deoplete#custom#source('LanguageClient',
+#            \ 'min_pattern_length',
+#            \ 2)
+#     " let g:deoplete#omni_patterns = {
+#     "   \ 'python': '[^. *\t]\.\w*',
+#     "   \}
+# '''
 
 [[plugins]]
 repo = 'prabirshrestha/vim-lsp'
 hook_add = '''
 '''
 
-[[plugins]]
-repo = 'lighttiger2505/deoplete-vim-lsp'
-hook_source = '''
-    if (executable('pyls'))
-        let s:pyls_path = fnamemodify(g:python_host_prog, ':h') . '/'. 'pyls'
-        augroup LspPython
-            autocmd!
-            autocmd User lsp_setup call lsp#register_server({
-          \ 'name': 'pyls',
-          \ 'cmd': {server_info->['pyls']},
-          \ 'whitelist': ['python']
-          \ })
-        augroup END
-    endif
-'''
+# [[plugins]]
+# repo = 'lighttiger2505/deoplete-vim-lsp'
+# hook_source = '''
+#     if (executable('pyls'))
+#         let s:pyls_path = fnamemodify(g:python_host_prog, ':h') . '/'. 'pyls'
+#         augroup LspPython
+#             autocmd!
+#             autocmd User lsp_setup call lsp#register_server({
+#          \ 'name': 'pyls',
+#          \ 'cmd': {server_info->['pyls']},
+#          \ 'whitelist': ['python']
+#          \ })
+#         augroup END
+#     endif
+# '''
 
 # [[plugins]]
 # repo = 'zchee/deoplete-jedi'
@@ -587,13 +565,16 @@ hook_add = '''
     let g:ale_statusline_format = ['x %d', '? %d', 'o ok']
     let g:ale_linters = { 
                 \   'python3.6': ['flake8'],
-                \   'markdown': ['alex'],
+                "\   'markdown': ['alex'],
+                \   'markdown': ['textlint'],
                 \   'javascript': ['eslint'],
                 \   'JSON': ['jq']
                 \}
     let g:ale_fixers = {
-    "\ 'python': ['autopep8', 'black', 'isort'],
     \ 'python': ['black', 'isort'],
+    \ 'markdown': [
+    \   {buffer, lines -> {'command': 'textlint -c ~/.config/textlintrc -o /dev/null --fix --no-color --quiet %t', 'read_temporary_file': 1}} 
+    \   ],
     \ }
 
     nmap [ale] <Nop>
@@ -1044,8 +1025,11 @@ hook_add ='''
 
 [[plugins]]
 repo = 'tyru/open-browser.vim' 
-on_ft = ['markdown', 'rst']
+on_ft = ['markdown', 'rst', 'txt']
 hook_add ='''
+    let g:netrw_nogx = get(g:, 'netrw_nogx', 1)
+    nmap gx <Plug>(openbrowser-smart-search)
+    vmap gx <Plug>(openbrowser-smart-search)
 '''
 
 [[plugins]]
@@ -1086,12 +1070,28 @@ hook_add ='''
 [[plugins]]
 repo = 'SirVer/ultisnips' 
 hook_add ='''
-    let g:UltiSnipsExpandTrigger="<tab>"
-    let g:UltiSnipsJumpForwardTrigger="<tab>"
-    let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+    " Usage: 
+    " /home/hiroomi/.cache/dein/repos/github.com/honza/vim-snippets/UltiSnips/.*.snippets
+    " let g:UltiSnipsExpandTrigger="<tab>"
+    " let g:UltiSnipsJumpForwardTrigger="<tab>"
+    " let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
     " If you want :UltiSnipsEdit to split your window.
     let g:UltiSnipsEditSplit="vertical"
+    let g:UltiSnipsSnippetsDir='~/tools'
+
+    inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+          \ coc#refresh()
+    inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+    function! s:check_back_space() abort
+      let col = col('.') - 1
+      return !col || getline('.')[col - 1]  =~# '\s'
+    endfunction
+
+    inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 '''
 
 [[plugins]]
@@ -1113,46 +1113,49 @@ hook_add ='''
     let g:tigris#delay = 300
 '''
 
-[[plugins]]
-repo = 'autozimu/LanguageClient-neovim'
-rev = 'next'
-depends = ['deoplete.nvim']
-build = 'bash install.sh'
-hook_add = '''
-    " Installation: pip install python-language-server
-    set hidden
-    " imap <expr> . pumvisible() ? "\<C-E>.\<C-X>\<C-O>\<C-P>" : ".\<C-X>\<C-O>\<C-P>"
-    let language_client_python_path = join([substitute(system('which python3'), "python3\n", "", ""), "pyls"], '/')
-    " let g:LanguageClient_hasSnippetSupport = 0
-    " set completefunc=LanguageClient#complete
-    let g:LanguageClient_serverCommands = {
-        \ 'python': [language_client_python_path],
-        "\ 'vim': ['vim-language-server', '--stdio'],
-        \ }
-    " nnoremap <silent> gdi :call LanguageClient#textDocument_implementation()<CR>
-    " nnoremap <silent> gdf :call LanguageClient#textDocument_formatting()<CR>
-    nnoremap <F5> :call LanguageClient_contextMenu()<CR>
-    nnoremap <silent> <c-j>k :call LanguageClient#textDocument_hover()<CR>
-    nnoremap <c-j><c-j> :call LanguageClient#textDocument_definition()<CR>
-    nnoremap <c-j>v :call LC_operation('vs')<cr>
-    nnoremap <c-j>s :call LC_operation('split')<cr>
-    nnoremap <c-j>t :call LC_operation('tab')<cr>
-    " nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
-    nnoremap <silent> <c-j>r :call LanguageClient#textDocument_references()<cr>
-
-    let g:LanguageClient_diagnosticsEnable = 0
-
-    fu! LC_operation(operation)
-        if a:operation == 'vs'
-            vs
-        elseif a:operation == 'split'
-            split
-        else
-            tab sp
-        endif
-        call LanguageClient#textDocument_definition()
-    endfu
-'''
+# [[plugins]]
+# repo = 'autozimu/LanguageClient-neovim'
+# rev = 'next'
+# build = 'bash install.sh'
+# hook_add = '''
+#     " Installation: pip install python-language-server
+#     set hidden
+#     " imap <expr> . pumvisible() ? "\<C-E>.\<C-X>\<C-O>\<C-P>" : ".\<C-X>\<C-O>\<C-P>"
+#     let language_client_python_path = join([substitute(system('which python3'), "python3\n", "", ""), "pyls"], '/')
+#     " let g:LanguageClient_hasSnippetSupport = 0
+#     " set completefunc=LanguageClient#complete
+#     let g:LanguageClient_serverCommands = {
+#       \ 'python': [language_client_python_path],
+#         "\ 'vim': ['vim-language-server', '--stdio'],
+#       \ }
+#     " nnoremap <silent> gdi :call LanguageClient#textDocument_implementation()<CR>
+#     " nnoremap <silent> gdf :call LanguageClient#textDocument_formatting()<CR>
+#     nnoremap <F5> :call LanguageClient_contextMenu()<CR>
+#     nnoremap <c-j><c-k> :call LanguageClient#textDocument_hover()<CR>
+#     nnoremap <c-j><c-j> :call LanguageClient#textDocument_definition()<CR>
+#     nnoremap <c-j><c-v> :call LC_operation('vs')<cr>
+#     nnoremap <c-j><c-s> :call LC_operation('split')<cr>
+#     nnoremap <c-j>t :call LC_operation('tab')<cr>
+#     " nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+#     nnoremap <silent> <c-j><c-r> :call LanguageClient#textDocument_references()<cr>
+#
+#     let g:LanguageClient_diagnosticsEnable = 0
+#
+#     fu! LC_operation(operation)
+#         if a:operation == 'vs'
+#             vs
+#         elseif a:operation == 'split'
+#             split
+#         else
+#             tab sp
+#         endif
+#         call LanguageClient#textDocument_definition()
+#     endfu
+#
+#     let g:neosnippet#enable_complete_done = 1
+#     let g:LanguageClient_hasSnippetSupport = 1
+#
+# '''
 
 [[plugins]]
 repo = 'ryanoasis/vim-devicons'
@@ -1172,7 +1175,7 @@ hook_add ='''
     nnoremap  <silent> <c-e><c-f> :IpythonRun<CR>
     vnoremap  <silent> <c-e><c-e> :VIpython<CR>
     nnoremap  <silent> <c-e><c-u> :VIpython<CR>
-    nnoremap  <silent> <c-e>i :IpythonInspection<CR>
+    nnoremap  <silent> <c-e><c-i> :IpythonInspection<CR>
     nnoremap  <silent> <c-e>d :IpythonDebug<CR>
 
     " nnoremap <c-e>i :call setline(".", "inspect.getmembers(".getline('.').")")<cr>
@@ -1285,6 +1288,11 @@ hook_add ='''
 repo = 'skanehira/translate.vim'
 hook_add = '''
     " Reqiurement: installed go lang
+    " $ git clone https://github.com/skanehira/gtran.git
+    " $ cd gtran
+    " export GOPATH=$HOME/.go
+    " export GOBIN=$GOPATH/bin
+    " $ go install
     let g:translate_source = "en"
     let g:translate_target = "ja"
     let g:translate_winsize = 10
@@ -1367,13 +1375,14 @@ hook_add ='''
     autocmd Filetype ipynb nmap <silent><Space>jn :VimpyterStartNteract<CR>
 '''
 
-[[plugins]]
-repo = 'Shougo/echodoc.vim'
-hook_add ='''
-    " To use echodoc, you must increase 'cmdheight' value.
-    set cmdheight=2
-    let g:echodoc_enable_at_startup = 1
-'''
+# [[plugins]]
+# repo = 'Shougo/echodoc.vim'
+# hook_add ='''
+#     " To use echodoc, you must increase 'cmdheight' value.
+#     set cmdheight=2
+#     let g:echodoc_enable_at_startup = 1
+#     let g:echodoc#type = 'signature'
+# '''
 
 [[plugins]]
 repo = 'numirias/semshi'
@@ -1436,7 +1445,7 @@ hook_add ='''
         nunmap u
         nunmap s
         nunmap f
-        nunmap <space>br
+        nunmap <space>b
         nunmap <c-p>
         nunmap <c-n>
         nunmap p
@@ -1453,7 +1462,7 @@ hook_add ='''
         nnoremap <silent><space>n :GdbNext<cr>
         nnoremap <silent>s :GdbStep<cr>
         nnoremap <silent>f :GdbFinish<cr>
-        nnoremap <silent><space>br :GdbBreakpointToggle<cr>
+        nnoremap <silent><space>b :GdbBreakpointToggle<cr>
         nnoremap <silent><c-p> :GdbFrameUp<cr>
         nnoremap <silent><c-n> :GdbFrameDown<cr>
         nnoremap <silent>p :GdbEvalWord<cr>
@@ -1523,4 +1532,64 @@ repo = 'justinmk/vim-sneak'
 hook_add ='''
     map f <Plug>Sneak_f
     map F <Plug>Sneak_F
+
+    map ; <Plug>Sneak_;
+    map , <Plug>Sneak_,
 '''
+
+[[plugins]]
+repo = 'iamcco/mathjax-support-for-mkdp'
+
+[[plugins]]
+repo = 'iamcco/markdown-preview.nvim'
+build = 'cd app & yarn install' 
+on_ft = ['markdown', 'pandoc.markdown', 'rmd']
+hook_add ='''
+    " let g:mkdp_browser= 'chrome'
+'''
+
+[[plugins]]
+repo = 'neoclide/coc.nvim'
+hook_add = '''
+    set hidden
+    " set cmdheight=2
+    set updatetime=100
+    set shortmess+=c
+    set pumblend=10
+
+    nmap <silent> <c-j><c-j> <Plug>(coc-definition)
+    " nmap <silent> gy <Plug>(coc-type-definition)
+    " nmap <silent> gi <Plug>(coc-implementation)
+    nmap <silent> <c-j><c-r> <Plug>(coc-references)
+
+
+    nnoremap <silent> <c-j><c-v> :call <sid>coc_operation('vs')<cr>
+    nnoremap <silent> <c-j><c-s> :call <sid>coc_operation('split')<cr>
+    nnoremap <silent> <c-j>t :call <sid>coc_operation('tab')<cr>
+
+    nnoremap <c-j><c-k> :call <SID>show_documentation()<cr>
+
+    function! s:show_documentation()
+      if (index(['vim','help'], &filetype) >= 0)
+        execute 'h '.expand('<cword>')
+      else
+        call CocAction('doHover')
+      endif
+    endfunction
+
+    nnoremap <expr><c-f> coc#util#has_float() ? coc#util#float_scroll(1) : "\<c-f>"
+	nnoremap <expr><c-b> coc#util#has_float() ? coc#util#float_scroll(0) : "\<c-b>"
+	" nnoremap <expr>q coc#util#has_float() ? coc#util#float_hide() : "q"
+
+    fu! s:coc_operation(operation)
+        if a:operation == 'vs'
+            vs
+        elseif a:operation == 'split'
+            split
+        else
+            tab sp
+        endif
+        call CocActionAsync('jumpDefinition')
+    endfu
+'''
+

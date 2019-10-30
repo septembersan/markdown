@@ -301,5 +301,12 @@ nnoremap tbv :vsplit enew<cr>
 set clipboard=unnamed
 nnoremap ss :%s/ *$//g<cr>
 " xnoremap SWP :!rm -f ~/.local/share/nvim/swap/*
-let &colorcolumn=join(range(90,999),",")                                                                                                                                                                                         
+let &colorcolumn=join(range(90,999),",")
 hi ColorColumn ctermbg=235 guibg=#2c2d27 
+
+augroup nvim_xml_keymaps
+    autocmd FileType xml call My_xml_format()
+augroup END
+function My_xml_format()
+    nnoremap <c-a><c-f> :%s/></>\r</g\|filetype indent on\|setf xml\|normal gg=G<cr>
+endfunction
