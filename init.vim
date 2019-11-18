@@ -179,8 +179,6 @@ endif
 " Git conds
 command! -nargs=+ Tg :T git <args>
 
-"set termguicolors
-" set background=dark
 set background=light
 autocmd VimEnter,WinEnter,ColorScheme * highlight Visual term=underline ctermfg=195 ctermbg=30 guifg=#c6c8d1 guibg=#5b7881
 autocmd VimEnter,WinEnter,ColorScheme * highlight BookMarkLine term=underline ctermfg=252 ctermbg=23 gui=undercurl guisp=#89b8c2
@@ -188,6 +186,7 @@ set t_Co=256
 " colorscheme lucius
 " colorscheme tender
 colorscheme iceberg
+" colorscheme candid
 " colorscheme breezy
 " colorscheme dracula
 " set termguicolors
@@ -211,7 +210,6 @@ set completeopt=menuone
 " nnoremap <C-u> :call jedi#usages()<CR>
 " nnoremap <C-j> :call jedi#goto_definitions()<CR>
 "}}}
-nnoremap <C-k> :DeniteCursorWord -buffer-name=gtags_ref gtags_ref<cr>
 " nnoremap <F6> :call Exec_gtags()<cr>
 " function! Exec_gtags()
 "     :ClearGTAGS

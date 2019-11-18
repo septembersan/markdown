@@ -483,70 +483,9 @@ hook_add ='''
 #     "   \}
 # '''
 
-[[plugins]]
-repo = 'prabirshrestha/vim-lsp'
-hook_add = '''
-'''
-
 # [[plugins]]
-# repo = 'lighttiger2505/deoplete-vim-lsp'
-# hook_source = '''
-#     if (executable('pyls'))
-#         let s:pyls_path = fnamemodify(g:python_host_prog, ':h') . '/'. 'pyls'
-#         augroup LspPython
-#             autocmd!
-#             autocmd User lsp_setup call lsp#register_server({
-#          \ 'name': 'pyls',
-#          \ 'cmd': {server_info->['pyls']},
-#          \ 'whitelist': ['python']
-#          \ })
-#         augroup END
-#     endif
-# '''
-
-# [[plugins]]
-# repo = 'zchee/deoplete-jedi'
-# on_ft = 'python'
-# hook_source = '''
-#     " let g:deoplete#sources#jedi#python_path = substitute(system('which python3.6'), "¥n", "", "")
-# '''
-
-# [[plugins]]
-# repo = 'davidhalter/jedi-vim'
-# on_ft = 'python'
-# # lazy=1
-# # hook_add = '''
-# hook_source = '''
-#         let g:jedi#auto_initialization = 1
-#         let g:jedi#auto_vim_configuration = 1
-#
-#         "# 補完キーの設定この場合???Ctrl+Space
-#         let g:jedi#completions_command = "<C-Space>"
-#         "# 変数の宣言場所へジャンプ???Ctrl + g)
-#         " let g:jedi#goto_assignments_command = "<C-g>"
-#         "# クラス???関数定義にジャンプ???Gtrl + d???
-#         " let g:jedi#goto_definitions_command = "<C-j>"
-#         nnoremap <C-j><C-j> :call jedi#goto_definitions()<cr>
-#         nnoremap <C-j>s :call Jedi_my_setting_sp()<cr>
-#         nnoremap <C-j>t :call Jedi_my_setting_tab()<cr>
-#         function! Jedi_my_setting_sp()
-#             :vs
-#             :call jedi#goto_definitions()
-#         endfunction
-#         function! Jedi_my_setting_tab()
-#             :tab sp
-#             :call jedi#goto_definitions()
-#         endfunction
-#         "# Pydocを表示???Ctrl + k???
-#         " let g:jedi#documentation_command = "<C-k>"
-#         let g:jedi#usages_command = "<C-k>"
-#         let g:jedi#popup_select_first = 0
-#         " let g:jedi#popup_on_dot = 0
-#         let g:jedi#show_call_signatures = 1
-#         let g:jedi#show_call_signatures_delay = 10
-#
-#         " nnoremap <silent><C-n> :cnext<cr>
-#         " nnoremap <silent><C-p> :cprev<cr>
+# repo = 'prabirshrestha/vim-lsp'
+# hook_add = '''
 # '''
 
 [[plugins]]
@@ -665,22 +604,6 @@ hook_add ='''
 [[plugins]]
 repo = 'dracula/vim'
 
-# [[plugins]]
-# repo = 'scrooloose/nerdtree'
-# hook_add ='''
-#     " autocmd vimenter * NERDTree
-#     nnoremap <F7> :NERDTreeToggle<cr>
-#     let g:NERDTreeDirArrows = 1
-#     let g:NERDTreeDirArrowExpandable  = '▶'
-#     let g:NERDTreeDirArrowCollapsible = '▼'
-#     let g:NERDTreeMapUpdir = "h"
-#     " let g:NERDTreeMapPreviewSplit = "h"
-#     let g:NERDTreeMapOpenVSplit = "v"
-#     let g:NERDTreeMapPreviewVSplit = "<C-v>"
-#     let g:NERDTreeMapOpenInTabSilent = "<C-t>"
-#     let g:NERDTreeMapActivateNode = "l"
-# '''
-
 [[plugins]]
 repo = 'xolox/vim-misc'
 hook_add ='''
@@ -707,14 +630,6 @@ hook_add ='''
     unlet s:local_session_directory
     let g:session_autoload = 'no'
 '''
-
-# [[plugins]]
-# repo = 'mattn/sonictemplate-vim'
-# hook_add ='''
-#     let g:sonictemplate_vim_template_dir = [
-#           \ '~/.config/nvim/template'
-#           \]
-# '''
 
 [[plugins]]
 repo = 'nathanaelkane/vim-indent-guides'
@@ -788,7 +703,7 @@ hook_add ='''
     nnoremap <silent> <Space>uu :<C-u>Unite buffer file_mru<CR>
     nnoremap <silent> <Space>y :<C-u>Unite history/yank<CR>
     nnoremap <silent> <Space>bb  :<C-u>Unite -default-action=vimfiler bookmark<CR>
-    nnoremap <silent> <Space>bf  :<C-u>Unite buffer<CR>
+    " nnoremap <silent> <Space>bf  :<C-u>Unite buffer<CR>
     " nnoremap <silent> <Space>r  :<C-u>Unite vimfiler/history<CR>
     " nnoremap <silent> <Space>r  :<C-u>UniteResume search-buffer<CR>
     nnoremap <silent> ,ug       :<C-u>Unite grep:. -no-empty -no-quit -buffer-name=search-buffer<CR>
@@ -804,7 +719,7 @@ hook_add ='''
     "au FileType unite inoremap <silent> <buffer> <expr> <C-v> unite#do_action('vsplit')
     au FileType unite nnoremap <silent> <buffer> <expr> t unite#do_action('tabswitch')
     au FileType unite inoremap <silent> <buffer> <expr> <c-t> unite#do_action('tabswitch')
-    au FileType unite inoremap <silent> <buffer> <expr> <c-c> <Plug> (unite_exit)
+    au FileType unite inoremap <silent> <buffer> <c-c> <Plug> (unite_exit)
     au FileType unite nnoremap <silent> <buffer> <ESC><ESC> q
     au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>q
 
@@ -937,12 +852,12 @@ hook_add ='''
     " * ログからdiffを確認する場合(一覧)
     "   :Gitv  -> Enter -> zM
     "   :Gitv  -> Enter -> Enter on target file
-    nnoremap <Space>gh :GitGutterLineHighlightsToggle<cr>
-    nmap ]g <Plug>GitGutterNextHunk
-    nmap [g <Plug>GitGutterPrevHunk
-    nmap <Space>gha <Plug>GitGutterStageHunk
-    nmap <Space>ghu <Plug>GitGutterUndoHunk
-    nmap <Space>ghp <Plug>GitGutterPreviewHunk
+    nnoremap <Space>gi :GitGutterLineHighlightsToggle<cr>
+    nmap ]g <Plug>(GitGutterNextHunk)
+    nmap [g <Plug>(GitGutterPrevHunk)
+    nmap <Space>gia <Plug>(GitGutterStageHunk)
+    nmap <Space>giu <Plug>(GitGutterUndoHunk)
+    nmap <Space>gip <Plug>(GitGutterPreviewHunk)
 
     autocmd FileType git call s:gitv_my_settings()
     function! s:gitv_my_settings()
@@ -1068,33 +983,6 @@ hook_add ='''
 '''
 
 [[plugins]]
-repo = 'SirVer/ultisnips' 
-hook_add ='''
-    " Usage: 
-    " /home/hiroomi/.cache/dein/repos/github.com/honza/vim-snippets/UltiSnips/.*.snippets
-    " let g:UltiSnipsExpandTrigger="<tab>"
-    " let g:UltiSnipsJumpForwardTrigger="<tab>"
-    " let g:UltiSnipsJumpBackwardTrigger="<c-z>"
-
-    " If you want :UltiSnipsEdit to split your window.
-    let g:UltiSnipsEditSplit="vertical"
-    let g:UltiSnipsSnippetsDir='~/tools'
-
-    inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-          \ coc#refresh()
-    inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
-    function! s:check_back_space() abort
-      let col = col('.') - 1
-      return !col || getline('.')[col - 1]  =~# '\s'
-    endfunction
-
-    inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-'''
-
-[[plugins]]
 repo = 'dhruvasagar/vim-table-mode'
 hook_add ='''
     nnoremap <c-t> :TableModeToggle<cr>
@@ -1112,50 +1000,6 @@ hook_add ='''
     let g:tigris#on_the_fly_enabled = 1
     let g:tigris#delay = 300
 '''
-
-# [[plugins]]
-# repo = 'autozimu/LanguageClient-neovim'
-# rev = 'next'
-# build = 'bash install.sh'
-# hook_add = '''
-#     " Installation: pip install python-language-server
-#     set hidden
-#     " imap <expr> . pumvisible() ? "\<C-E>.\<C-X>\<C-O>\<C-P>" : ".\<C-X>\<C-O>\<C-P>"
-#     let language_client_python_path = join([substitute(system('which python3'), "python3\n", "", ""), "pyls"], '/')
-#     " let g:LanguageClient_hasSnippetSupport = 0
-#     " set completefunc=LanguageClient#complete
-#     let g:LanguageClient_serverCommands = {
-#       \ 'python': [language_client_python_path],
-#         "\ 'vim': ['vim-language-server', '--stdio'],
-#       \ }
-#     " nnoremap <silent> gdi :call LanguageClient#textDocument_implementation()<CR>
-#     " nnoremap <silent> gdf :call LanguageClient#textDocument_formatting()<CR>
-#     nnoremap <F5> :call LanguageClient_contextMenu()<CR>
-#     nnoremap <c-j><c-k> :call LanguageClient#textDocument_hover()<CR>
-#     nnoremap <c-j><c-j> :call LanguageClient#textDocument_definition()<CR>
-#     nnoremap <c-j><c-v> :call LC_operation('vs')<cr>
-#     nnoremap <c-j><c-s> :call LC_operation('split')<cr>
-#     nnoremap <c-j>t :call LC_operation('tab')<cr>
-#     " nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
-#     nnoremap <silent> <c-j><c-r> :call LanguageClient#textDocument_references()<cr>
-#
-#     let g:LanguageClient_diagnosticsEnable = 0
-#
-#     fu! LC_operation(operation)
-#         if a:operation == 'vs'
-#             vs
-#         elseif a:operation == 'split'
-#             split
-#         else
-#             tab sp
-#         endif
-#         call LanguageClient#textDocument_definition()
-#     endfu
-#
-#     let g:neosnippet#enable_complete_done = 1
-#     let g:LanguageClient_hasSnippetSupport = 1
-#
-# '''
 
 [[plugins]]
 repo = 'ryanoasis/vim-devicons'
@@ -1176,7 +1020,7 @@ hook_add ='''
     vnoremap  <silent> <c-e><c-e> :VIpython<CR>
     nnoremap  <silent> <c-e><c-u> :VIpython<CR>
     nnoremap  <silent> <c-e><c-i> :IpythonInspection<CR>
-    nnoremap  <silent> <c-e>d :IpythonDebug<CR>
+    nnoremap  <silent> <c-e><c-d> :IpythonDebug<cr>
 
     " nnoremap <c-e>i :call setline(".", "inspect.getmembers(".getline('.').")")<cr>
 
@@ -1215,9 +1059,9 @@ build = './install --all'
 repo = 'junegunn/fzf.vim'
 hook_add ='''
     autocmd! FileType fzf nnoremap <buffer> <silent> q :q<cr>
-    let $FZF_DEFAULT_OPTS = '--reverse'
-    let g:fzf_layout = { 
-     \ 'up': '~30%' }
+    " let $FZF_DEFAULT_OPTS = '--reverse'
+    " let g:fzf_layout = { 
+    " \ 'up': '~30%' }
 
     let g:fzf_action = {
         \ 'ctrl-t': 'tab split',
@@ -1232,6 +1076,7 @@ hook_add ='''
     nnoremap <Space>ff :Rgf<cr>
     nnoremap <Space>fh :Files ~/<cr>
     nnoremap <Space>gf :GFiles<cr>
+    nnoremap <Space>bf :OpenBuffers<cr>
     " nnoremap <Space>gss :GFiles?<cr>
     nnoremap <Space>bl :BLines<cr>
     nnoremap <Space>gg :call My_Ggrep()<cr>
@@ -1258,6 +1103,10 @@ hook_add ='''
         call fzf#run(fzf#wrap({'source': 'find -type d', 'up': '30%'}))
     endfu
 
+    command -bang -nargs=0 OpenBuffers
+      \ call fzf#run(fzf#wrap({'source': map(filter(range(1, bufnr('$')), 'buflisted(v:val)'),
+      \   'bufname(v:val)'), 'up': '30%'}))
+
     command! -bang -nargs=0 Repos
       \ call fzf#run(fzf#wrap({'source': 'ghq list -p', 'up': '30%'}))
 
@@ -1282,6 +1131,39 @@ hook_add ='''
     function! My_Ggrep()
         Gcd
         Rg
+    endfunction
+
+    " Reverse the layout to make the FZF list top-down
+    let $FZF_DEFAULT_OPTS='--layout=reverse --preview "bat --color=always --style=header,grid --line-range :100 {}"'
+
+    " Using the custom window creation function
+    let g:fzf_layout = { 'window': 'call FloatingFZF()' }
+
+    " Function to create the custom floating window
+    function! FloatingFZF()
+        " creates a scratch, unlisted, new, empty, unnamed buffer
+        " to be used in the floating window
+        let buf = nvim_create_buf(v:false, v:true)
+
+        " 90% of the height
+        let height = float2nr(&lines * 0.9)
+        " 60% of the height
+        let width = float2nr(&columns * 0.85)
+        " horizontal position (centralized)
+        let horizontal = float2nr((&columns - width) / 2)
+        " vertical position (one line down of the top)
+        let vertical = 1
+
+        let opts = {
+            \ 'relative': 'editor',
+            \ 'row': vertical,
+            \ 'col': horizontal,
+            \ 'width': width,
+            \ 'height': height
+            \ }
+
+        " open the new window, floating, and enter to it
+        call nvim_open_win(buf, v:true, opts)
     endfunction
 '''
 [[plugins]]
@@ -1493,7 +1375,7 @@ hook_add ='''
     endfunction
 
     function! s:nvimgdb_python_settings() abort
-        nnoremap <silent> <c-e><c-d> :call My_GdbStartPDB()<cr>
+        nnoremap <silent> <c-e>d :call My_GdbStartPDB()<cr>
     endfunction
 
     function! My_GdbStartPDB()
@@ -1551,21 +1433,27 @@ hook_add ='''
 [[plugins]]
 repo = 'neoclide/coc.nvim'
 hook_add = '''
+    nnoremap <space>cc :CocConfig<cr>
+    nnoremap <space>cs :CocCommand snippets.editSnippets<cr>
+
+    inoremap <expr> <c-i> coc#refresh()
+
     set hidden
-    " set cmdheight=2
+    set cmdheight=2
     set updatetime=100
     set shortmess+=c
-    set pumblend=10
+
+    nnoremap <silent> <c-j><c-v> :call <sid>coc_operation('vs')<cr>
 
     nmap <silent> <c-j><c-j> <Plug>(coc-definition)
-    " nmap <silent> gy <Plug>(coc-type-definition)
+    nmap <silent> <c-j><c-i> <Plug>(coc-type-definition)
     " nmap <silent> gi <Plug>(coc-implementation)
     nmap <silent> <c-j><c-r> <Plug>(coc-references)
 
 
     nnoremap <silent> <c-j><c-v> :call <sid>coc_operation('vs')<cr>
     nnoremap <silent> <c-j><c-s> :call <sid>coc_operation('split')<cr>
-    nnoremap <silent> <c-j>t :call <sid>coc_operation('tab')<cr>
+    nnoremap <silent> <c-j><c-t> :call <sid>coc_operation('tab')<cr>
 
     nnoremap <c-j><c-k> :call <SID>show_documentation()<cr>
 
@@ -1578,8 +1466,13 @@ hook_add = '''
     endfunction
 
     nnoremap <expr><c-f> coc#util#has_float() ? coc#util#float_scroll(1) : "\<c-f>"
-	nnoremap <expr><c-b> coc#util#has_float() ? coc#util#float_scroll(0) : "\<c-b>"
-	" nnoremap <expr>q coc#util#has_float() ? coc#util#float_hide() : "q"
+    nnoremap <expr><c-b> coc#util#has_float() ? coc#util#float_scroll(0) : "\<c-b>"
+    " nnoremap <expr>q coc#util#has_float() ? coc#util#float_hide() : "q"
+    " inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+    " inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+    " inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+
+    " inoremap <silent><expr> <c-l> pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
     fu! s:coc_operation(operation)
         if a:operation == 'vs'
@@ -1591,5 +1484,40 @@ hook_add = '''
         endif
         call CocActionAsync('jumpDefinition')
     endfu
+
+    function! s:check_back_space() abort
+        let col = col('.') - 1
+        return !col || getline('.')[col - 1]  =~# '\s'
+    endfunction
+
+    inoremap <silent><expr> <tab>
+       \ pumvisible() ? coc#_select_confirm() :
+       \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+       \ <SID>check_back_space() ? "\<TAB>" :
+       \ coc#refresh()
+
+    " Use <C-l> for trigger snippet expand.
+    " imap <tab> <Plug>(coc-snippets-expand)
+
+    " Use <C-j> for select text for visual placeholder of snippet.
+    " vmap <tab> <Plug>(coc-snippets-select)
+
+    let g:coc_snippet_next = '<tab>'
+    let g:coc_snippet_prev = '<S-tab>'
+
+    " Use <C-j> for both expand and jump (make expand higher priority.)
+    " imap <C-j> <Plug>(coc-snippets-expand-jump)
 '''
 
+[[plugins]]
+repo = 'voldikss/vim-floaterm'
+hook_add = '''
+    let g:floaterm_position='center'
+    let g:floaterm_keymap_toggle='ttf'
+    let g:floaterm_background='#1d2815'
+'''
+
+[[plugins]]
+repo = 'flrnd/candid.vim'
+hook_add = '''
+'''
