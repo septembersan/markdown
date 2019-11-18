@@ -1,0 +1,94 @@
+# A valid snippet should starts with:
+#
+#		snippet trigger_word [ "description" [ options ] ]
+#
+# and end with:
+#
+#		endsnippet
+#
+# Snippet options:
+#
+#		b - Beginning of line.
+#		i - In-word expansion.
+#		w - Word boundary.
+#		r - Regular expression
+#		e - Custom context snippet
+#		A - Snippet will be triggered automatically, when condition matches.
+#
+# Basic example:
+#
+#		snippet emitter "emitter properties" b
+#		private readonly ${1} = new Emitter<$2>()
+#		public readonly ${1/^_(.*)/$1/}: Event<$2> = this.$1.event
+#		endsnippet
+#
+# Online reference: https://github.com/SirVer/ultisnips/blob/master/doc/UltiSnips.txt
+snippet torch "pytorch import set..."
+from textwrap import dedent
+
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+import torchvision
+import torchvision.transforms as transforms
+from torch.utils.data.dataloader import DataLoader
+from tqdm import tqdm
+
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+endsnippet
+
+snippet Image "PIL import set..."
+from PIL import Image
+
+with open(img_path, 'rb') as f:
+	img = Image.open(f)
+	img = img.convert('RGB')
+endsnippet
+
+snippet cv2 "OpenCV import set..."
+import cv2
+endsnippet
+
+snippet sklearn "sklearn import set..."
+import numpy as np
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.datasets import load_iris, make_classification
+from sklearn.datasets import (load_boston, make_regression)
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+endsnippet
+
+snippet kyou "sklearn import set..."
+endsnippet
+
+snippet ndoc "numpy style docstring..."
+'''
+${1:Extended description of function.}
+
+Parameters
+----------
+${2:arg1} : ${3:type}
+    ${4:Description}
+
+Returns
+-------
+${5:type}
+    ${6:Description}
+'''
+endsnippet
+
+snippet cvshow "show image with using opencv"
+import cv2
+import numpy as np
+
+img = np.zeros(128 * 128).reshape(128, 128)
+
+cv2.imshow('test', img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+endsnippet
