@@ -20,6 +20,7 @@ nnoremap k gk
 nnoremap v <c-v>
 vnoremap / <esc>/\%V
 nnoremap <c-b> <c-^>
+nnoremap n nzz
 " setting search"{{{
 nnoremap * *Nzz
 set hlsearch
@@ -271,3 +272,4 @@ augroup END
 function My_xml_format()
     nnoremap <c-a><c-f> :%s/></>\r</g\|filetype indent on\|setf xml\|normal gg=G<cr>
 endfunction
+hi CocCursorRange guibg=#b16286 guifg=#ebdbb2

@@ -641,33 +641,33 @@ hook_add ='''
     " Usage: 3-way diff :Gstatus -> D -> :diffget //2 |diffup -> :diffget //3 |diffup -> ]c -> :only
     " Usage: recent master diff :Git fetch -> :Gvdiff -> origin/master
     " nnoremap <silent> <Space>vb :Gblame<cr>
-    autocmd FileType fugitive nnoremap <silent> <buffer> <c-c> :q<cr>
+    augroup nvim_fugitive_end
+        autocmd!
+        autocmd FileType fugitive nnoremap <silent> <buffer> <c-t> :exec "norm O"<cr>
+        autocmd FileType fugitive nnoremap <buffer> <c-l> :call My_Open_Fugitive()<cr>
+        autocmd FileType fugitive nnoremap <silent> <buffer> dd :call My_New_Gvsplit_Tab()<cr>
+        autocmd FileType fugitive nnoremap <silent> <buffer> <c-c> :q<cr>
+    augroup END
+
+    function! My_Open_Fugitive()
+        exec "norm \<cr>"
+    endfunction
+
+    function! My_New_Gvsplit_Tab()
+        exec "norm O"
+        :Gdiff
+    endfunction
+
     nnoremap <silent> <Space>gd :Gdiff<cr>
-    nnoremap <silent> <Space>gb  :Gbranch<cr>
-    " nnoremap <silent> <Space>vl :Glog<cr>
-    " nnoremap <silent> <Space>gr :Gread<cr>
+    nnoremap <silent> gb  :Gbranch<cr>
     nnoremap <Space>ge :Gvdiff :%<left><left>
     nnoremap <Space>gp :Gpull
-    nnoremap <Space>gss :Gstatus<cr>
-    " nnoremap <Space>gg :call My_Ggrep()<cr>
-    " nnoremap <Space>gj :call My_Cursor_Under_Ggrep()<cr>
+    nnoremap gss :Gstatus<cr>
     nnoremap <Space>gco :Gcommit -m ""<left>
     nnoremap <Space>gca :Gcommit -amend<cr>
-    " nnoremap <Space>gr :Gvsplit :<left><left>
     nnoremap gst :Git stash save ""<left>
-    nnoremap <silent> gss :Git stash list<cr>
+    " nnoremap <silent> gss :Git stash list<cr>
     nnoremap gsa :Git stash apply stash@{}<left>
-    " function! My_Cursor_Under_Ggrep()
-    "     :Gcd
-    "     call feedkeys("yiw")
-    "     call feedkeys(",ug")
-    "     call feedkeys("\<Space>p")
-    "     call feedkeys("\<cr>")
-    " endfunction
-    " function! My_Ggrep()
-    "     :Gcd
-    "     call feedkeys(",ug")
-    " endfunction
 '''
 
 [[plugins]]
@@ -681,8 +681,6 @@ hook_add ='''
     " Usage: branch switch -> giti/branch new -> switch(`git branch -b`)
     nnoremap <silent> <Space>gl  :Gitv<CR>
     nnoremap <silent> <Space>gL  :Gitv!<CR>
-    nnoremap <silent> <Space>gsu  :<C-u>Unite giti/status<CR>
-    " nnoremap <silent> <Space>gg  :<C-u>Unite giti/grep<CR>
 '''
 
 [[plugins]]
@@ -925,7 +923,6 @@ hook_add ='''
     nnoremap <Space>fh :Files ~/<cr>
     nnoremap <space>gf :GFiles<cr>
     nnoremap <space>bf :OpenBuffers<cr>
-    " nnoremap <Space>gss :GFiles?<cr>
     nnoremap <Space>bl :BLines<cr>
     nnoremap <Space>gg :call My_Ggrep()<cr>
     nnoremap <Space>o :History<cr>
@@ -1029,7 +1026,7 @@ hook_add ='''
       \ 'sink': function('s:changebranch')}))
 
     " Reverse the layout to make the FZF list top-down
-    let $FZF_DEFAULT_OPTS='--layout=reverse --preview "bat --color=always --style=header,grid --line-range :100 {}"'
+    let $FZF_DEFAULT_OPTS='--exact --layout=reverse --preview "bat --color=always --style=header,grid --line-range :100 {}"'
 
     " Using the custom window creation function
     let g:fzf_layout = { 'window': 'call FloatingFZF()' }
@@ -1355,7 +1352,7 @@ hook_add = '''
     nmap <silent> <c-j><c-r> <Plug>(coc-references)
     nmap <silent> <space>cr <Plug>(coc-rename)
     " nmap <silent> <c-a><c-f> <Plug>(coc-format)
-
+    
     nnoremap <silent> <c-j><c-v> :call <sid>coc_operation('vs')<cr>
     nnoremap <silent> <c-j><c-s> :call <sid>coc_operation('split')<cr>
     nnoremap <silent> <c-j><c-t> :call <sid>coc_operation('tab')<cr>
@@ -1419,7 +1416,7 @@ hook_add = '''
 repo = 'voldikss/vim-floaterm'
 hook_add = '''
     let g:floaterm_position='center'
-    " let g:floaterm_keymap_toggle='ttf'
+    let g:floaterm_keymap_toggle='ttf'
     let g:floaterm_background='#1d2815'
 '''
 
@@ -1538,3 +1535,11 @@ repo = 'roxma/nvim-yarp'
 [[plugins]]
 repo = 'roxma/vim-hug-neovim-rpc'
 
+[[plugins]]
+repo = 'voldikss/vim-translator'
+hook_add = '''
+    let g:translator_target_lang = 'ja'
+    let g:translator_default_engines = ['google']
+    nmap <silent> tl <Plug>TranslateW
+    vmap <silent> tl <Plug>TranslateWV
+'''
