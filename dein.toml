@@ -556,12 +556,6 @@ repo = 'aliev/vim-compiler-python'
 [[plugins]]
 repo = 'neovim/python-client'
 
-# [[plugins]]
-# repo = 'jsfaint/gen_tags.vim'
-# hook_add = '''
-#     let g:gen_tags#gtags_auto_gen = 1
-# '''
-
 [[plugins]]
 repo = 'tyru/caw.vim.git'
 hook_add ='''
@@ -920,7 +914,7 @@ hook_add ='''
     autocmd! FileType fzf nnoremap <buffer> <silent> q :q<cr>
     " let $FZF_DEFAULT_OPTS = '--reverse'
     " let g:fzf_layout = {
-    " \ 'up': '~30%' }
+    "\ 'up': '~30%' }
 
     let g:fzf_action = {
         \ 'ctrl-t': 'tab drop',
@@ -951,6 +945,7 @@ hook_add ='''
     nnoremap <Space>vr :call RgInVimPlug()<cr>
     nnoremap <Space>vf :Files ~/.cache/dein/repos/github.com<cr>
     nnoremap <Space>mm :Marks<cr>
+    nnoremap ta :Tabs<cr>
 
     command! -bang -nargs=? Directorys
       "\ call fzf#run(fzf#wrap({'source': 'find -type d', 'up': '30%'}))
@@ -994,6 +989,9 @@ hook_add ='''
       \   'rg --line-number --no-heading '.shellescape(<q-args>), 0,
       \   fzf#vim#with_preview({'options': '--exact --reverse'}, 'right:50%:wrap'))
 
+    command! -bang -nargs=0 Tabs
+      \ call fzf#run(fzf#wrap({'source': s:GetTabList(), 'up': '30%'}))
+
     function! My_Cursor_Under_Ggrep()
         Gcd
         call fzf#vim#grep(
@@ -1004,6 +1002,19 @@ hook_add ='''
     function! My_Ggrep()
         Gcd
         Rg
+    endfunction
+
+    function! s:GetTabList()
+        let s:tabList = execute('tabs')
+        let s:textList = []
+        for tabText in split(s:tabList, '\n')
+            let s:tabPageText = matchstr(tabText, '^タブページ')
+            if empty(s:tabPageText)
+                let s:text = matchstr(tabText, '[^> +].*')
+                let s:textList = add(s:textList, printf('%s', s:text))
+            endif
+        endfor
+        return s:textList
     endfunction
 
     " Reverse the layout to make the FZF list top-down
@@ -1389,7 +1400,7 @@ hook_add = '''
 
     " Use <C-j> for both expand and jump (make expand higher priority.)
     " imap <C-j> <Plug>(coc-snippets-expand-jump)
-    let g:coc_global_extensions = ['coc-yank', 'coc-lists', 'coc-calc', 'coc-cmake', 'coc-floaterm', 'coc-highlight', 'coc-markdownlint', 'coc-todolist']
+    let g:coc_global_extensions = ['coc-python', 'coc-tsserver', 'coc-yank', 'coc-lists', 'coc-calc', 'coc-cmake', 'coc-floaterm', 'coc-highlight', 'coc-markdownlint', 'coc-todolist']
 '''
 
 [[plugins]]
@@ -1413,20 +1424,20 @@ hook_add = '''
 #     nnoremap <silent> <space>t :<c-u>Vista finder coc<cr>
 # '''
 
-[[plugins]]
-repo = 'kiteco/vim-plugin'
-hook_add = '''
-    " Attention: $HOME/.config/nvim/pack/kite/start/vim-plugin
-    let g:kite_auto_complete=1
-    let g:kite_snippets=1
-    let g:kite_tab_complete=1
- 
-    let g:kite_previous_placeholder = '<c-p>'
-    let g:kite_next_placeholder = '<c-n>'
-    nmap <silent> <buffer> <c-j><c-k> <Plug>(kite-docs)
-    " nmap <silent> <buffer> <c-j><c-k> <Plug>(kite-hover)
-    " let g:kite_documentation_continual=1
-'''
+# [[plugins]]
+# repo = 'kiteco/vim-plugin'
+# hook_add = '''
+#     " Attention: $HOME/.config/nvim/pack/kite/start/vim-plugin
+#     let g:kite_auto_complete=1
+#     let g:kite_snippets=1
+#     let g:kite_tab_complete=1
+# 
+#     let g:kite_previous_placeholder = '<c-p>'
+#     let g:kite_next_placeholder = '<c-n>'
+#     nmap <silent> <buffer> <c-j><c-k> <Plug>(kite-docs)
+#     " nmap <silent> <buffer> <c-j><c-k> <Plug>(kite-hover)
+#     " let g:kite_documentation_continual=1
+# '''
 
 [[plugins]]
 repo = 'neomake/neomake'
