@@ -1009,6 +1009,13 @@ hook_add ='''
         let s:textList = []
         for tabText in split(s:tabList, '\n')
             let s:tabPageText = matchstr(tabText, '^タブページ')
+            if !empty(s:tabPageText)
+                continue
+            endif
+            let s:tabPageText = matchstr(tabText, '^Tab page')
+            if !empty(s:tabPageText)
+                continue
+            endif
             if empty(s:tabPageText)
                 let s:text = matchstr(tabText, '[^> +].*')
                 let s:textList = add(s:textList, printf('%s', s:text))
