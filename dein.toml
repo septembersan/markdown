@@ -1029,7 +1029,7 @@ hook_add ='''
       \ 'sink': function('s:changebranch')}))
 
     " Reverse the layout to make the FZF list top-down
-    let $FZF_DEFAULT_OPTS='--layout=reverse --preview "bat --color=always --style=header,grid --line-range :100 {}"'
+    let $FZF_DEFAULT_OPTS='--exact --layout=reverse --preview "bat --color=always --style=header,grid --line-range :100 {}"'
 
     " Using the custom window creation function
     let g:fzf_layout = { 'window': 'call FloatingFZF()' }

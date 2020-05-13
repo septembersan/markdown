@@ -20,6 +20,7 @@ nnoremap k gk
 nnoremap v <c-v>
 vnoremap / <esc>/\%V
 nnoremap <c-b> <c-^>
+nnoremap n nzz
 " setting search"{{{
 nnoremap * *Nzz
 set hlsearch
