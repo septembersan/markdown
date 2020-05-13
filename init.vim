@@ -56,7 +56,6 @@ set wildmode=longest:full,full
 syntax enable
 set background=dark
 set t_Co=256
-set nobackup
 set autoindent
 set nu
 
@@ -84,11 +83,6 @@ cnoremap <C-e> <End>
 cnoremap <C-n> <Down>
 cnoremap <C-p> <Up>
 cnoremap <Space>; <C-r>0
-"}}}
-" setting gui font"{{{
-if has('win64')
-	set guifont=Myrica\ M:h11
-endif
 "}}}
 set iminsert=0
 " setting specific word"{{{
@@ -194,45 +188,15 @@ syntax on
 "}}}
 let g:python_host_prog = substitute(system('which python'), "\n", "", "")
 let g:python3_host_prog = substitute(system('which python3'), "\n", "", "")
-" settings deoplete{{{
-set completeopt=menuone
-"}}}
-" setting jedi{{{
-" let g:jedi#completions_command = "<C-Space>"
-" let g:jedi#rename_command = "[jedi]r"
-" let g:jedi#popup_select_first = 0
-" let g:jedi#popup_on_dot = 0
-" let g:jedi#show_call_signatures = 1
-" let g:jedi#show_call_signatures_delay = 10
-"
-" nnoremap <C-g> :call jedi#goto_assignments()<CR>
-" nnoremap <C-k> :call jedi#show_documentation()<CR>
-" nnoremap <C-u> :call jedi#usages()<CR>
-" nnoremap <C-j> :call jedi#goto_definitions()<CR>
-"}}}
-" nnoremap <F6> :call Exec_gtags()<cr>
-" function! Exec_gtags()
-"     :ClearGTAGS
-"     :GenGTAGS
-" endfunction
 " settings quickfix{{{
 nnoremap <Space>p :cp<cr>
 nnoremap <Space>n :cn<cr>
 " tnoremap <silent> mm <c-\><c-n><c-w>p
 " tnoremap <silent> tm <c-\><c-n>
 "}}}
-" settings dev env{{{
-nnoremap <silent> <F9> :call Display_DevEnv_Toggle()<cr>
-function! Display_DevEnv_Toggle()
-    :Ttoggle
-    :NERDTreeToggle
-    :TagbarToggle
-endfunction
-"}}}
 " setting range search{{{
 vnoremap <silent> <Space>/ <ESC>/\%V
 "}}}
-autocmd BufNewFile *.py 0r $HOME/.config/nvim/template/python/aapf_dev.py
 " settings terminal mode {{{
 " change cursol shape in terminal mode
 if has('vim_starting')
@@ -298,7 +262,6 @@ nnoremap tbv :vsplit enew<cr>
 " autocmd BufWritePost ~/.config/nvim/dein.toml execute UpdateRemotePlugins
 set clipboard=unnamed
 nnoremap ss :%s/ *$//g<cr>
-" xnoremap SWP :!rm -f ~/.local/share/nvim/swap/*
 let &colorcolumn=join(range(90,999),",")
 hi ColorColumn ctermbg=235 guibg=#2c2d27 
 

@@ -187,7 +187,7 @@ fun! s:run_script(run_target) abort
         elseif a:run_target == 'inspection'
             call splitterm#jobsend_id(s:ipython[tabpagenr()].info, "inspect.getmembers(".getline('.').")")
         elseif a:run_target == 'clear'
-            call splitterm#jobsend_id(s:ipython[tabpagenr()].info, "clear")
+            call splitterm#jobsend_id(s:ipython[tabpagenr()].info, 'clear')
         elseif a:run_target == 'debug'
             " into debug mode if debug mode off
             if g:ipython_is_debug == 0

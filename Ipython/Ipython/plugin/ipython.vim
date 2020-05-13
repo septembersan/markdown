@@ -18,6 +18,6 @@ endif
 command! IpythonLine call ipython#run('line')
 command! IpythonInspection call ipython#run('inspection')
 command! IpythonRun call ipython#run('file')
+command! IpythonClear call ipython#run('clear')
 command! -range VIpython call ipython#run_visual()
 command! IpythonDebug call ipython#run('debug')
-command! IpythonClear call ipython#run('clear')

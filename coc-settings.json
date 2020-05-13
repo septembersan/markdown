@@ -1,32 +1,19 @@
 {
     "suggest.noselect": false,
-    "suggest.autoTrigger": "trigger",
+    "suggest.autoTrigger": "always",
     "suggest.triggerAfterInsertEnter": true,
-    "suggest.acceptSuggestionOnCommitCaracter": true,
     "diagnostic.enable": false,
-    "python.linting.enabled": true,
     "python.jediEnabled": false,
-    "snippets.ultisnips.enable": true,
-    "snippets.ultisnips.directories": [
-        "UltiSnips"
-    ],
-    "languageserver": {
-        "python": {
-            "command": "python",
-            "args": [
-                "-mpyls"
-            ],
-            "filetypes": [
-              "python"
-            ],
-            "settings": {
-                "pyls": {
-                    "enable": true,
-                    "trace": {
-                      "server": "verbose"
-                    }
-                }
-            }
-        }
+    "python.linting.enabled": true,
+    "python.analysis.diagnosticEnabled": true,
+    "python.formatting.provider": "autopep8",
+    "list.insertMappings": {
+        "<c-r>": "do:refresh",
+        "<c-c>": "do:exit",
+        "<c-n>": "normal:j",
+        "<c-p>": "normal:k",
+        "<c-t>": "action:tabe",
+        "<c-x>": "call:MyFunc",
+        "<c-v>": "eval:@@"
     }
 }
