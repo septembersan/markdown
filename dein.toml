@@ -251,17 +251,6 @@ repo = 'pebble8888/doxygen_comment_creator'
 hook_add ='''
 '''
 
-# [[plugins]]
-# repo = 'vim-scripts/gtags.vim'
-# hook_add ='''
-# '''
-
-[[plugins]]
-repo = 'vim-scripts/DoxygenToolkit.vim'
-hook_add ='''
-    noremap ,d :Dox<CR>
-'''
-
 [[plugins]]
 repo = 'fuenor/qfixgrep'
 hook_add ='''
@@ -477,14 +466,6 @@ hook_add ='''
 #     "   \ 'python': '[^. *\t]\.\w*',
 #     "   \}
 # '''
-
-# [[plugins]]
-# repo = 'prabirshrestha/vim-lsp'
-# hook_add = '''
-# '''
-
-[[plugins]]
-repo = 'iyuuya/denite-ale'
 
 [[plugins]]
 repo = 'w0rp/ale'
@@ -1347,6 +1328,9 @@ hook_add = '''
 
     set signcolumn=yes
 
+    " au CursorHold * sil call CocActionAsync('highlight')
+    " au CursorHoldI * sil call CocActionAsync('showSignatureHelp')
+
     nmap <silent> <c-j><c-j> <Plug>(coc-definition)
     nmap <silent> <c-j><c-i> <Plug>(coc-type-definition)
     " nmap <silent> gi <Plug>(coc-implementation)
@@ -1541,6 +1525,59 @@ repo = 'voldikss/vim-translator'
 hook_add = '''
     let g:translator_target_lang = 'ja'
     let g:translator_default_engines = ['google']
-    nmap <silent> tl <Plug>TranslateW
-    vmap <silent> tl <Plug>TranslateWV
+    nmap <silent> <space>tl <Plug>TranslateW
+    vmap <silent> <space>tl <Plug>TranslateWV
+    nmap <silent> <space>tr <Plug>TranslateR
+    vmap <silent> <space>tr <Plug>TranslateRV
 '''
+
+[[plugins]]
+repo = 'octol/vim-cpp-enhanced-highlight'
+hook_add = '''
+    let g:cpp_class_scope_highlight = 1
+    let g:cpp_member_variable_highlight = 1
+    let g:cpp_class_decl_highlight = 1
+    let g:cpp_posix_standard = 1
+    let g:cpp_experimental_simple_template_highlight = 1
+    let g:cpp_experimental_template_highlight = 1
+    " let g:cpp_concepts_highlight = 1
+    " let g:cpp_no_function_highlight = 1
+'''
+
+# [[plugins]]
+# repo = 'pechorin/any-jump.vim'
+# hook_add = '''
+#     " Normal mode: Jump to definition under cursore
+#     nnoremap <c-j><c-j> :call My_toDefinition("o")<cr>
+#     nnoremap <c-j><c-v> :call My_toDefinition("v")<cr>
+#     nnoremap <c-j><c-s> :call My_toDefinition("s")<cr>
+#     nnoremap <c-j><c-t> :call My_toDefinition("t")<cr>
+#     nnoremap <c-j><c-f> :AnyJump<cr>
+#
+#     " Visual mode: jump to selected text in visual mode
+#     xnoremap <c-j><c-j> :AnyJumpVisual<cr>
+#
+#     " Normal mode: open previous opened file (after jump)
+#     nnoremap <c-j><c-o> :AnyJumpBack<cr>
+#
+#     " Normal mode: open last closed search window again
+#     nnoremap <c-j><c-m> :AnyJumpLastResults<cr>
+#
+#     function! My_toDefinition(operation)
+#         AnyJump
+#         if a:operation == "o" 
+#             exec "norm o"
+#         elseif a:operation == "v"
+#             exec "norm v"
+#         elseif a:operation == "s"
+#             exec "norm s"
+#         elseif a:operation == "t"
+#             exec "norm t"
+#         endif
+#     endfunction
+# '''
+
+# [[plugins]]
+# repo = 'khzaw/vim-conceal'
+# hook_add = '''
+# '''
