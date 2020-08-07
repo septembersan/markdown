@@ -273,3 +273,12 @@ function My_xml_format()
     nnoremap <c-a><c-f> :%s/></>\r</g\|filetype indent on\|setf xml\|normal gg=G<cr>
 endfunction
 hi CocCursorRange guibg=#b16286 guifg=#ebdbb2
+" setting goto last tab{{{
+if !exists('g:lasttab')                      
+  let g:lasttab = 1                          
+endif                                        
+nnoremap <c-m> :exe "tabn ".g:lasttab<cr>    
+augroup nvim_goto_last_tab                   
+    au TabLeave * let g:lasttab = tabpagenr()
+augroup END                                  
+"}}}

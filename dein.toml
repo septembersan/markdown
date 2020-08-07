@@ -2,6 +2,7 @@
 # @reload:call dein#recache_runtimepath()
 # @lazy  :lazy = 1
 # pip install notedown
+# apt install bat
 
 [[plugins]]
 repo = 't9md/vim-quickhl'
@@ -504,7 +505,7 @@ hook_add = '''
                 \   'JSON': ['jq']
                 \}
     let g:ale_fixers = {
-    \ 'python': ['black', 'isort'],
+    \ 'python': ['black'],
     \ 'markdown': [
     \   {buffer, lines -> {'command': 'textlint -c ~/.config/textlintrc -o /dev/null --fix --no-color --quiet %t', 'read_temporary_file': 1}}
     \   ],
@@ -645,7 +646,7 @@ hook_add ='''
         autocmd!
         autocmd FileType fugitive nnoremap <silent> <buffer> <c-t> :exec "norm O"<cr>
         autocmd FileType fugitive nnoremap <buffer> <c-l> :call My_Open_Fugitive()<cr>
-        autocmd FileType fugitive nnoremap <silent> <buffer> dd :call My_New_Gvsplit_Tab()<cr>
+        autocmd FileType fugitive nnoremap <silent> <buffer> D :call My_New_Gvsplit_Tab()<cr>
         autocmd FileType fugitive nnoremap <silent> <buffer> <c-c> :q<cr>
     augroup END
 
@@ -661,7 +662,7 @@ hook_add ='''
     nnoremap <silent> <Space>gd :Gdiff<cr>
     nnoremap <silent> gb  :Gbranch<cr>
     nnoremap <Space>ge :Gvdiff :%<left><left>
-    nnoremap <Space>gp :Gpull
+    " nnoremap <Space>gp :Gpull
     nnoremap gss :Gstatus<cr>
     nnoremap <Space>gco :Gcommit -m ""<left>
     nnoremap <Space>gca :Gcommit -amend<cr>
@@ -703,9 +704,9 @@ hook_add ='''
     nnoremap <Space>gi :GitGutterLineHighlightsToggle<cr>
     nmap ]g <Plug>(GitGutterNextHunk)
     nmap [g <Plug>(GitGutterPrevHunk)
-    nmap <Space>gia <Plug>(GitGutterStageHunk)
-    nmap <Space>giu <Plug>(GitGutterUndoHunk)
-    nmap <Space>gip <Plug>(GitGutterPreviewHunk)
+    nmap <space>gs <Plug>(GitGutterStageHunk)
+    nmap <space>gu <Plug>(GitGutterUndoHunk)
+    nmap <space>gp <Plug>(GitGutterPreviewHunk)
 
     autocmd FileType git call s:gitv_my_settings()
     function! s:gitv_my_settings()
@@ -1291,16 +1292,16 @@ hook_add ='''
     endfunction
 '''
 
-[[plugins]]
-repo = 'yuttie/comfortable-motion.vim'
-hook_add ='''
-    let g:comfortable_motion_no_default_key_mappings = 1
-    nnoremap <silent> <C-d> :call comfortable_motion#flick(100)<cr>
-    nnoremap <silent> <C-u> :call comfortable_motion#flick(-100)<cr>
-
-    nnoremap <silent> <C-f> :call comfortable_motion#flick(200)<cr>
-    " nnoremap <silent> <C-b> :call comfortable_motion#flick(-200)<cr>
-'''
+# [[plugins]]
+# repo = 'yuttie/comfortable-motion.vim'
+# hook_add ='''
+#     let g:comfortable_motion_no_default_key_mappings = 1
+#     nnoremap <silent> <C-d> :call comfortable_motion#flick(100)<cr>
+#     nnoremap <silent> <C-u> :call comfortable_motion#flick(-100)<cr>
+#
+#     nnoremap <silent> <C-f> :call comfortable_motion#flick(200)<cr>
+#     nnoremap <silent> <C-b> :call comfortable_motion#flick(-200)<cr>
+# '''
 
 [[plugins]]
 repo = 'justinmk/vim-sneak'
