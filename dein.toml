@@ -17,7 +17,7 @@ repo = 'vim-airline/vim-airline'
 [[plugins]]
 repo = 'vim-airline/vim-airline-themes'
 hook_add ='''
-    set laststatus=2
+    set laststatus=1
     let g:airline_powerline_fonts = 1
     let g:airline#extensions#whitespace#mixed_indent_algo = 1
     let g:airline#extensions#tabline#buffer_idx_mode = 1
@@ -25,8 +25,9 @@ hook_add ='''
     let g:airline#extensions#ale#error_symbol = 'E:'
     let g:airline#extensions#ale#warning_symbol = 'W:'
     " let g:airline_theme = 'dracula'
+    let g:airline_theme = 'jellybeans'
     " let g:airline_theme = 'iceberg'
-    let g:airline_theme = 'tomorrow'
+    " let g:airline_theme = 'tomorrow'
     " let g:airline_theme = 'breezy'
     let g:airline#extensions#tabline#enabled = 1
     let g:airline#extensions#tabline#show_buffers = 0
@@ -263,17 +264,6 @@ hook_add ='''
 '''
 
 [[plugins]]
-repo = 'fuenor/qfixgrep'
-hook_add ='''
-'''
-
-[[plugins]]
-repo = 'vim-scripts/DoxygenToolkit.vim'
-hook_add ='''
-    noremap ,d :Dox<CR>
-'''
-
-[[plugins]]
 repo = 'kana/vim-operator-user'
 hook_add ='''
 '''
@@ -483,43 +473,43 @@ hook_add ='''
 # hook_add = '''
 # '''
 
-[[plugins]]
-repo = 'iyuuya/denite-ale'
+# [[plugins]]
+# repo = 'iyuuya/denite-ale'
 
-[[plugins]]
-repo = 'w0rp/ale'
-build = 'pip install flake8 flake8-import-order autopep8 black flake8-isort'
-hook_add = '''
-    " Installation: pip install flake8 flake8-import-order autopep8 black isort
-    let g:ale_enabled = 0
-    let g:ale_sign_error = '>>'
-    let g:ale_sign_warning = '??'
-    " let g:ale_lint_on_save = 1
-    let g:ale_lint_on_text_changed = 0
-    let g:ale_statusline_format = ['x %d', '? %d', 'o ok']
-    let g:ale_linters = {
-                \   'python': ['flake8'],
-                "\   'markdown': ['alex'],
-                \   'markdown': ['textlint'],
-                \   'javascript': ['eslint'],
-                \   'JSON': ['jq']
-                \}
-    let g:ale_fixers = {
-    \ 'python': ['black'],
-    \ 'markdown': [
-    \   {buffer, lines -> {'command': 'textlint -c ~/.config/textlintrc -o /dev/null --fix --no-color --quiet %t', 'read_temporary_file': 1}}
-    \   ],
-    \ }
-
-    nmap [ale] <Nop>
-    map <c-a> [ale]
-    nmap <silent> [a <Plug>(ale_previous)
-    nmap <silent> ]a <Plug>(ale_next)
-    nmap <silent> [ale]<c-f> <Plug>(ale_fix)
-
-    highlight clear ALEErrorSign
-    highlight clear ALEWarningSign
-'''
+# [[plugins]]
+# repo = 'w0rp/ale'
+# build = 'pip install flake8 flake8-import-order autopep8 black flake8-isort'
+# hook_add = '''
+#     " Installation: pip install flake8 flake8-import-order autopep8 black isort
+#     let g:ale_enabled = 0
+#     let g:ale_sign_error = '>>'
+#     let g:ale_sign_warning = '??'
+#     " let g:ale_lint_on_save = 1
+#     let g:ale_lint_on_text_changed = 0
+#     let g:ale_statusline_format = ['x %d', '? %d', 'o ok']
+#     let g:ale_linters = {
+#                \   'python': ['flake8'],
+#                 "\   'markdown': ['alex'],
+#                \   'markdown': ['textlint'],
+#                \   'javascript': ['eslint'],
+#                \   'JSON': ['jq']
+#                \}
+#     let g:ale_fixers = {
+#    \ 'python': ['black'],
+#    \ 'markdown': [
+#    \   {buffer, lines -> {'command': 'textlint -c ~/.config/textlintrc -o /dev/null --fix --no-color --quiet %t', 'read_temporary_file': 1}}
+#    \   ],
+#    \ }
+#
+#     nmap [ale] <Nop>
+#     map <c-a> [ale]
+#     nmap <silent> [a <Plug>(ale_previous)
+#     nmap <silent> ]a <Plug>(ale_next)
+#     nmap <silent> [ale]<c-f> <Plug>(ale_fix)
+#
+#     highlight clear ALEErrorSign
+#     highlight clear ALEWarningSign
+# '''
 
 [[plugins]]
 repo = 'tpope/vim-dispatch'
@@ -529,6 +519,7 @@ repo = 'janko-m/vim-test'
 depends = ['vim-dispatch']
 hook_add = '''
     let g:test#strategy = 'dispatch'
+    let test#python#runner = 'pytest'
 '''
 
 [[plugins]]
@@ -659,7 +650,9 @@ hook_add ='''
         :Gdiff
     endfunction
 
-    nnoremap <silent> <Space>gd :Gdiff<cr>
+    nnoremap <silent> gdd :Gdiff<cr>
+    " nnoremap gdb :Git difftool --name-status 
+    nnoremap gdb :Git difftool -y 
     nnoremap <silent> gb  :Gbranch<cr>
     nnoremap <Space>ge :Gvdiff :%<left><left>
     " nnoremap <Space>gp :Gpull
@@ -834,7 +827,7 @@ hook_add ='''
 [[plugins]]
 repo = 'dhruvasagar/vim-table-mode'
 hook_add ='''
-    nnoremap <c-t> :TableModeToggle<cr>
+    " nnoremap <c-t> :TableModeToggle<cr>
     let g:table_mode_corner='|'
 '''
 
@@ -850,10 +843,10 @@ hook_add ='''
     let g:tigris#delay = 300
 '''
 
-[[plugins]]
-repo = 'ryanoasis/vim-devicons'
-hook_add ='''
-'''
+# [[plugins]]
+# repo = 'ryanoasis/vim-devicons'
+# hook_add ='''
+# '''
 
 [[plugins]]
 repo = 'szkny/SplitTerm'
@@ -865,6 +858,7 @@ repo = 'szkny/Ipython'
 on_ft = 'python'
 hook_add ='''
     nnoremap  <silent> <c-e><c-e> :IpythonLine<CR>
+    nnoremap  <silent> <c-e><c-k> :IpythonCword<CR>
     nnoremap  <silent> <c-e><c-f> :IpythonRun<CR>
     vnoremap  <silent> <c-e><c-e> :VIpython<CR>
     nnoremap  <silent> <c-e><c-u> :VIpython<CR>
@@ -923,6 +917,7 @@ hook_add ='''
     nnoremap <Space>ff :Rgf<cr>
     nnoremap <Space>fh :Files ~/<cr>
     nnoremap <space>gf :GFiles<cr>
+    nnoremap <space>fl :Locate 
     nnoremap <space>bf :OpenBuffers<cr>
     nnoremap <Space>bl :BLines<cr>
     nnoremap <Space>gg :call My_Ggrep()<cr>
@@ -1060,19 +1055,19 @@ hook_add ='''
     endfunction
 '''
 
-[[plugins]]
-repo = 'skanehira/translate.vim'
-hook_add = '''
-    " Reqiurement: installed go lang
-    " $ git clone https://github.com/skanehira/gtran.git
-    " $ cd gtran
-    " export GOPATH=$HOME/.go
-    " export GOBIN=$GOPATH/bin
-    " $ go install
-    let g:translate_source = "en"
-    let g:translate_target = "ja"
-    let g:translate_winsize = 10
-'''
+# [[plugins]]
+# repo = 'skanehira/translate.vim'
+# hook_add = '''
+#     " Reqiurement: installed go lang
+#     " $ git clone https://github.com/skanehira/gtran.git
+#     " $ cd gtran
+#     " export GOPATH=$HOME/.go
+#     " export GOBIN=$GOPATH/bin
+#     " $ go install
+#     let g:translate_source = "en"
+#     let g:translate_target = "ja"
+#     let g:translate_winsize = 10
+# '''
 
 
 [[plugins]]
@@ -1353,7 +1348,7 @@ hook_add = '''
     nmap <silent> <c-j><c-r> <Plug>(coc-references)
     nmap <silent> <space>cr <Plug>(coc-rename)
     " nmap <silent> <c-a><c-f> <Plug>(coc-format)
-    
+
     nnoremap <silent> <c-j><c-v> :call <sid>coc_operation('vs')<cr>
     nnoremap <silent> <c-j><c-s> :call <sid>coc_operation('split')<cr>
     nnoremap <silent> <c-j><c-t> :call <sid>coc_operation('tab')<cr>
@@ -1393,10 +1388,10 @@ hook_add = '''
     endfunction
 
     inoremap <silent><expr> <tab>
-       \ pumvisible() ? coc#_select_confirm() :
-       \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-       \ <SID>check_back_space() ? "\<TAB>" :
-       \ coc#refresh()
+      \ pumvisible() ? coc#_select_confirm() :
+      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
 
     " Use <C-l> for trigger snippet expand.
     " imap <tab> <Plug>(coc-snippets-expand)
@@ -1452,7 +1447,7 @@ hook_add = '''
 repo = 'Shougo/defx.nvim'
 depends = ['nvim-yarp', 'vim-hug-neovim-rpc']
 hook_add = '''
-    nnoremap <silent> <Space>e :Defx -split=vertical -toggle -winwidth=30 -direction=topleft -auto-cd .<cr>
+    nnoremap <silent> <Space>e :Defx -split=vertical -toggle -winwidth=40 -direction=topleft -auto-cd .<cr>
     augroup nvimgdb_python_keymaps
         autocmd!
         autocmd FileType defx call s:defx_my_settings()
@@ -1508,7 +1503,7 @@ hook_add = '''
           \ defx#do_action('repeat')
           nnoremap <silent><buffer><expr> h
           \ defx#do_action('cd', ['..'])
-          nnoremap <silent><buffer><expr> ~
+          nnoremap <silent><buffer><expr> H
           \ defx#do_action('cd')
           nnoremap <silent><buffer><expr> <c-c>
           \ defx#do_action('quit')
@@ -1541,6 +1536,33 @@ repo = 'voldikss/vim-translator'
 hook_add = '''
     let g:translator_target_lang = 'ja'
     let g:translator_default_engines = ['google']
-    nmap <silent> tl <Plug>TranslateW
+    nmap <silent> <space>tl <Plug>TranslateW
     vmap <silent> tl <Plug>TranslateWV
+'''
+
+[[plugins]]
+repo = 'neovim/nvim-lsp'
+hook_add = '''
+" require'nvim_lsp'.tsserver.setup{}
+" nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
+" nnoremap <silent> gh     <cmd>lua vim.lsp.buf.hover()<CR>
+" nnoremap <silent> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
+" nnoremap <silent> <c-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
+" nnoremap <silent> 1gD   <cmd>lua vim.lsp.buf.type_definition()<CR>
+" nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
+" nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
+" nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
+'''
+
+[[plugins]]
+repo = 'septembersan/heatmap'
+hook_add = '''
+    vnoremap <silent> <space>h :HeatMap<cr>
+    " nnoremap <silent> <ESC><ESC> :HeatMapDisable<cr>
+'''
+
+[[plugins]]
+repo = 'septembersan/circletab'
+hook_add = '''
+    nnoremap <silent> <c-t> :TabRollBack<cr>
 '''

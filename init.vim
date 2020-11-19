@@ -56,7 +56,7 @@ set wildmode=longest:full,full
 "}}}
 syntax enable
 set background=dark
-set t_Co=256
+" set t_Co=256
 set autoindent
 set nu
 
@@ -174,10 +174,8 @@ endif
 " Git conds
 command! -nargs=+ Tg :T git <args>
 
-set background=light
 autocmd VimEnter,WinEnter,ColorScheme * highlight Visual term=underline ctermfg=195 ctermbg=30 guifg=#c6c8d1 guibg=#5b7881
 autocmd VimEnter,WinEnter,ColorScheme * highlight BookMarkLine term=underline ctermfg=252 ctermbg=23 gui=undercurl guisp=#89b8c2
-set t_Co=256
 " colorscheme lucius
 " colorscheme tender
 colorscheme iceberg
@@ -277,8 +275,11 @@ hi CocCursorRange guibg=#b16286 guifg=#ebdbb2
 if !exists('g:lasttab')                      
   let g:lasttab = 1                          
 endif                                        
-nnoremap <c-m> :exe "tabn ".g:lasttab<cr>    
-augroup nvim_goto_last_tab                   
-    au TabLeave * let g:lasttab = tabpagenr()
-augroup END                                  
+" nnoremap <c-m> :exe "tabn ".g:lasttab<cr>    
+" augroup nvim_goto_last_tab                   
+"     au TabLeave * let g:lasttab = tabpagenr()
+" augroup END                                  
 "}}}
+nnoremap ? :/\<\><left><left>
+nnoremap / /\v
+" autocmd BufLeave *.py echo "Leave!!"
