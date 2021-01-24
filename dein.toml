@@ -4,6 +4,7 @@
 # pip install notedown
 # pip install pyls-isort
 # pip install pyls-black
+# pip install howdoi
 # apt install bat
 
 [[plugins]]
@@ -87,8 +88,13 @@ hook_add = '''
     nnoremap <silent> tts  :call My_New_Terminal_VSplit()<cr>
     nnoremap <silent> ttk  :Tkill<cr>
     nnoremap <silent> <F5> :T pdb %<CR><c-w>ki
-    tnoremap <silent> <c-g> tdir=$(pwd) && cd .. && clear && echo -e $tdir '->'"\e[32m $(pwd) \e[m"<cr>
-    tnoremap <silent> <c-o> tdir=$(pwd) && tdir=$(pwd) && popd && clear && echo -e "\e[32m $(pwd) \e[m" '<-' $tdir <cr>
+    " " <space> is remove command from command history
+    tnoremap <silent> <c-g><c-h> <c-e><c-u><space>tdir=$(pwd) && cd .. && clear && echo -e $tdir '->'"\e[32m $(pwd) \e[m"<cr>
+    tnoremap <silent> <c-g><c-l> <c-e><c-u><space>tdir=$(pwd) && tdir=$(pwd) && popd && clear && echo -e "\e[32m $(pwd) \e[m" '<-' $tdir <cr>
+    " Attention: install goto command
+    tnoremap <silent> <c-g><c-g> <c-e><c-u>goto -l<cr>goto 
+    " Attention: pip install howdoi
+    tnoremap <silent> <c-g><c-u> <c-e><c-u>howdoi -c 
 
     let g:terminal_count_id = 1
     function! My_ActivateCondaEnv()
@@ -883,6 +889,7 @@ hook_add ='''
     nnoremap  <silent> <c-e><c-l> :IpythonClear<CR>
     nnoremap  <silent> <c-e><c-i> :IpythonInspection<CR>
     nnoremap  <silent> <c-e><c-d> :IpythonDebug<cr>
+    nnoremap <silent> <c-e>d :IpythonCommand %debug<cr>
     " Debug Usage:
     " c-l: screen clear
     " c-n: next
@@ -1282,7 +1289,7 @@ hook_add ='''
     endfunction
 
     function! s:nvimgdb_python_settings() abort
-        nnoremap <silent> <c-e>d :call My_GdbStartPDB()<cr>
+        " nnoremap <silent> <c-e>d :call My_GdbStartPDB()<cr>
     endfunction
 
     function! My_GdbStartPDB()
@@ -1646,8 +1653,6 @@ hook_source = '''
         " call s:on_lsp_buffer_enabled only for languages that has the server registered.
         autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
     augroup END
-
-    set omnifunc=lsp#complete 
 '''
 
 [[plugins]]

@@ -284,3 +284,5 @@ nnoremap ? :/\<\><left><left>
 nnoremap / /\v
 " autocmd BufLeave *.py echo "Leave!!"
 set synmaxcol=200
+nnoremap <c-w>t <c-w>T
+nnoremap <c-w><c-t> <c-w>T
