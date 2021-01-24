@@ -454,52 +454,6 @@ hook_add ='''
       \ ['git', 'ls-files', '-co', '--exclude-standard'])
 '''
 
-[[plugins]]
-repo = 'Shougo/deoplete.nvim'
-# if = 'has("nvim")'
-# on_i = 1
-hook_source = '''
-     let g:deoplete#enable_at_startup = 1
-     " let g:deoplete#enable_camel_case = 1
-     " let g:deoplete#enable_ignore_case = 0
-     " let g:deoplete#file#enable_buffer_path = 1
-     " let g:deoplete#max_list = 10000
-     " call deoplete#custom#source('LanguageClient',
-     "       \ 'min_pattern_length',
-     "       \ 2)
-     
-     " let g:deoplete#omni_patterns = {
-     "  \ 'python': '[^. *\t]\.\w*',
-     "  \}
-
-    " inoremap <expr><C-h> deoplete#smart_close_popup()."<C-h>"
-    " inoremap <expr><BS> deoplete#smart_close_popup()."<C-h>"
-
-    call deoplete#custom#option({
-        \ 'auto_complete': v:true,
-        \ 'min_pattern_length': 2,
-        \ 'auto_complete_delay': 0,
-        \ 'auto_refresh_delay': 1,
-        \ 'refresh_always': v:true,
-        \ 'smart_case': v:true,
-        \ 'camel_case': v:true,
-        \ })
-    let s:use_lsp_sources = ['lsp', 'dictionary', 'file']
-    call deoplete#custom#option('sources', {
-        \ 'go': s:use_lsp_sources,
-        \ 'python': s:use_lsp_sources,
-        \ 'vim': ['vim', 'buffer', 'dictionary', 'file'],
-        \})
-'''
-
-# [[plugins]]
-# repo = 'prabirshrestha/vim-lsp'
-# hook_add = '''
-# '''
-
-# [[plugins]]
-# repo = 'iyuuya/denite-ale'
-
 # [[plugins]]
 # repo = 'w0rp/ale'
 # build = 'pip install flake8 flake8-import-order autopep8 black flake8-isort'
@@ -548,26 +502,6 @@ hook_add = '''
 
 [[plugins]]
 repo = 'aliev/vim-compiler-python'
-
-# [[plugins]]
-# repo = 'hellosputnik/vim-plugin'
-# hook_add = '''
-#     set completeopt-=menu
-#     set completeopt+=menuone
-#     set completeopt-=longest
-#     set completeopt-=preview
-#     set completeopt+=noinsert
-#     set completeopt-=noselect
-#     set completeopt+=preview
-#     autocmd CompleteDone * if !pumvisible() | pclose | endif
-#     set belloff+=ctrlg
-#     nmap <silent> <buffer> gK <Plug>(kite-hover)
-#     let g:kite_documentation_continual=1
-#     let g:kite_preview_code=1
-#     let g:kite_override_sign_column_highlight=0
-#     set statusline=%<%f¥ %h%m%r%{kite#statusline()}%=%-14.(%l,%c%V%)¥ %P
-#     set laststatus=2
-# '''
 
 [[plugins]]
 repo = 'neovim/python-client'
@@ -1447,21 +1381,6 @@ hook_add = '''
 '''
 
 # [[plugins]]
-# repo = 'kiteco/vim-plugin'
-# hook_add = '''
-#     " Attention: $HOME/.config/nvim/pack/kite/start/vim-plugin
-#     let g:kite_auto_complete=1
-#     let g:kite_snippets=1
-#     let g:kite_tab_complete=1
-#  
-#     let g:kite_previous_placeholder = '<c-p>'
-#     let g:kite_next_placeholder = '<c-n>'
-#     nmap <silent> <buffer> <c-j><c-k> <Plug>(kite-docs)
-#     " nmap <silent> <buffer> <c-j><c-k> <Plug>(kite-hover)
-#     " let g:kite_documentation_continual=1
-# '''
-
-# [[plugins]]
 # repo = 'neomake/neomake'
 # hook_add = '''
 #     call neomake#configure#automake('w')
@@ -1565,19 +1484,19 @@ hook_add = '''
     vmap <silent> tl <Plug>TranslateWV
 '''
 
-[[plugins]]
-repo = 'neovim/nvim-lsp'
-hook_add = '''
-" require'nvim_lsp'.tsserver.setup{}
-" nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
-" nnoremap <silent> gh     <cmd>lua vim.lsp.buf.hover()<CR>
-" nnoremap <silent> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
-" nnoremap <silent> <c-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
-" nnoremap <silent> 1gD   <cmd>lua vim.lsp.buf.type_definition()<CR>
-" nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
-" nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
-" nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
-'''
+# [[plugins]]
+# repo = 'neovim/nvim-lsp'
+# hook_add = '''
+# " require'nvim_lsp'.tsserver.setup{}
+# " nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
+# " nnoremap <silent> gh     <cmd>lua vim.lsp.buf.hover()<CR>
+# " nnoremap <silent> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
+# " nnoremap <silent> <c-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
+# " nnoremap <silent> 1gD   <cmd>lua vim.lsp.buf.type_definition()<CR>
+# " nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
+# " nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
+# " nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
+# '''
 
 [[plugins]]
 repo = 'septembersan/heatmap'
@@ -1618,12 +1537,12 @@ hook_source = '''
     let g:lsp_signs_hint = {'text': '?'}
 
     if executable('pyls')
-        " pip install python-language-server
+        " :LspInstallServer pyls-ms
         au User lsp_setup call lsp#register_server({
-            \ 'name': 'pyls',
-            \ 'cmd': {server_info->['pyls']},
-            \ 'allowlist': ['python'],
-            \ })
+           \ 'name': 'pyls',
+           \ 'cmd': {server_info->['pyls']},
+           \ 'allowlist': ['python'],
+           \ })
     endif
 
     function! s:on_lsp_buffer_enabled() abort
@@ -1641,12 +1560,31 @@ hook_source = '''
         nmap <buffer> [d <Plug>(lsp-previous-diagnostic)
         nmap <buffer> ]d <Plug>(lsp-next-diagnostic)
         nmap <buffer> <c-j><c-k> <plug>(lsp-hover)
+        nmap <buffer> <c-j><c-t> :call My_New_Definition_Tab()<cr>
+        nmap <buffer> <c-j><c-v> :call My_New_Definition_VSplit()<cr>
+        nmap <buffer> <c-j><c-s> :call My_New_Definition_Split()<cr>
 
         let g:lsp_format_sync_timeout = 1000
         autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
         
         " refer to doc to add more commands
     endfunction
+
+    function! My_New_Definition_Tab()
+        :tab sp
+        :LspDefinition
+    endfunction
+
+    function! My_New_Definition_VSplit()
+        :vs
+        :LspDefinition
+    endfunction
+
+    function! My_New_Definition_Split()
+        :split
+        :LspDefinition
+    endfunction
+
 
     augroup lsp_install
         au!
@@ -1656,6 +1594,11 @@ hook_source = '''
 '''
 
 [[plugins]]
-repo = 'lighttiger2505/deoplete-vim-lsp'
+repo = 'prabirshrestha/asyncomplete-lsp.vim'
+
+[[plugins]]
+repo = 'prabirshrestha/asyncomplete.vim'
 hook_source = '''
+    imap <c-i> <Plug>(asyncomplete_force_refresh)
 '''
+
