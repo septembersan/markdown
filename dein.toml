@@ -309,24 +309,11 @@ hook_add ='''
 '''
 
 [[plugins]]
-repo = 'bps/vim-textobj-python'
+repo = 'jeetsukumaran/vim-pythonsense'
+on_ft = 'python'
 hook_add ='''
-    let g:textobj_python_no_default_key_mappings = 1
-    xmap af <Plug>(textobj-python-function-a)
-    omap af <Plug>(textobj-python-function-a)
-    xmap if <Plug>(textobj-python-function-i)
-    omap if <Plug>(textobj-python-function-i)
-
-    xmap ac <Plug>(textobj-python-class-a)
-    omap ac <Plug>(textobj-python-class-a)
-    xmap ic <Plug>(textobj-python-class-i)
-    omap ic <Plug>(textobj-python-class-i)
-
-    nmap [f <Plug>(textobj-python-function-p)
-    nmap ]f <Plug>(textobj-python-function-n)
-
-    nmap [c <Plug>(textobj-python-class-p)
-    nmap ]c <Plug>(textobj-python-class-n)
+    let g:is_pythonsense_alternate_motion_keymaps = 1
+    map <buffer> g: <Plug>(PythonsensePyWhere)
 '''
 
 [[plugins]]
@@ -775,6 +762,14 @@ build = 'pip install neovim-remote'
 hook_add ='''
     " Installation: pip3 install neovim-remote
     " Usage: README.md
+'''
+
+[[plugins]]
+repo = 'SirVer/ultisnips'
+hook_add ='''
+    let g:UltiSnipsExpandTrigger='<c-l>'
+    let g:UltiSnipsJumpForwardTrigger='<c-j>'
+    let g:UltiSnipsJumpBackwardTrigger='<c-k>'
 '''
 
 [[plugins]]
@@ -1539,10 +1534,10 @@ hook_source = '''
     if executable('pyls')
         " :LspInstallServer pyls-ms
         au User lsp_setup call lsp#register_server({
-           \ 'name': 'pyls',
-           \ 'cmd': {server_info->['pyls']},
-           \ 'allowlist': ['python'],
-           \ })
+          \ 'name': 'pyls',
+          \ 'cmd': {server_info->['pyls']},
+          \ 'allowlist': ['python'],
+          \ })
     endif
 
     function! s:on_lsp_buffer_enabled() abort
@@ -1566,7 +1561,7 @@ hook_source = '''
 
         let g:lsp_format_sync_timeout = 1000
         autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
-        
+
         " refer to doc to add more commands
     endfunction
 
@@ -1602,3 +1597,33 @@ hook_source = '''
     imap <c-i> <Plug>(asyncomplete_force_refresh)
 '''
 
+[[plugins]]
+repo = 'prabirshrestha/asyncomplete-file.vim'
+hook_source = '''
+    au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
+        \ 'name': 'file',
+        \ 'allowlist': ['*'],
+        \ 'priority': 10,
+        \ 'completor': function('asyncomplete#sources#file#completor')
+        \ }))
+'''
+
+[[plugins]]
+repo = 'prabirshrestha/asyncomplete-buffer.vim'
+hook_source = '''
+    call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
+        \ 'name': 'buffer',
+        \ 'allowlist': ['*'],
+        \ 'blocklist': ['go'],
+        \ 'completor': function('asyncomplete#sources#buffer#completor'),
+        \ 'config': {
+        \    'max_buffer_size': 5000000,
+        \  },
+        \ }))
+'''
+
+[[plugins]]
+repo = 'raimon49/requirements.txt.vim'
+
+# [[plugins]]
+# repo = 'sheerun/vim-polyglot'
